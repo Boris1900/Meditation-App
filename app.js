@@ -270,23 +270,38 @@ dimSlider.addEventListener('input', () => {
   updateDimLabel();
 });
 
-// Timer-Area zwischen Gong-Unterkante und Navigation zentrieren
+// Layout-Berechnung
 const timerArea = document.getElementById('timer-area');
+
+const IMG_W = 852, IMG_H = 1846;
+const BUDDHA_PCT = 0.60;   // Buddha-Kopf bei 60% der Bildhöhe
+const GONG_ASPECT = 312 / 360;
+const MIN_TIMER_ZONE = 140; // px Mindestplatz für Timer + Slider
+
+function getBuddhaScreenY() {
+  const scale = Math.max(window.innerWidth / IMG_W, window.innerHeight / IMG_H);
+  const offsetY = (IMG_H * scale - window.innerHeight) / 2;
+  return Math.round(IMG_H * BUDDHA_PCT * scale - offsetY);
+}
+
+function initLayout() {
+  const buddhaY = getBuddhaScreenY();
+  const gongH = Math.min(360, buddhaY - MIN_TIMER_ZONE);
+  const gongW = Math.round(gongH * GONG_ASPECT);
+  document.documentElement.style.setProperty('--gong-height', gongH + 'px');
+  document.documentElement.style.setProperty('--gong-width', gongW + 'px');
+  requestAnimationFrame(positionTimerArea);
+}
 
 function positionTimerArea() {
   const gongBottom = gongEl.getBoundingClientRect().bottom;
-  // Mit dvh-Gong (= window.innerHeight-basiert) gilt:
-  // Gong = 40% von Bildschirm, Buddha-Kopf = 62% → Verhältnis: 62/40 = 1.55
-  // Das skaliert auf JEDEM Display korrekt – kein fester Prozentwert nötig.
-  const buddhaHeadY = gongBottom * 1.55;
-  const zoneBottom = Math.max(buddhaHeadY, gongBottom + 80);
+  const buddhaY = getBuddhaScreenY();
   timerArea.style.top = gongBottom + 'px';
-  timerArea.style.height = (zoneBottom - gongBottom) + 'px';
+  timerArea.style.height = (buddhaY - gongBottom) + 'px';
 }
 
-// requestAnimationFrame stellt sicher, dass erst nach erstem Rendern gemessen wird
-window.addEventListener('load', () => requestAnimationFrame(positionTimerArea));
-window.addEventListener('resize', () => requestAnimationFrame(positionTimerArea));
+window.addEventListener('load', initLayout);
+window.addEventListener('resize', initLayout);
 
 // Init
 updateDuration(40);

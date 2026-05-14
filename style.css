@@ -1,3 +1,7 @@
+html {
+  background: #1a1a1a;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -174,11 +178,8 @@ main {
 .cord { display: none; }
 
 #gong {
-  /* dvh = dynamische Viewport-Höhe (= window.innerHeight), löst vh-Diskrepanz auf Android */
-  height: min(360px, 40vh);
-  height: min(360px, 40dvh);
-  width: min(312px, 34.7vh);
-  width: min(312px, 34.7dvh);
+  height: var(--gong-height, min(360px, 40dvh));
+  width: var(--gong-width, min(312px, 34.7dvh));
   background: url('gong.png') center center / contain no-repeat;
   cursor: pointer;
   display: flex;
@@ -215,7 +216,7 @@ main {
   transform-origin: top center;
 }
 
-/* Timer-Area: wird per JS zwischen Gong-Unterkante und Nav zentriert */
+/* Timer-Area: wird per JS zwischen Gong-Unterkante und Buddha-Kopf positioniert */
 #timer-area {
   position: absolute;
   left: 0;
@@ -223,7 +224,8 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-top: 4px;
   pointer-events: none;
   z-index: 2;
 }
@@ -336,12 +338,6 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .nav-btn.active { color: rgba(255,255,255,0.9); }
 .nav-btn:active { color: #d4a853; }
-
-/* Gestoppt: Controls direkt unter Timer, kein Zentrieren */
-#timer-area {
-  justify-content: flex-start;
-  padding-top: 4px;
-}
 
 /* Läuft: nur Timer-Text, exakt mittig zwischen Gong und Buddha */
 body.running #timer-area {
