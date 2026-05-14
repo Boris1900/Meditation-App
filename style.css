@@ -300,13 +300,6 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: pointer;
 }
 
-#duration-value {
-  text-align: center;
-  margin-top: 8px;
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.6);
-  letter-spacing: 0.05em;
-}
 
 /* Navigation */
 #bottom-nav {
@@ -343,6 +336,7 @@ input[type="range"]::-webkit-slider-thumb {
 .nav-btn.active { color: rgba(255,255,255,0.9); }
 .nav-btn:active { color: #d4a853; }
 
-/* Timer läuft – Gong-Label wechseln */
-body.running #gong-label-stop { display: inline; }
-body:not(.running) #gong-label-stop { display: none; }
+/* Timer läuft – Controls ausblenden, nur Zeitanzeige bleibt */
+body.running #controls {
+  display: none;
+}

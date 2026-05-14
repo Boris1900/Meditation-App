@@ -62,7 +62,6 @@ const gongEl      = document.getElementById('gong');
 const gongLabel   = document.getElementById('gong-label');
 const timerText   = document.getElementById('timer-text');
 const slider      = document.getElementById('duration-slider');
-const durationVal = document.getElementById('duration-value');
 const minusBtn    = document.getElementById('minus-btn');
 const plusBtn     = document.getElementById('plus-btn');
 const overlay     = document.getElementById('overlay');
@@ -85,7 +84,6 @@ function updateSliderProgress() {
 function updateDuration(val) {
   durationMinutes = val;
   slider.value = val;
-  durationVal.textContent = val === 1 ? '1 Minute' : val + ' Minuten';
   timerText.textContent = formatTime(val * 60);
   updateSliderProgress();
 }
