@@ -277,15 +277,16 @@ const timerArea = document.getElementById('timer-area');
 
 function positionTimerArea() {
   const gongBottom = gongEl.getBoundingClientRect().bottom;
-  // Der Buddha-Kopf liegt je nach Bildschirm bei ~61% der Höhe (background-size: cover)
-  const buddhaHeadY = window.innerHeight * 0.61;
-  const zoneBottom = Math.max(buddhaHeadY, gongBottom + 90);
+  // Buddha-Kopf liegt bei ~68% der Bildschirmhöhe (background-size: cover, portrait)
+  const buddhaHeadY = window.innerHeight * 0.68;
+  const zoneBottom = Math.max(buddhaHeadY, gongBottom + 100);
   timerArea.style.top = gongBottom + 'px';
   timerArea.style.height = (zoneBottom - gongBottom) + 'px';
 }
 
-window.addEventListener('load', positionTimerArea);
-window.addEventListener('resize', positionTimerArea);
+// requestAnimationFrame stellt sicher, dass erst nach erstem Rendern gemessen wird
+window.addEventListener('load', () => requestAnimationFrame(positionTimerArea));
+window.addEventListener('resize', () => requestAnimationFrame(positionTimerArea));
 
 // Init
 updateDuration(40);
