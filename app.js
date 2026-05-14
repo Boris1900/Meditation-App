@@ -275,23 +275,17 @@ const timerArea = document.getElementById('timer-area');
 
 function positionTimerArea() {
   const gongBottom = gongEl.getBoundingClientRect().bottom;
-  // Buddha-Kopf liegt bei ~68% der Bildschirmhöhe (background-size: cover, portrait)
-  const buddhaHeadY = window.innerHeight * 0.68;
-  const zoneBottom = Math.max(buddhaHeadY, gongBottom + 100);
+  // Buddha-Kopf: CSS vh ist auf Android Chrome größer als window.innerHeight (URL-Bar-Effekt).
+  // Gong-Höhe basiert auf vh (CSS), daher gongBottom > 40% von innerHeight.
+  // Buddha-Kopf liegt bei ~56% von innerHeight auf diesem Gerät.
+  const buddhaHeadY = window.innerHeight * 0.56;
+  const zoneBottom = Math.max(buddhaHeadY, gongBottom + 80);
   timerArea.style.top = gongBottom + 'px';
   timerArea.style.height = (zoneBottom - gongBottom) + 'px';
 }
 
 // requestAnimationFrame stellt sicher, dass erst nach erstem Rendern gemessen wird
-window.addEventListener('load', () => requestAnimationFrame(() => {
-  positionTimerArea();
-  // DEBUG – temporär: Messwerte anzeigen
-  const gongBottom = gongEl.getBoundingClientRect().bottom;
-  const dbg = document.createElement('div');
-  dbg.style.cssText = 'position:fixed;top:0;left:0;background:rgba(255,0,0,0.7);color:#fff;font-size:12px;padding:4px 8px;z-index:9999;pointer-events:none;';
-  dbg.textContent = `vh=${window.innerHeight} gongB=${Math.round(gongBottom)} ta-top=${timerArea.style.top} ta-h=${timerArea.style.height}`;
-  document.body.appendChild(dbg);
-}));
+window.addEventListener('load', () => requestAnimationFrame(positionTimerArea));
 window.addEventListener('resize', () => requestAnimationFrame(positionTimerArea));
 
 // Init
