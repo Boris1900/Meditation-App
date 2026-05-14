@@ -274,9 +274,9 @@ dimSlider.addEventListener('input', () => {
 const timerArea = document.getElementById('timer-area');
 
 const IMG_W = 852, IMG_H = 1846;
-const BUDDHA_PCT = 0.60;   // Buddha-Kopf bei 60% der Bildhöhe
+const BUDDHA_PCT = 0.54;   // Buddha-Kopfkrone bei 54% der Bildhöhe
 const GONG_ASPECT = 312 / 360;
-const MIN_TIMER_ZONE = 140; // px Mindestplatz für Timer + Slider
+const MIN_TIMER_ZONE = 130; // px Mindestplatz für Timer + Slider
 
 function getBuddhaScreenY() {
   const scale = Math.max(window.innerWidth / IMG_W, window.innerHeight / IMG_H);
