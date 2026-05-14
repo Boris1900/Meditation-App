@@ -174,10 +174,11 @@ main {
 .cord { display: none; }
 
 #gong {
-  /* Auf kleinen Displays (< 900px Höhe) wird der Gong proportional kleiner */
-  --gong-h: min(360px, 40vh);
-  width: calc(var(--gong-h) * 0.867);
-  height: var(--gong-h);
+  /* dvh = dynamische Viewport-Höhe (= window.innerHeight), löst vh-Diskrepanz auf Android */
+  height: min(360px, 40vh);
+  height: min(360px, 40dvh);
+  width: min(312px, 34.7vh);
+  width: min(312px, 34.7dvh);
   background: url('gong.png') center center / contain no-repeat;
   cursor: pointer;
   display: flex;
@@ -339,7 +340,7 @@ input[type="range"]::-webkit-slider-thumb {
 /* Gestoppt: Controls direkt unter Timer, kein Zentrieren */
 #timer-area {
   justify-content: flex-start;
-  padding-top: 10px;
+  padding-top: 4px;
 }
 
 /* Läuft: nur Timer-Text, exakt mittig zwischen Gong und Buddha */

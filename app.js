@@ -275,10 +275,10 @@ const timerArea = document.getElementById('timer-area');
 
 function positionTimerArea() {
   const gongBottom = gongEl.getBoundingClientRect().bottom;
-  // Buddha-Kopf: CSS vh ist auf Android Chrome größer als window.innerHeight (URL-Bar-Effekt).
-  // Gong-Höhe basiert auf vh (CSS), daher gongBottom > 40% von innerHeight.
-  // Buddha-Kopf liegt bei ~56% von innerHeight auf diesem Gerät.
-  const buddhaHeadY = window.innerHeight * 0.56;
+  // Mit dvh-Gong (= window.innerHeight-basiert) gilt:
+  // Gong = 40% von Bildschirm, Buddha-Kopf = 62% → Verhältnis: 62/40 = 1.55
+  // Das skaliert auf JEDEM Display korrekt – kein fester Prozentwert nötig.
+  const buddhaHeadY = gongBottom * 1.55;
   const zoneBottom = Math.max(buddhaHeadY, gongBottom + 80);
   timerArea.style.top = gongBottom + 'px';
   timerArea.style.height = (zoneBottom - gongBottom) + 'px';
