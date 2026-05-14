@@ -1,0 +1,18 @@
+{
+  "name": "Meditation Timer",
+  "short_name": "Meditation",
+  "description": "Persönlicher Meditations-Timer mit Gong",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    {
+      "src": "gong.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
