@@ -1,0 +1,7 @@
+# Bild-Backups (liegen nur lokal, nicht im Repo)
+Gong_V*.png
+Hintergrundbild_*.png
+
+# System
+Thumbs.db
+.DS_Store
