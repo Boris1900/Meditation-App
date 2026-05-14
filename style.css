@@ -212,14 +212,21 @@ main {
   transform-origin: top center;
 }
 
-/* Timer + Slider – zusammen unter dem Gong */
-#timer-display {
+/* Timer-Area: wird per JS zwischen Gong-Unterkante und Nav zentriert */
+#timer-area {
   position: absolute;
-  top: 36%;
   left: 0;
   right: 0;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
   z-index: 2;
+}
+
+#timer-display {
+  text-align: center;
   pointer-events: none;
 }
 #timer-text {
@@ -232,15 +239,11 @@ main {
 
 /* Controls – direkt unter dem Timer */
 #controls {
-  position: absolute;
-  top: calc(36% + 70px);
-  left: 50%;
-  transform: translateX(-50%);
   width: 85%;
   max-width: 380px;
   padding: 0 8px;
   pointer-events: auto;
-  z-index: 2;
+  margin-top: 12px;
 }
 
 .control-row {

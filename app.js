@@ -272,6 +272,21 @@ dimSlider.addEventListener('input', () => {
   updateDimLabel();
 });
 
+// Timer-Area zwischen Gong-Unterkante und Navigation zentrieren
+const timerArea = document.getElementById('timer-area');
+
+function positionTimerArea() {
+  const gongBottom = gongEl.getBoundingClientRect().bottom;
+  // Der Buddha-Kopf liegt je nach Bildschirm bei ~61% der Höhe (background-size: cover)
+  const buddhaHeadY = window.innerHeight * 0.61;
+  const zoneBottom = Math.max(buddhaHeadY, gongBottom + 90);
+  timerArea.style.top = gongBottom + 'px';
+  timerArea.style.height = (zoneBottom - gongBottom) + 'px';
+}
+
+window.addEventListener('load', positionTimerArea);
+window.addEventListener('resize', positionTimerArea);
+
 // Init
 updateDuration(40);
 updateDimLabel();
