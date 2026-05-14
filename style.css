@@ -174,8 +174,10 @@ main {
 .cord { display: none; }
 
 #gong {
-  width: 312px;
-  height: 360px;
+  /* Auf kleinen Displays (< 900px Höhe) wird der Gong proportional kleiner */
+  --gong-h: min(360px, 40vh);
+  width: calc(var(--gong-h) * 0.867);
+  height: var(--gong-h);
   background: url('gong.png') center center / contain no-repeat;
   cursor: pointer;
   display: flex;
