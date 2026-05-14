@@ -174,21 +174,21 @@ function brighten() {
   isDimmed = false;
 }
 
-function scheduleAutoDim() {
+function scheduleAutoDim(delayMs = 3000) {
   clearTimeout(autoDimTimeout);
   if (dimOpacity > 0 && isRunning) {
     autoDimTimeout = setTimeout(() => {
       if (isRunning) dim();
-    }, 3000);
+    }, delayMs);
   }
 }
 
-// Overlay: Tap während abgedunkelt → aufhellen, Timer läuft weiter
+// Overlay: Tap während abgedunkelt → aufhellen, nach 1s wieder sanft abdunkeln
 overlay.addEventListener('click', (e) => {
   e.stopPropagation();
   if (isRunning && isDimmed) {
     brighten();
-    scheduleAutoDim();
+    scheduleAutoDim(1000);
   }
 });
 
@@ -208,13 +208,14 @@ gongEl.addEventListener('click', (e) => {
   }
 });
 
-// Tap auf Display (nicht Gong, nicht Nav) während Timer hell läuft → wieder abdunkeln
+// Tap auf Display (nicht Gong, nicht Nav) während Timer hell läuft → sofort abdunkeln
 document.addEventListener('click', (e) => {
   if (!isRunning || isDimmed) return;
   if (e.target.closest('#gong')) return;
   if (e.target.closest('#bottom-nav')) return;
   if (e.target.closest('#audio-menu')) return;
-  scheduleAutoDim();
+  clearTimeout(autoDimTimeout);
+  dim();
 });
 
 // Wake Lock
