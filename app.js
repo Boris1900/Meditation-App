@@ -283,7 +283,15 @@ function positionTimerArea() {
 }
 
 // requestAnimationFrame stellt sicher, dass erst nach erstem Rendern gemessen wird
-window.addEventListener('load', () => requestAnimationFrame(positionTimerArea));
+window.addEventListener('load', () => requestAnimationFrame(() => {
+  positionTimerArea();
+  // DEBUG – temporär: Messwerte anzeigen
+  const gongBottom = gongEl.getBoundingClientRect().bottom;
+  const dbg = document.createElement('div');
+  dbg.style.cssText = 'position:fixed;top:0;left:0;background:rgba(255,0,0,0.7);color:#fff;font-size:12px;padding:4px 8px;z-index:9999;pointer-events:none;';
+  dbg.textContent = `vh=${window.innerHeight} gongB=${Math.round(gongBottom)} ta-top=${timerArea.style.top} ta-h=${timerArea.style.height}`;
+  document.body.appendChild(dbg);
+}));
 window.addEventListener('resize', () => requestAnimationFrame(positionTimerArea));
 
 // Init
