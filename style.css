@@ -336,7 +336,17 @@ input[type="range"]::-webkit-slider-thumb {
 .nav-btn.active { color: rgba(255,255,255,0.9); }
 .nav-btn:active { color: #d4a853; }
 
-/* Timer läuft – Controls ausblenden, nur Zeitanzeige bleibt */
+/* Gestoppt: Controls direkt unter Timer, kein Zentrieren */
+#timer-area {
+  justify-content: flex-start;
+  padding-top: 10px;
+}
+
+/* Läuft: nur Timer-Text, exakt mittig zwischen Gong und Buddha */
+body.running #timer-area {
+  justify-content: center;
+  padding-top: 0;
+}
 body.running #controls {
   display: none;
 }
