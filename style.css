@@ -33,6 +33,35 @@ body::before {
   z-index: 0;
 }
 
+/* Flammen-Schein: liegt zwischen Hintergrund und Inhalt, pulsiert sanft */
+#flame-glow {
+  position: fixed;
+  left: var(--flame-x, 50%);
+  top: var(--flame-y, 50%);
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255, 190, 100, 0.40) 0%,
+    rgba(255, 160, 70, 0.22) 35%,
+    rgba(255, 130, 50, 0.0) 70%);
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: screen;
+  animation: flame-pulse 6.5s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+@keyframes flame-pulse {
+  0%   { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+  18%  { opacity: 0.72; transform: translate(-50%, -50%) scale(1.05); }
+  37%  { opacity: 0.50; transform: translate(-50%, -50%) scale(0.98); }
+  56%  { opacity: 0.68; transform: translate(-50%, -50%) scale(1.03); }
+  74%  { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+  88%  { opacity: 0.65; transform: translate(-50%, -50%) scale(1.02); }
+  100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+}
+
 /* Kein Schleier */
 body::after {
   display: none;

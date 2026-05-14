@@ -280,6 +280,8 @@ const timerArea = document.getElementById('timer-area');
 
 const IMG_W = 852, IMG_H = 1846;
 const BUDDHA_PCT = 0.54;   // Buddha-Kopfkrone bei 54% der Bildhöhe
+const FLAME_X_PCT = 0.85;  // Flammen-Mitte X (rechts unten im Bild)
+const FLAME_Y_PCT = 0.72;  // Flammen-Mitte Y
 const GONG_ASPECT = 312 / 360;
 const MIN_TIMER_ZONE = 115; // px Mindestplatz für Timer + Slider
 
@@ -289,12 +291,23 @@ function getBuddhaScreenY() {
   return Math.round(IMG_H * BUDDHA_PCT * scale - offsetY);
 }
 
+function positionFlame() {
+  const scale = Math.max(window.innerWidth / IMG_W, window.innerHeight / IMG_H);
+  const offsetX = (IMG_W * scale - window.innerWidth) / 2;
+  const offsetY = (IMG_H * scale - window.innerHeight) / 2;
+  const flameX = Math.round(IMG_W * FLAME_X_PCT * scale - offsetX);
+  const flameY = Math.round(IMG_H * FLAME_Y_PCT * scale - offsetY);
+  document.documentElement.style.setProperty('--flame-x', flameX + 'px');
+  document.documentElement.style.setProperty('--flame-y', flameY + 'px');
+}
+
 function initLayout() {
   const buddhaY = getBuddhaScreenY();
   const gongH = Math.min(360, buddhaY - MIN_TIMER_ZONE);
   const gongW = Math.round(gongH * GONG_ASPECT);
   document.documentElement.style.setProperty('--gong-height', gongH + 'px');
   document.documentElement.style.setProperty('--gong-width', gongW + 'px');
+  positionFlame();
   requestAnimationFrame(positionTimerArea);
 }
 
