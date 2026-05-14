@@ -21,11 +21,14 @@ body {
   user-select: none;
 }
 
-/* Hintergrundbild */
+/* Hintergrundbild – top: -2px deckt feine helle Linie am oberen Viewport-Rand ab */
 body::before {
   content: '';
   position: fixed;
-  inset: 0;
+  top: -2px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: url('background.png') center center / cover no-repeat;
   z-index: 0;
 }
@@ -178,13 +181,11 @@ main {
 .cord { display: none; }
 
 #gong {
+  position: relative;
   height: var(--gong-height, min(360px, 40dvh));
   width: var(--gong-width, min(312px, 34.7dvh));
   background: url('gong.png') center center / contain no-repeat;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   pointer-events: auto;
   filter: drop-shadow(0 6px 14px rgba(0,0,0,0.4));
   perspective: 600px;
@@ -192,13 +193,17 @@ main {
 
 #gong:active { transform: scale(0.96); }
 
+/* Label sitzt mittig auf der Scheibe (57% = Scheibenmitte im PNG, skaliert mit Gonghöhe) */
 #gong-label {
+  position: absolute;
+  top: 57%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   color: rgba(255,255,255,0.95);
   font-size: 1rem;
   letter-spacing: 0.15em;
   font-weight: 300;
   text-shadow: 0 1px 6px rgba(0,0,0,0.9);
-  margin-top: 55px;
 }
 
 /* Gong-Animation: sanftes Vor/Zurück-Pendeln */

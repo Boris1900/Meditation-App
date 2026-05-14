@@ -265,9 +265,14 @@ function updateDimLabel() {
   else               dimLevelLabel.textContent = 'Sehr stark';
 }
 
+function updateDimSliderProgress() {
+  dimSlider.style.setProperty('--progress', dimSlider.value + '%');
+}
+
 dimSlider.addEventListener('input', () => {
   dimOpacity = dimSlider.value / 100;
   updateDimLabel();
+  updateDimSliderProgress();
 });
 
 // Layout-Berechnung
@@ -306,3 +311,4 @@ window.addEventListener('resize', initLayout);
 // Init
 updateDuration(40);
 updateDimLabel();
+updateDimSliderProgress();
