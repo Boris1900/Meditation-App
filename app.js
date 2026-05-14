@@ -183,12 +183,11 @@ function scheduleAutoDim(delayMs = 3000) {
   }
 }
 
-// Overlay: Tap während abgedunkelt → aufhellen, nach 1s wieder sanft abdunkeln
+// Overlay: Tap während abgedunkelt → nur aufhellen, bleibt hell bis zum nächsten Tipp
 overlay.addEventListener('click', (e) => {
   e.stopPropagation();
   if (isRunning && isDimmed) {
     brighten();
-    scheduleAutoDim(1000);
   }
 });
 
@@ -282,7 +281,7 @@ const timerArea = document.getElementById('timer-area');
 const IMG_W = 852, IMG_H = 1846;
 const BUDDHA_PCT = 0.54;   // Buddha-Kopfkrone bei 54% der Bildhöhe
 const GONG_ASPECT = 312 / 360;
-const MIN_TIMER_ZONE = 130; // px Mindestplatz für Timer + Slider
+const MIN_TIMER_ZONE = 115; // px Mindestplatz für Timer + Slider
 
 function getBuddhaScreenY() {
   const scale = Math.max(window.innerWidth / IMG_W, window.innerHeight / IMG_H);
