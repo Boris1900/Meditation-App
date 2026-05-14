@@ -193,10 +193,10 @@ main {
 
 #gong:active { transform: scale(0.96); }
 
-/* Label sitzt mittig auf der Scheibe (57% = Scheibenmitte im PNG, skaliert mit Gonghöhe) */
+/* Label sitzt mittig auf der Scheibe (54% = visuelle Scheibenmitte, skaliert mit Gonghöhe) */
 #gong-label {
   position: absolute;
-  top: 57%;
+  top: 54%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: rgba(255,255,255,0.95);
@@ -206,18 +206,16 @@ main {
   text-shadow: 0 1px 6px rgba(0,0,0,0.9);
 }
 
-/* Gong-Animation: sanftes Vor/Zurück-Pendeln */
+/* Gong-Animation: langsam zurück, sanft nach vorne, ausschwingen */
 @keyframes gong-strike {
   0%   { transform: perspective(800px) rotateX(0deg); }
-  10%  { transform: perspective(800px) rotateX(-8deg); }
-  25%  { transform: perspective(800px) rotateX(5deg); }
-  40%  { transform: perspective(800px) rotateX(-3deg); }
-  55%  { transform: perspective(800px) rotateX(1.5deg); }
-  70%  { transform: perspective(800px) rotateX(-0.5deg); }
+  30%  { transform: perspective(800px) rotateX(-9deg); }
+  60%  { transform: perspective(800px) rotateX(5deg); }
+  82%  { transform: perspective(800px) rotateX(-2deg); }
   100% { transform: perspective(800px) rotateX(0deg); }
 }
 #gong.swinging {
-  animation: gong-strike 2.5s ease-in-out forwards;
+  animation: gong-strike 3s cubic-bezier(0.45, 0, 0.55, 1) forwards;
   transform-origin: top center;
 }
 
@@ -247,13 +245,14 @@ main {
   text-shadow: 0 2px 20px rgba(0,0,0,0.7);
 }
 
-/* Controls – direkt unter dem Timer */
+/* Controls – direkt unter dem Timer, fadet bei Meditation aus */
 #controls {
   width: 85%;
   max-width: 380px;
   padding: 0 8px;
   pointer-events: auto;
   margin-top: 4px;
+  transition: opacity 0.6s ease;
 }
 
 .control-row {
@@ -351,11 +350,8 @@ body.running #bottom-nav {
 .nav-btn.active { color: rgba(255,255,255,0.9); }
 .nav-btn:active { color: #d4a853; }
 
-/* Läuft: nur Timer-Text, exakt mittig zwischen Gong und Buddha */
-body.running #timer-area {
-  justify-content: center;
-  padding-top: 0;
-}
+/* Läuft: Slider fadet aus, Timer-Position bleibt unverändert */
 body.running #controls {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
 }
