@@ -1,4 +1,4 @@
-// Audio-Kontext
+// Audio
 let audioCtx = null;
 let customAudioBuffer = null;
 let usingCustomAudio = false;
@@ -8,12 +8,9 @@ function getAudioCtx() {
   return audioCtx;
 }
 
-// Demo-Gong synthetisch erzeugen
 function playDemoGong() {
   const ctx = getAudioCtx();
   const now = ctx.currentTime;
-
-  // Grundton: tiefer Gong ~110 Hz mit Obertönen
   const frequencies = [110, 220, 330, 550, 880];
   const gains      = [0.5, 0.3, 0.15, 0.08, 0.04];
   const decays     = [4.0, 3.0, 2.0,  1.5,  1.0];
@@ -21,23 +18,18 @@ function playDemoGong() {
   frequencies.forEach((freq, i) => {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-
     osc.type = 'sine';
     osc.frequency.setValueAtTime(freq, now);
     osc.frequency.exponentialRampToValueAtTime(freq * 0.98, now + decays[i]);
-
     gain.gain.setValueAtTime(gains[i], now);
     gain.gain.exponentialRampToValueAtTime(0.001, now + decays[i]);
-
     osc.connect(gain);
     gain.connect(ctx.destination);
-
     osc.start(now);
     osc.stop(now + decays[i]);
   });
 }
 
-// Eigene MP3 abspielen
 function playCustomAudio() {
   const ctx = getAudioCtx();
   const source = ctx.createBufferSource();
@@ -47,11 +39,8 @@ function playCustomAudio() {
 }
 
 function playGong() {
-  if (usingCustomAudio && customAudioBuffer) {
-    playCustomAudio();
-  } else {
-    playDemoGong();
-  }
+  if (usingCustomAudio && customAudioBuffer) playCustomAudio();
+  else playDemoGong();
 }
 
 // Timer-State
@@ -60,23 +49,33 @@ let remainingSeconds = 0;
 let timerInterval = null;
 let isRunning = false;
 
-// DOM
-const gongEl       = document.getElementById('gong');
-const gongLabel    = document.getElementById('gong-label');
-const timerText    = document.getElementById('timer-text');
-const slider       = document.getElementById('duration-slider');
-const durationVal  = document.getElementById('duration-value');
-const minusBtn     = document.getElementById('minus-btn');
-const plusBtn      = document.getElementById('plus-btn');
-const overlay      = document.getElementById('overlay');
-const audioMenu    = document.getElementById('audio-menu');
-const navAudio     = document.getElementById('nav-audio');
-const closeMenu    = document.getElementById('close-menu');
-const fileInput    = document.getElementById('audio-file-input');
-const currentName  = document.getElementById('current-audio-name');
-const useDemoBtn   = document.getElementById('use-demo-gong');
+// Dimm-State
+let dimOpacity = 0.85;
+let isDimmed = false;
+let autoDimTimeout = null;
 
-// Slider initialisieren
+// Wake Lock
+let wakeLock = null;
+
+// DOM
+const gongEl      = document.getElementById('gong');
+const gongLabel   = document.getElementById('gong-label');
+const timerText   = document.getElementById('timer-text');
+const slider      = document.getElementById('duration-slider');
+const durationVal = document.getElementById('duration-value');
+const minusBtn    = document.getElementById('minus-btn');
+const plusBtn     = document.getElementById('plus-btn');
+const overlay     = document.getElementById('overlay');
+const audioMenu   = document.getElementById('audio-menu');
+const navAudio    = document.getElementById('nav-audio');
+const closeMenu   = document.getElementById('close-menu');
+const fileInput   = document.getElementById('audio-file-input');
+const currentName = document.getElementById('current-audio-name');
+const useDemoBtn  = document.getElementById('use-demo-gong');
+const dimSlider   = document.getElementById('dim-slider');
+const dimLevelLabel = document.getElementById('dim-level-label');
+
+// Slider
 function updateSliderProgress() {
   const val = parseInt(slider.value);
   const pct = ((val - 1) / (90 - 1)) * 100;
@@ -95,10 +94,12 @@ slider.addEventListener('input', () => {
   if (!isRunning) updateDuration(parseInt(slider.value));
 });
 
-minusBtn.addEventListener('click', () => {
+minusBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
   if (!isRunning && durationMinutes > 1) updateDuration(durationMinutes - 1);
 });
-plusBtn.addEventListener('click', () => {
+plusBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
   if (!isRunning && durationMinutes < 90) updateDuration(durationMinutes + 1);
 });
 
@@ -114,45 +115,32 @@ function startTimer() {
   isRunning = true;
   gongLabel.textContent = 'STOP';
   document.body.classList.add('running');
-
-  // Controls sperren
   slider.disabled = true;
   minusBtn.disabled = true;
   plusBtn.disabled = true;
-
-  // Display dimmen nach 3 Sekunden
-  setTimeout(() => {
-    if (isRunning) {
-      overlay.style.opacity = '1';
-      overlay.style.pointerEvents = 'auto';
-      overlay.classList.remove('hidden');
-      overlay.dataset.dimmed = 'true';
-    }
-  }, 3000);
+  requestWakeLock();
+  scheduleAutoDim();
 
   timerInterval = setInterval(() => {
     remainingSeconds--;
     timerText.textContent = formatTime(remainingSeconds);
-
-    if (remainingSeconds <= 0) {
-      finishTimer();
-    }
+    if (remainingSeconds <= 0) finishTimer();
   }, 1000);
 }
 
 function stopTimer() {
   clearInterval(timerInterval);
+  clearTimeout(autoDimTimeout);
   timerInterval = null;
+  autoDimTimeout = null;
   isRunning = false;
   gongLabel.textContent = 'START';
   document.body.classList.remove('running');
-
   slider.disabled = false;
   minusBtn.disabled = false;
   plusBtn.disabled = false;
-
-  overlay.classList.add('hidden');
-  overlay.dataset.dimmed = 'false';
+  releaseWakeLock();
+  brighten();
   updateDuration(durationMinutes);
 }
 
@@ -165,70 +153,83 @@ function finishTimer() {
 // Gong-Animation
 function swingGong() {
   gongEl.classList.remove('swinging');
-  void gongEl.offsetWidth; // Reflow
+  void gongEl.offsetWidth;
   gongEl.classList.add('swinging');
   gongEl.addEventListener('animationend', () => {
     gongEl.classList.remove('swinging');
   }, { once: true });
 }
 
+// Dimm-Logik
+function dim() {
+  if (dimOpacity === 0) return;
+  overlay.style.transitionDuration = '3s';
+  overlay.style.opacity = dimOpacity;
+  overlay.style.pointerEvents = 'auto';
+  isDimmed = true;
+}
+
+function brighten() {
+  overlay.style.transitionDuration = '1s';
+  overlay.style.opacity = '0';
+  overlay.style.pointerEvents = 'none';
+  isDimmed = false;
+}
+
+function scheduleAutoDim() {
+  clearTimeout(autoDimTimeout);
+  if (dimOpacity > 0 && isRunning) {
+    autoDimTimeout = setTimeout(() => {
+      if (isRunning) dim();
+    }, 3000);
+  }
+}
+
+// Overlay: Tap während abgedunkelt → aufhellen, Timer läuft weiter
+overlay.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (isRunning && isDimmed) {
+    brighten();
+    scheduleAutoDim();
+  }
+});
+
 // Gong antippen
-gongEl.addEventListener('click', () => {
+gongEl.addEventListener('click', (e) => {
+  e.stopPropagation();
   if (!isRunning) {
+    // Timer starten
     playGong();
     swingGong();
     setTimeout(() => startTimer(), 500);
   } else {
+    // Nur erreichbar wenn NICHT abgedunkelt – Overlay fängt Klick ab wenn dimmed
     stopTimer();
+    playGong();
+    swingGong();
   }
 });
 
-// Overlay: Display hell/dunkel toggle
-overlay.addEventListener('click', () => {
-  if (overlay.dataset.dimmed === 'true') {
-    // Hell machen – Klicks durchlassen
-    overlay.style.opacity = '0';
-    overlay.style.pointerEvents = 'none';
-    overlay.dataset.dimmed = 'false';
-    // Nach 5 Sekunden wieder abdunkeln
-    setTimeout(() => {
-      if (isRunning && overlay.dataset.dimmed === 'false') {
-        overlay.style.opacity = '1';
-        overlay.style.pointerEvents = 'auto';
-        overlay.dataset.dimmed = 'true';
-      }
-    }, 5000);
-  } else {
-    overlay.style.opacity = '1';
-    overlay.style.pointerEvents = 'auto';
-    overlay.dataset.dimmed = 'true';
-  }
+// Tap auf Display (nicht Gong, nicht Nav) während Timer hell läuft → wieder abdunkeln
+document.addEventListener('click', (e) => {
+  if (!isRunning || isDimmed) return;
+  if (e.target.closest('#gong')) return;
+  if (e.target.closest('#bottom-nav')) return;
+  if (e.target.closest('#audio-menu')) return;
+  scheduleAutoDim();
 });
 
-// Wake Lock (verhindert automatisches Screen-Ausschalten)
-let wakeLock = null;
+// Wake Lock
 async function requestWakeLock() {
   if ('wakeLock' in navigator) {
-    try {
-      wakeLock = await navigator.wakeLock.request('screen');
-    } catch (e) {
-      // Wake Lock nicht verfügbar – kein Problem
-    }
+    try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
   }
 }
 async function releaseWakeLock() {
-  if (wakeLock) {
-    await wakeLock.release();
-    wakeLock = null;
-  }
+  if (wakeLock) { await wakeLock.release(); wakeLock = null; }
 }
 
-// Wake Lock beim Starten/Stoppen
-const origStart = startTimer;
-// (Wake Lock ist in startTimer integriert via Patch)
-gongEl.addEventListener('click', () => {}, { passive: true });
-
-// Navigation: Audio-Menü
+// Navigation: Menü öffnen/schließen
 navAudio.addEventListener('click', () => {
   audioMenu.classList.remove('hidden');
 });
@@ -240,7 +241,6 @@ closeMenu.addEventListener('click', () => {
 fileInput.addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
-
   const ctx = getAudioCtx();
   const arrayBuffer = await file.arrayBuffer();
   customAudioBuffer = await ctx.decodeAudioData(arrayBuffer);
@@ -256,15 +256,22 @@ useDemoBtn.addEventListener('click', () => {
   audioMenu.classList.add('hidden');
 });
 
-// Wake Lock in Timer integrieren
-const _startTimer = startTimer;
-window.addEventListener('load', () => {
-  // Override startTimer mit Wake Lock
-  gongEl.addEventListener('click', () => {
-    if (!isRunning) requestWakeLock();
-    else releaseWakeLock();
-  }, { passive: true });
+// Abdunkelung einstellen
+function updateDimLabel() {
+  const v = Math.round(dimOpacity * 100);
+  if (v === 0)       dimLevelLabel.textContent = 'Keine Abdunkelung';
+  else if (v <= 20)  dimLevelLabel.textContent = 'Sehr leicht';
+  else if (v <= 45)  dimLevelLabel.textContent = 'Leicht';
+  else if (v <= 65)  dimLevelLabel.textContent = 'Mittel';
+  else if (v <= 80)  dimLevelLabel.textContent = 'Stark';
+  else               dimLevelLabel.textContent = 'Sehr stark';
+}
+
+dimSlider.addEventListener('input', () => {
+  dimOpacity = dimSlider.value / 100;
+  updateDimLabel();
 });
 
 // Init
 updateDuration(40);
+updateDimLabel();

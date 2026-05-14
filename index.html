@@ -9,7 +9,7 @@
 <body>
 
   <!-- Dimm-Overlay -->
-  <div id="overlay" class="hidden"></div>
+  <div id="overlay"></div>
 
   <!-- Menü: Audio-Dateien laden -->
   <div id="audio-menu" class="hidden">
@@ -22,6 +22,14 @@
       </label>
       <div id="current-audio-name">Aktuell: Demo-Gong</div>
       <button id="use-demo-gong" class="demo-btn">Demo-Gong verwenden</button>
+      <hr class="menu-divider">
+      <h2>Abdunkelung</h2>
+      <div class="dim-slider-row">
+        <span class="dim-end-label">Keine</span>
+        <input type="range" id="dim-slider" min="0" max="95" value="85" step="5">
+        <span class="dim-end-label">Sehr dunkel</span>
+      </div>
+      <p id="dim-level-label">Stark</p>
       <button id="close-menu" class="close-btn">Schließen</button>
     </div>
   </div>

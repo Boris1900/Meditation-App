@@ -35,12 +35,15 @@ body::after {
 #overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.93);
+  background: #000;
   z-index: 50;
   cursor: pointer;
-  transition: opacity 0.5s ease;
+  opacity: 0;
+  pointer-events: none;
+  transition-property: opacity;
+  transition-timing-function: ease;
+  transition-duration: 3s;
 }
-#overlay.hidden { display: none; }
 
 /* Audio-Menü */
 #audio-menu {
@@ -116,6 +119,37 @@ body::after {
   cursor: pointer;
   font-size: 0.9rem;
   letter-spacing: 0.05em;
+}
+
+.menu-divider {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin: 4px 0;
+}
+
+.dim-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dim-end-label {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dim-slider-row input[type="range"] {
+  flex: 1;
+}
+
+#dim-level-label {
+  text-align: center;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.6);
+  font-style: italic;
+  margin-top: -4px;
 }
 
 /* Hauptbereich */
