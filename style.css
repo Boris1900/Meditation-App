@@ -22,32 +22,13 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(ellipse at 80% 20%, rgba(34,85,34,0.35) 0%, transparent 50%),
-    radial-gradient(ellipse at 20% 70%, rgba(20,60,20,0.4) 0%, transparent 50%),
-    linear-gradient(180deg, #2a3a2a 0%, #1a2a1a 40%, #3a2a1a 100%);
+  background: url('background.png') center center / cover no-repeat;
   z-index: 0;
 }
 
-/* Bambus-Dekoration (CSS-gezeichnet) */
+/* Kein Schleier */
 body::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 120px;
-  height: 60%;
-  background:
-    repeating-linear-gradient(
-      180deg,
-      rgba(60,100,40,0.6) 0px, rgba(60,100,40,0.6) 2px,
-      rgba(40,80,20,0.4) 2px, rgba(40,80,20,0.4) 40px,
-      rgba(70,110,50,0.5) 40px, rgba(70,110,50,0.5) 42px,
-      rgba(40,80,20,0.4) 42px, rgba(40,80,20,0.4) 80px
-    );
-  clip-path: polygon(40% 0, 50% 0, 65% 100%, 55% 100%);
-  z-index: 0;
-  pointer-events: none;
+  display: none;
 }
 
 /* Dimm-Overlay */
@@ -139,106 +120,93 @@ body::after {
 
 /* Hauptbereich */
 main {
-  position: relative;
+  position: fixed;
+  inset: 0;
   z-index: 1;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-bottom: 70px;
+  pointer-events: none;
 }
 
-/* Gong */
+/* Gong – oben zentriert, größer */
 #gong-container {
-  position: relative;
-  width: 100%;
-  height: 55%;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 20px;
-}
-
-.cord {
   position: absolute;
   top: 0;
-  width: 2px;
-  height: 80px;
-  background: linear-gradient(180deg, #8b6914, #c9973a);
-  transform-origin: top center;
-  z-index: 2;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
 }
-#gong-cord-left  { left: calc(50% - 80px); transform: rotate(-15deg); }
-#gong-cord-right { right: calc(50% - 80px); transform: rotate(15deg); }
+
+.cord { display: none; }
 
 #gong {
-  position: absolute;
-  top: 50px;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 35% 35%, #e8b86d 0%, #c9870a 25%, #8b5e0a 55%, #5a3d08 80%, #3a2806 100%);
-  box-shadow:
-    0 8px 32px rgba(0,0,0,0.6),
-    inset 0 2px 8px rgba(255,220,100,0.3),
-    inset 0 -4px 12px rgba(0,0,0,0.4);
+  width: 312px;
+  height: 360px;
+  background: url('gong.png') center center / contain no-repeat;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 3;
-  transition: transform 0.15s ease;
+  pointer-events: auto;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.4));
+  perspective: 600px;
 }
 
 #gong:active { transform: scale(0.96); }
 
 #gong-label {
-  color: rgba(255,255,255,0.9);
-  font-size: 1.1rem;
+  color: rgba(255,255,255,0.95);
+  font-size: 1rem;
   letter-spacing: 0.15em;
   font-weight: 300;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+  margin-top: 55px;
 }
 
-/* Gong-Animations-Klassen */
-@keyframes gong-swing {
-  0%   { transform: rotate(0deg); }
-  10%  { transform: rotate(-8deg); }
-  25%  { transform: rotate(6deg); }
-  40%  { transform: rotate(-4deg); }
-  55%  { transform: rotate(3deg); }
-  70%  { transform: rotate(-1.5deg); }
-  85%  { transform: rotate(0.5deg); }
-  100% { transform: rotate(0deg); }
+/* Gong-Animation: sanftes Vor/Zurück-Pendeln */
+@keyframes gong-strike {
+  0%   { transform: perspective(800px) rotateX(0deg); }
+  10%  { transform: perspective(800px) rotateX(-8deg); }
+  25%  { transform: perspective(800px) rotateX(5deg); }
+  40%  { transform: perspective(800px) rotateX(-3deg); }
+  55%  { transform: perspective(800px) rotateX(1.5deg); }
+  70%  { transform: perspective(800px) rotateX(-0.5deg); }
+  100% { transform: perspective(800px) rotateX(0deg); }
 }
 #gong.swinging {
-  animation: gong-swing 2.5s ease-in-out forwards;
+  animation: gong-strike 2.5s ease-in-out forwards;
   transform-origin: top center;
 }
 
-/* Timer */
+/* Timer + Slider – zusammen unter dem Gong */
 #timer-display {
-  position: relative;
-  z-index: 1;
-  margin-top: -20px;
+  position: absolute;
+  top: 36%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 2;
+  pointer-events: none;
 }
 #timer-text {
-  font-size: 3.8rem;
+  font-size: 4.2rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   color: #fff;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.7);
+  text-shadow: 0 2px 20px rgba(0,0,0,0.7);
 }
 
-/* Controls */
+/* Controls – direkt unter dem Timer */
 #controls {
-  position: relative;
-  z-index: 1;
-  width: 90%;
-  max-width: 400px;
-  margin-top: 24px;
+  position: absolute;
+  top: calc(36% + 70px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 85%;
+  max-width: 380px;
   padding: 0 8px;
+  pointer-events: auto;
+  z-index: 2;
 }
 
 .control-row {
@@ -278,18 +246,18 @@ main {
 input[type="range"] {
   flex: 1;
   -webkit-appearance: none;
-  height: 4px;
-  background: linear-gradient(90deg, #c9870a var(--progress, 43%), rgba(255,255,255,0.25) var(--progress, 43%));
-  border-radius: 2px;
+  height: 6px;
+  background: linear-gradient(90deg, #e8a020 var(--progress, 43%), rgba(255,255,255,0.4) var(--progress, 43%));
+  border-radius: 3px;
   outline: none;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, #f0c060, #c9870a);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  background: radial-gradient(circle at 40% 35%, #f8d070, #e8a020);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
   cursor: pointer;
 }
 

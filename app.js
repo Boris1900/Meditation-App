@@ -123,6 +123,8 @@ function startTimer() {
   // Display dimmen nach 3 Sekunden
   setTimeout(() => {
     if (isRunning) {
+      overlay.style.opacity = '1';
+      overlay.style.pointerEvents = 'auto';
       overlay.classList.remove('hidden');
       overlay.dataset.dimmed = 'true';
     }
