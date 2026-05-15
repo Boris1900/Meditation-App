@@ -1,6 +1,16 @@
 html {
-  background: url('background.jpg') center center / cover no-repeat #1a1a1a;
   min-height: 100%;
+}
+
+/* Hintergrundbild: position:fixed, Höhe per JS auf window.screen.height fixiert.
+   Dadurch bleibt der Hintergrund stabil wenn Android-Statusbar kurz erscheint. */
+#app-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: -1;
+  background: url('background.jpg') center center / cover no-repeat #1a1a1a;
 }
 
 * {
@@ -12,7 +22,6 @@ html {
 
 body {
   font-family: 'Georgia', serif;
-  background: url('background.jpg') center center / cover no-repeat #1a1a1a;
   color: #fff;
   height: 100dvh;
   overflow: hidden;
@@ -20,21 +29,6 @@ body {
   flex-direction: column;
   position: relative;
   user-select: none;
-}
-
-/* Schwarze Leiste ganz oben – deckt Safe-Area + Subpixel-Artefakt ab.
-   Wenn keine Safe-Area (env() = 0), bleiben 4px. Bei Notch/Display-Cutout
-   wird die Leiste so hoch wie der System-Insetbereich. */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: calc(4px + env(safe-area-inset-top, 0px));
-  background: #1a1a1a;
-  z-index: 200;
-  pointer-events: none;
 }
 
 /* Flammen-Schein: liegt zwischen Hintergrund und Inhalt, pulsiert sanft */
@@ -127,11 +121,6 @@ body::before {
   55%  { opacity: 0.68; }
   80%  { opacity: 0.98; }
   100% { opacity: 0.78; }
-}
-
-/* Kein Schleier */
-body::after {
-  display: none;
 }
 
 /* Dimm-Overlay */

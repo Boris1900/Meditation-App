@@ -20,7 +20,7 @@ MeditationsApp/
 └── CLAUDE.md         # Diese Datei
 ```
 
-## Aktueller Stand (nach Session 7 – v1.8)
+## Aktueller Stand (nach Session 9 – v1.16)
 
 ### Alles was funktioniert
 - Layout, Timer 1–90 Min, Wake Lock
@@ -44,7 +44,8 @@ MeditationsApp/
 - iOS PWA Audio-Bug gefixt: rawAudioBuffer trennt Fetch von Decode, AudioContext wird erst beim Tippen erstellt
 - App-Icon: icon-1024.png (Bambus-Hintergrund + Gong zentriert, 88%), apple-touch-icon in index.html
 - **iOS Timer-Fix (v1.1–v1.5):** Jede Ziffer in festem `<span>` (renderTimer()), verhindert Wandern. Auf iOS: Merriweather 700 (lining-nums, gleichmäßige Höhen). Android bleibt Georgia.
-- **Hintergrundbild (v1.8):** Direkt auf `html`-Element (background-attachment: fixed), body::before entfernt – keine weiße Linie mehr auf Android/iOS, auch nicht beim Menü-Wechsel.
+- **Hintergrundbild (v1.8):** Direkt auf `html`-Element (background-attachment: fixed), body::before entfernt.
+- **Flammen-Animation (v1.9):** CSS-Element exakt über Kerzen-Position (`FLAME_X_PCT = 0.85`, `FLAME_Y_PCT = 0.72`), sanftes Flackern per Keyframes (translateX + scaleY + opacity) – sehr ruhig, lebendig.
 - **Update-Funktion (v1.6):** CSS/JS werden vor Reload mit `cache: reload` frisch geladen. Auf iOS funktioniert der Update-Reload noch nicht zuverlässig → dort über Safari direkt laden.
 
 ### Erststart-Defaults (wenn localStorage leer)
@@ -66,12 +67,16 @@ MeditationsApp/
 
 ## Bekannte offene Punkte / Nächste Schritte
 
-### Akut (nächste Session)
+### Akut – Ungeklärter Bug (Priorität hoch)
 
-1. **Flammen-Animation (sanft flackern):** Die Kerze unten rechts in der Klangschale soll animiert wirken.
-   - **Kein Photoshop nötig** – Flammenposition ist bereits im Code bekannt: `FLAME_X_PCT = 0.85`, `FLAME_Y_PCT = 0.72` in `app.js` (wird schon für den Feuerschein genutzt).
-   - **Ansatz:** Kleines CSS-Element (orange/gelb, unscharf per `filter: blur`) exakt über die statische Flamme im Hintergrundbild legen. Per CSS-Keyframes sanft schwanken (leichtes `translateX` + `scaleY`) und in Helligkeit pulsieren (`opacity`). Wirkt wie echtes Flackern – kein extra PNG, kein Ausschneiden.
-   - **Ton:** Sehr sanft und zart – kein wildes Flackern, eher ruhige lebendige Flamme.
+**Weiße Linie oben am Hintergrundbild (hartnäckig, seit v1.9–v1.16 nicht gelöst)**
+- Linie erscheint **nicht sofort**, sondern erst nach einer Weile nach App-Start
+- Nach Update-Reload (Cache-Flush) ist sie kurzzeitig weg – kommt dann aber wieder
+- **Nur auf Android (OnePlus 5 / Chrome)** – auf iOS nicht reproduzierbar
+- **Exakte Reproduktion:** Screen-Off → Screen-On → Android-Statusbar erscheint kurz oben → zieht sich zurück → weiße Linie bleibt
+- **Ursache (klar):** Android-Chrome ändert beim Statusbar-Ein/Ausblenden kurz die Viewport-Höhe. Das Hintergrundbild springt nicht sauber zurück wenn der Viewport wieder wächst.
+- **Richtiger Fix-Ansatz:** `visibilitychange`-Event abfangen (wenn Screen wieder angeht) + ggf. `visualViewport resize`-Event → Hintergrund neu zeichnen / Repaint erzwingen
+- Bisherige Ansätze haben nicht dauerhaft geholfen
 
 ### Mittelfristig
 - **Nativer iOS-Wrapper** via PWABuilder/Capacitor (Stummschalter-Bypass)

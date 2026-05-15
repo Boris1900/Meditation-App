@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.16';
+const APP_VERSION = 'v1.17';
 
 // Geräteerkennung
 function isIOS() {
@@ -374,7 +374,13 @@ function positionFlame() {
   document.documentElement.style.setProperty('--flame-y', flameY + 'px');
 }
 
+function fixBgHeight() {
+  const bg = document.getElementById('app-bg');
+  if (bg) bg.style.height = window.screen.height + 'px';
+}
+
 function initLayout() {
+  fixBgHeight();
   const buddhaY = getBuddhaScreenY();
   const gongH = Math.min(360, buddhaY - MIN_TIMER_ZONE);
   const gongW = Math.round(gongH * GONG_ASPECT);
@@ -394,9 +400,14 @@ function positionTimerArea() {
 window.addEventListener('load', initLayout);
 window.addEventListener('resize', initLayout);
 
-// Nach Screen-On nur Layout neu berechnen, KEIN display-Toggle (das verursachte Flackern).
+// Nach Screen-On: warten bis Statusbar-Animation fertig (~400ms), dann Hintergrund und Layout neu setzen
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) initLayout();
+  if (!document.hidden) {
+    setTimeout(() => {
+      fixBgHeight();
+      initLayout();
+    }, 400);
+  }
 });
 
 // Init
