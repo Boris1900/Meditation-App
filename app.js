@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.13';
+const APP_VERSION = 'v1.14';
 
 // Geräteerkennung
 function isIOS() {
@@ -394,16 +394,9 @@ function positionTimerArea() {
 window.addEventListener('load', initLayout);
 window.addEventListener('resize', initLayout);
 
-// Android-Bug-Workaround: nach Screen-Off → Screen-On kann die Viewport-Höhe
-// um 1px abweichen → 1px-Lücke oben. Beim Sichtbarwerden Layout neu berechnen.
+// Nach Screen-On nur Layout neu berechnen, KEIN display-Toggle (das verursachte Flackern).
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) {
-    // Zwinge Reflow durch kurzes Display-Umschalten
-    document.body.style.display = 'none';
-    void document.body.offsetHeight;
-    document.body.style.display = '';
-    initLayout();
-  }
+  if (!document.hidden) initLayout();
 });
 
 // Init
