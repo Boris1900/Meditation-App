@@ -16,61 +16,120 @@ MeditationsApp/
 └── CLAUDE.md         # Diese Datei
 ```
 
-## Aktueller Stand (Session 3 – noch offen!)
+## Aktueller Stand (nach Session 3 – abgeschlossen)
 
-### Funktioniert
-- Layout, Gong-Animation, Timer 1–90 Min
-- Audio-Menü, Demo-Gong, MP3-Upload
+### Alles was funktioniert
+- Layout, Gong-Animation (leichtes Zucken noch bekannt), Timer 1–90 Min
+- Audio-Menü mit einheitlichem Georgia-Font, goldene Buttons
+- Demo-Gong (synthetisch) + MP3-Upload
 - Wake Lock
-- Abdunkelung mit einstellbarer Stufe (0–95%)
-- Tipp-Logik komplett überarbeitet (siehe Tabelle unten)
+- Abdunkelung: einstellbar 0–95%, manuelle Kontrolle
+- Timer-Positionierung: per Bildgeometrie-Rechnung exakt zwischen Gong und Buddha
+- Gong-Größe: dynamisch, so groß wie möglich ohne Überlappung
+- Flammen-Schein: sanft pulsierendes warmes Leuchten, exakt auf Teelicht positioniert
+- Navigation: nur Musiknoten-Icon, blendet während Meditation sanft aus
+- START/STOP-Label: mittig auf der Gong-Scheibe (skaliert mit Gonggröße)
+- Timer-Anzeige springt beim Stoppen nicht mehr
 - PWA Manifest + Homescreen-Installation
 - GitHub Pages: https://boris1900.github.io/Meditation-App/
-- Wenn Timer läuft: Slider wird ausgeblendet, nur Zeitanzeige bleibt
+- .gitignore für Bild-Backups
 
 ### Tipp-Logik
 | Situation | Tap auf Gong | Tap woanders |
 |---|---|---|
-| Timer läuft, abgedunkelt | Aufhellen (kein Klang) | Aufhellen |
-| Timer läuft, hell | Stoppen + Klang + Schwingen | Nach 3s wieder abdunkeln |
+| Timer läuft, abgedunkelt | – (Overlay fängt ab) | Aufhellen (bleibt hell) |
+| Timer läuft, hell | Stoppen + Klang + Schwingen | Sofort abdunkeln |
 | Timer gestoppt | Starten + Klang + Schwingen | – |
 
-### NOCH NICHT GELÖST: Timer-Position auf verschiedenen Handygrößen
+**Wichtig:** Nach dem Aufhellen dunkelt die App NICHT automatisch wieder ab.
+Nur Tap auf dunkles Display → aufhellen. Tap auf helles Display → sofort abdunkeln.
+Die einzige automatische Abdunkelung: 3 Sekunden nach Timer-Start.
 
-**Boris' Anforderung:** Timer-Anzeige (40:00) und Slider sollen auf JEDEM Handy mittig im freien Raum zwischen Gong-Unterkante und Buddha-Kopfspitze sitzen. Nichts soll Gong oder Buddha überlappen.
+---
 
-**Konkretes Testgerät:** OnePlus 5
-- Aus DEBUG-Daten: `window.innerHeight = 651px`, `gongBottom = 283px`
-- Visuell: Buddha-Kopf bei ~62% von innerHeight = ~403px
-- Verfügbarer Raum zwischen Gong und Buddha: 120px
+## Session 3 – Was neu gemacht wurde
 
-**Was wir versucht haben (alles fehlgeschlagen):**
-1. Hardcoded percentage (68% → 56% → 50%) für buddhaHeadY → entweder Slider auf Buddha oder Timer zu hoch/tief
-2. Gong responsive mit `min(360px, 40vh)` → bisschen kleiner, half nicht entscheidend
-3. `dvh` statt `vh` für Gong-Höhe → soll vh-Diskrepanz auf Android Chrome lösen
-4. Faktor 1.55 (= 62/40) als Verhältnis Buddha-Position zu Gong-Höhe
-5. `justify-content: flex-start` für gestoppt vs `center` für laufend
-6. Padding-top auf Timer-Area variiert (4px, 8px, 10px)
-7. "40 Minuten" Label entfernt → spart 28px
-8. adj-btn von 40px auf 36px verkleinert
+### 1. Weiße Pixellinie oben (3-teilige Lösung)
+- `html { background: #1a1a1a; }` als Fallback
+- `body::before { top: -2px; }` – Hintergrundbild 2px nach oben versetzt
+- `<meta name="viewport" content="..., viewport-fit=cover">` in index.html
 
-**Boris' letzte Rückmeldung (kritisch):**
-> "ich verstehe das nicht. den gong noch kleiner? es ist so viel platz zwischen gong und buddha kopfspitze für time anzeige und slider. da muss doch nicht der gong noch kleiner."
+### 2. Timer-Positionierung per Bildgeometrie
+Statt zu raten: echte Bildkoordinaten berechnen.
 
-**Boris hat RECHT:** Der Raum IST groß genug. Das Problem liegt vermutlich in:
-- Doppelte CSS-Regel für `#timer-area` (Zeilen 219 und 341 in style.css) → mögliches Cascade-Problem
-- Browser-Cache: Boris sieht evtl. alte Versionen
-- Visuelle Wahrnehmung: Mein Code positioniert Timer am ANFANG der freien Zone (flex-start + padding-top: 4px), aber visuell scheint er weiter unten zu sitzen
-- Möglicherweise ist meine 1.55-Faktor Annahme falsch, weil das Background-Image evtl. anders skaliert als angenommen
+```javascript
+const IMG_W = 852, IMG_H = 1846;  // Pixelmaße background.png
+const BUDDHA_PCT = 0.54;           // Buddha-Kopfkrone bei 54% Bildhöhe
+const GONG_ASPECT = 312 / 360;     // Seitenverhältnis gong.png
+const MIN_TIMER_ZONE = 115;        // Mindestplatz für Timer+Slider in px
 
-### Nächste Schritte für neue Session
-1. **Erst messen, dann coden:** Auf OnePlus 5 die ECHTEN Werte für Gong-Bottom UND Buddha-Kopf-Position bekommen (Debug-Overlay einbauen mit beiden Werten, evtl. auch ein vertikaler Strich an der vermuteten Buddha-Position zur visuellen Prüfung)
-2. **Nicht vor-rechnen:** Stattdessen Boris fragen, ob er manuell die Position einstellen will (z.B. mit einem versteckten Slider zum Justieren des padding-top), oder per Tipp-Geste
-3. **Alternative:** Vielleicht ist das Problem grundsätzlich, dass Timer + Slider zusammen einfach zu hoch sind. Slider ins Audio-Menü verschieben? Oder +/- Buttons direkt neben den Timer setzen statt darunter?
+function getBuddhaScreenY() {
+  const scale = Math.max(window.innerWidth / IMG_W, window.innerHeight / IMG_H);
+  const offsetY = (IMG_H * scale - window.innerHeight) / 2;
+  return Math.round(IMG_H * BUDDHA_PCT * scale - offsetY);
+}
+```
 
-### Offene Bugs
-- START-Label sitzt noch auf dem Gong-Bügel statt auf der Scheibe (kosmetisch, niedrige Prio)
-- Service Worker für Offline-PWA noch nicht implementiert
+`initLayout()` berechnet maximale Gonggröße, positioniert Timer-Area per `requestAnimationFrame` nach `getBoundingClientRect()`.
+
+### 3. Dynamische Gonggröße
+Gong wird so groß wie möglich, aber Buddha und Timer-Zone bleiben frei:
+```javascript
+const gongH = Math.min(360, buddhaY - MIN_TIMER_ZONE);
+```
+
+### 4. Flammen-Schein
+Position ebenfalls per Bildgeometrie:
+```javascript
+const FLAME_X_PCT = 0.85;  // X-Position des Teelichts im Bild
+const FLAME_Y_PCT = 0.72;  // Y-Position des Teelichts im Bild
+```
+Pulsierender Radial-Gradient (`mix-blend-mode: screen`), 6,5-Sekunden-Zyklus.
+
+### 5. Abdunkelung (korrigierte Logik)
+- `scheduleAutoDim()` wird nur einmal aufgerufen: 3s nach Timer-Start
+- Overlay-Tap → `brighten()` ohne erneutes `scheduleAutoDim`
+- Display-Tap (hell, Timer läuft) → sofort `dim()`
+
+### 6. Navigation
+- Linkes Icon (Uhr) entfernt – nur noch Musiknoten-Icon
+- Nav blendet bei laufendem Timer mit `opacity: 0` aus (1,2s Übergang)
+- Slider/Controls blendet mit `opacity: 0` aus (0,6s) – kein Layout-Sprung
+
+### 7. START/STOP-Label
+```css
+#gong-label {
+  position: absolute;
+  top: 54%;  /* visuelle Mitte der Gong-Scheibe */
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+```
+
+### 8. Menü-Design
+Einheitlicher Georgia-Serif-Font, goldene Buttons (`rgba(180,120,50,...)`), abgerundete Ecken.
+
+---
+
+## Bekannte offene Punkte
+
+### Gong-Animation zuckt noch
+Der Schwung (`gong-strike` Animation) ist besser als zuvor, aber noch nicht perfekt.
+Boris hat bestätigt: „lassen wir erstmal."
+
+### Multi-MP3-Feature (aufgeschoben)
+Idee: bis zu 3 eigene MP3s laden, mit Auswahl im Menü. Boris: „das machen wir später."
+
+### Service Worker (Offline-PWA)
+Noch nicht implementiert – App braucht Internet beim ersten Laden.
+
+---
+
+## Wichtige Arbeitsregel (Session 3 festgelegt)
+**Immer erst fragen, bevor eine Idee umgesetzt wird.** Boris entscheidet, was gebaut wird –
+Claude schlägt vor und wartet auf Freigabe.
+
+---
 
 ## Lokaler Entwicklungsserver
 ```
@@ -84,8 +143,7 @@ http://localhost:3456
 - Gong_V0.1.png (aktuell aktiv) – freigestellter Bronze-Gong mit Bügel
 
 ## Kontext für neue Session
-- Boris ist Heilpraktiker, kein Entwickler – er kann visuell beurteilen, aber keine Pixel messen
-- Boris testet auf OnePlus 5 in Chrome (mit URL-Bar sichtbar, NICHT als PWA)
-- Wenn Boris gefragt hat das Handy-Modell zu nennen → tat er. Hat funktioniert.
-- DEBUG-Overlay-Strategie hat funktioniert um echte Werte zu bekommen
-- Boris ist verständlicherweise frustriert nach mehreren Fehlversuchen
+- Boris ist Heilpraktiker, kein Entwickler – beurteilt visuell, misst keine Pixel
+- Boris testet auf OnePlus 5 in Chrome (mit URL-Bar, NICHT als PWA)
+- Debug-Overlay-Strategie hat funktioniert (stilles Messen im Hintergrund)
+- Boris möchte immer erst gefragt werden, bevor etwas implementiert wird

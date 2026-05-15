@@ -73,6 +73,8 @@ const currentName = document.getElementById('current-audio-name');
 const useDemoBtn  = document.getElementById('use-demo-gong');
 const dimSlider   = document.getElementById('dim-slider');
 const dimLevelLabel = document.getElementById('dim-level-label');
+const flameSlider = document.getElementById('flame-slider');
+const flameLevelLabel = document.getElementById('flame-level-label');
 
 // Slider
 function updateSliderProgress() {
@@ -275,6 +277,35 @@ dimSlider.addEventListener('input', () => {
   updateDimSliderProgress();
 });
 
+// Flammen-Schein einstellen
+function updateFlameGlow() {
+  const v = flameSlider.value / 100;
+  const a1 = Math.min(1.0, v * 1.5).toFixed(3);
+  const a2 = Math.min(1.0, v * 0.85).toFixed(3);
+  const size = Math.round(180 + v * 220); // 180px bei 0%, 400px bei 100%
+  document.documentElement.style.setProperty('--flame-a1', a1);
+  document.documentElement.style.setProperty('--flame-a2', a2);
+  document.documentElement.style.setProperty('--flame-size', size + 'px');
+  updateFlameLevelLabel();
+  updateFlameSliderProgress();
+}
+
+function updateFlameLevelLabel() {
+  const v = parseInt(flameSlider.value);
+  if (v === 0)       flameLevelLabel.textContent = 'Aus';
+  else if (v <= 20)  flameLevelLabel.textContent = 'Sehr leicht';
+  else if (v <= 40)  flameLevelLabel.textContent = 'Leicht';
+  else if (v <= 60)  flameLevelLabel.textContent = 'Mittel';
+  else if (v <= 80)  flameLevelLabel.textContent = 'Stark';
+  else               flameLevelLabel.textContent = 'Sehr stark';
+}
+
+function updateFlameSliderProgress() {
+  flameSlider.style.setProperty('--progress', flameSlider.value + '%');
+}
+
+flameSlider.addEventListener('input', updateFlameGlow);
+
 // Layout-Berechnung
 const timerArea = document.getElementById('timer-area');
 
@@ -325,3 +356,4 @@ window.addEventListener('resize', initLayout);
 updateDuration(40);
 updateDimLabel();
 updateDimSliderProgress();
+updateFlameGlow();

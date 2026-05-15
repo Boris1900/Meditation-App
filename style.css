@@ -38,12 +38,12 @@ body::before {
   position: fixed;
   left: var(--flame-x, 50%);
   top: var(--flame-y, 50%);
-  width: 240px;
-  height: 240px;
+  width: var(--flame-size, 240px);
+  height: var(--flame-size, 240px);
   border-radius: 50%;
   background: radial-gradient(circle,
-    rgba(255, 190, 100, 0.40) 0%,
-    rgba(255, 160, 70, 0.22) 35%,
+    rgba(255, 190, 100, var(--flame-a1, 0.48)) 0%,
+    rgba(255, 160, 70, var(--flame-a2, 0.26)) 35%,
     rgba(255, 130, 50, 0.0) 70%);
   pointer-events: none;
   z-index: 0;
