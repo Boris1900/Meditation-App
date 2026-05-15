@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.12';
+const APP_VERSION = 'v1.13';
 
 // Geräteerkennung
 function isIOS() {
@@ -393,6 +393,18 @@ function positionTimerArea() {
 
 window.addEventListener('load', initLayout);
 window.addEventListener('resize', initLayout);
+
+// Android-Bug-Workaround: nach Screen-Off → Screen-On kann die Viewport-Höhe
+// um 1px abweichen → 1px-Lücke oben. Beim Sichtbarwerden Layout neu berechnen.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    // Zwinge Reflow durch kurzes Display-Umschalten
+    document.body.style.display = 'none';
+    void document.body.offsetHeight;
+    document.body.style.display = '';
+    initLayout();
+  }
+});
 
 // Init
 const savedDauer = parseInt(localStorage.getItem('medi_dauer'));

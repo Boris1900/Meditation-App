@@ -1,5 +1,6 @@
 html {
-  background-color: #1a1a1a;
+  background: url('background.png') center center / cover no-repeat #1a1a1a;
+  min-height: 100%;
 }
 
 * {
