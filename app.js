@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.0';
+const APP_VERSION = 'v1.1';
 
 // Geräteerkennung
 function isIOS() {
@@ -81,6 +81,13 @@ const dimLevelLabel = document.getElementById('dim-level-label');
 const flameSlider = document.getElementById('flame-slider');
 const flameLevelLabel = document.getElementById('flame-level-label');
 
+// Timer-Anzeige: jede Ziffer in fixen Span, verhindert iOS-Ruckeln
+function renderTimer(timeStr) {
+  timerText.innerHTML = timeStr.split('').map(ch =>
+    `<span class="${ch === ':' ? 'colon' : 'digit'}">${ch}</span>`
+  ).join('');
+}
+
 // Slider
 function updateSliderProgress() {
   const val = parseInt(slider.value);
@@ -91,7 +98,7 @@ function updateSliderProgress() {
 function updateDuration(val) {
   durationMinutes = val;
   slider.value = val;
-  timerText.textContent = formatTime(val * 60);
+  renderTimer(formatTime(val * 60));
   updateSliderProgress();
   localStorage.setItem('medi_dauer', val);
 }
@@ -129,7 +136,7 @@ function startTimer() {
 
   timerInterval = setInterval(() => {
     remainingSeconds--;
-    timerText.textContent = formatTime(remainingSeconds);
+    renderTimer(formatTime(remainingSeconds));
     if (remainingSeconds <= 0) finishTimer();
   }, 1000);
 }
@@ -394,6 +401,7 @@ updateFlameGlow();
 if (isIOS()) {
   const hint = document.getElementById('ios-mute-hint');
   if (hint) hint.style.display = 'block';
+  document.body.classList.add('ios');
 }
 
 const versionEl = document.getElementById('app-version');

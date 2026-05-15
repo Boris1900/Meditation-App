@@ -344,6 +344,20 @@ main {
   text-shadow: 0 2px 20px rgba(0,0,0,0.7);
 }
 
+body.ios #timer-text .digit {
+  display: inline-block;
+  width: 0.62em;
+  text-align: center;
+  font-variant-numeric: lining-nums tabular-nums;
+  vertical-align: top;
+}
+
+body.ios #timer-text .colon {
+  display: inline-block;
+  width: 0.40em;
+  text-align: center;
+}
+
 /* Controls – direkt unter dem Timer, fadet bei Meditation aus */
 #controls {
   width: 85%;
