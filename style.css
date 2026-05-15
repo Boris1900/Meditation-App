@@ -350,6 +350,7 @@ body.ios #timer-text .digit {
   text-align: center;
   font-variant-numeric: lining-nums tabular-nums;
   vertical-align: top;
+  font-family: 'Cormorant Garamond', Georgia, serif;
 }
 
 body.ios #timer-text .colon {
