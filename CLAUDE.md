@@ -13,17 +13,20 @@ MeditationsApp/
 ├── manifest.json     # PWA-Manifest (Homescreen-Installation)
 ├── background.png    # Hintergrundbild (V0.3: Buddha unten, Bambus, Kerze)
 ├── gong.png          # Gong-Bild (freigestellt, RGBA PNG, V0.1)
+├── klang1.mp3        # Eingebauter Klang (781 KB, im Menü auswählbar)
 └── CLAUDE.md         # Diese Datei
 ```
 
-## Aktueller Stand (nach Session 3 – abgeschlossen)
+## Aktueller Stand (nach Session 4 – abgeschlossen)
 
 ### Alles was funktioniert
 - Layout, Gong-Animation (leichtes Zucken noch bekannt), Timer 1–90 Min
 - Audio-Menü mit einheitlichem Georgia-Font, goldene Buttons
-- Demo-Gong (synthetisch) + MP3-Upload
+- Demo-Gong (synthetisch) + Klang 1 (eingebaut) + MP3-Upload
 - Wake Lock
 - Abdunkelung: einstellbar 0–95%, manuelle Kontrolle
+- **Flammen-Schein-Slider: Intensität und Größe einstellbar (Aus bis Sehr stark)**
+- **iOS Safari Audio-Fix: AudioContext wird per `resume()` aufgeweckt**
 - Timer-Positionierung: per Bildgeometrie-Rechnung exakt zwischen Gong und Buddha
 - Gong-Größe: dynamisch, so groß wie möglich ohne Überlappung
 - Flammen-Schein: sanft pulsierendes warmes Leuchten, exakt auf Teelicht positioniert
@@ -111,17 +114,68 @@ Einheitlicher Georgia-Serif-Font, goldene Buttons (`rgba(180,120,50,...)`), abge
 
 ---
 
-## Bekannte offene Punkte
+---
 
-### Gong-Animation zuckt noch
-Der Schwung (`gong-strike` Animation) ist besser als zuvor, aber noch nicht perfekt.
-Boris hat bestätigt: „lassen wir erstmal."
+## Session 4 – Was neu gemacht wurde
 
-### Multi-MP3-Feature (aufgeschoben)
-Idee: bis zu 3 eigene MP3s laden, mit Auswahl im Menü. Boris: „das machen wir später."
+### 1. Flammen-Schein per Slider einstellbar
+Neuer Slider im Menü unter Abdunkelung. Steuert:
+- **Alpha-Werte** des Radial-Gradienten via CSS-Variablen `--flame-a1`, `--flame-a2`
+- **Größe** des Leuchtkreises via `--flame-size` (180px Aus → 400px Sehr stark)
 
-### Service Worker (Offline-PWA)
-Noch nicht implementiert – App braucht Internet beim ersten Laden.
+Beschriftung dynamisch: Aus / Sehr leicht / Leicht / Mittel / Stark / Sehr stark.
+
+### 2. Klang 1 als eingebaute Soundoption
+- `klang1.mp3` (781 KB) liegt direkt im Repo
+- Neuer Button „Klang 1 verwenden" im Menü
+- Wird per `fetch` geladen und über die bestehende `customAudioBuffer`-Mechanik abgespielt
+- Boris kann später weitere eingebaute Klänge analog hinzufügen
+
+### 3. iOS Safari AudioContext-Fix
+```javascript
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+```
+Safari startet AudioContext immer im suspended-Zustand. Ohne `resume()` ist auf iPhone kein Ton zu hören.
+
+---
+
+## WICHTIGE Erkenntnis: iOS Stummschalter-Problem
+
+**Apple verbietet allen Browsern auf iPhone den Klang bei aktivem Stummschalter.**
+Das betrifft Safari, Chrome, Firefox, Edge – alle nutzen WebKit, alle respektieren den Schalter.
+HTML5-Audio, Web Audio API, Video-Audio – kein Unterschied.
+
+**Auf Android (Chrome) funktioniert es problemlos** – dort ist Medien- und Klingelton-Lautstärke getrennt.
+
+**Konsequenz:** Wer die App auf iPhone bei stummem Handy nutzen will (Katharina!), braucht
+einen **nativen Wrapper** (PWABuilder oder Capacitor). Dafür nötig:
+- Apple Developer Account (99 $/Jahr)
+- TestFlight für private Verteilung
+- Synergie: gleicher Account nutzbar für TinnitusTracker (gleiches Problem dort!)
+
+**Status:** Vorerst aufgeschoben. Erst Stummschalter-Hinweis im Menü, dann später ggf. nativer Weg.
+
+---
+
+## Bekannte offene Punkte / Nächste Schritte
+
+### Akut für nächste Session
+1. **Stummschalter-Hinweis im Menü** einbauen (z.B. „💡 Für Klang: iPhone-Stummschalter aus")
+2. **Versionsnummer sichtbar machen** – kleines, dezentes Label
+3. Versions-Workflow: bei jeder Änderung Versionsnummer hochzählen
+
+### Mittelfristig
+- **Nativer iOS-Wrapper** via PWABuilder/Capacitor (sobald Apple-Developer-Account angeschafft)
+- **Gong-Animation zuckt noch** – Schwung-Keyframes weiter verfeinern
+
+### Aufgeschoben
+- Multi-MP3-Feature: bis zu 3 eigene MP3s mit Auswahl
+- Service Worker (Offline-PWA) – braucht erst Internet beim Laden
+- Buddha-Daumen-Animation (Boris' Idee – brauchte separates Hand-PNG)
 
 ---
 
