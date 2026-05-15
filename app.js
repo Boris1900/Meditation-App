@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.17';
+const APP_VERSION = 'v1.18';
 
 // Geräteerkennung
 function isIOS() {
@@ -379,6 +379,15 @@ function fixBgHeight() {
   if (bg) bg.style.height = window.screen.height + 'px';
 }
 
+function forceRepaint() {
+  const bg = document.getElementById('app-bg');
+  if (!bg) return;
+  bg.style.opacity = '0.999';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    bg.style.opacity = '';
+  }));
+}
+
 function initLayout() {
   fixBgHeight();
   const buddhaY = getBuddhaScreenY();
@@ -406,9 +415,20 @@ document.addEventListener('visibilitychange', () => {
     setTimeout(() => {
       fixBgHeight();
       initLayout();
+      forceRepaint();
     }, 400);
   }
 });
+
+// Viewport-Resize (Statusbar erscheint/verschwindet): Repaint wenn Viewport wächst
+if (window.visualViewport) {
+  let lastVpHeight = window.visualViewport.height;
+  window.visualViewport.addEventListener('resize', () => {
+    const vh = window.visualViewport.height;
+    if (vh > lastVpHeight) forceRepaint();
+    lastVpHeight = vh;
+  });
+}
 
 // Init
 const savedDauer = parseInt(localStorage.getItem('medi_dauer'));
