@@ -1,7 +1,16 @@
+// Version
+const APP_VERSION = 'v0.7';
+
+// Geräteerkennung
+function isIOS() {
+  return (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1)) &&
+    !window.MSStream;
+}
+
 // Audio
 let audioCtx = null;
 let customAudioBuffer = null;
-let usingCustomAudio = false;
 
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -9,39 +18,14 @@ function getAudioCtx() {
   return audioCtx;
 }
 
-function playDemoGong() {
+async function playGong() {
+  if (!customAudioBuffer) return;
   const ctx = getAudioCtx();
-  const now = ctx.currentTime;
-  const frequencies = [110, 220, 330, 550, 880];
-  const gains      = [0.5, 0.3, 0.15, 0.08, 0.04];
-  const decays     = [4.0, 3.0, 2.0,  1.5,  1.0];
-
-  frequencies.forEach((freq, i) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, now);
-    osc.frequency.exponentialRampToValueAtTime(freq * 0.98, now + decays[i]);
-    gain.gain.setValueAtTime(gains[i], now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + decays[i]);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + decays[i]);
-  });
-}
-
-function playCustomAudio() {
-  const ctx = getAudioCtx();
+  if (ctx.state === 'suspended') await ctx.resume();
   const source = ctx.createBufferSource();
   source.buffer = customAudioBuffer;
   source.connect(ctx.destination);
-  source.start();
-}
-
-function playGong() {
-  if (usingCustomAudio && customAudioBuffer) playCustomAudio();
-  else playDemoGong();
+  source.start(ctx.currentTime);
 }
 
 // Timer-State
@@ -51,7 +35,7 @@ let timerInterval = null;
 let isRunning = false;
 
 // Dimm-State
-let dimOpacity = 0.85;
+let dimOpacity = 0;
 let isDimmed = false;
 let autoDimTimeout = null;
 
@@ -71,8 +55,7 @@ const navAudio    = document.getElementById('nav-audio');
 const closeMenu   = document.getElementById('close-menu');
 const fileInput   = document.getElementById('audio-file-input');
 const currentName = document.getElementById('current-audio-name');
-const useDemoBtn  = document.getElementById('use-demo-gong');
-const useKlang1Btn = document.getElementById('use-klang1');
+const klangBtns   = document.querySelectorAll('.klang-btn');
 const dimSlider   = document.getElementById('dim-slider');
 const dimLevelLabel = document.getElementById('dim-level-label');
 const flameSlider = document.getElementById('flame-slider');
@@ -90,6 +73,7 @@ function updateDuration(val) {
   slider.value = val;
   timerText.textContent = formatTime(val * 60);
   updateSliderProgress();
+  localStorage.setItem('medi_dauer', val);
 }
 
 slider.addEventListener('input', () => {
@@ -154,8 +138,7 @@ function finishTimer() {
 
 // Gong-Animation
 function swingGong() {
-  gongEl.classList.remove('swinging');
-  void gongEl.offsetWidth;
+  if (gongEl.classList.contains('swinging')) return;
   gongEl.classList.add('swinging');
   gongEl.addEventListener('animationend', () => {
     gongEl.classList.remove('swinging');
@@ -196,10 +179,14 @@ overlay.addEventListener('click', (e) => {
 });
 
 // Gong antippen
+let gongLocked = false;
 gongEl.addEventListener('click', (e) => {
   e.stopPropagation();
+  if (gongLocked) return;
+  gongLocked = true;
+  setTimeout(() => { gongLocked = false; }, 1000);
+
   if (!isRunning) {
-    // Timer starten
     playGong();
     swingGong();
     setTimeout(() => startTimer(), 500);
@@ -246,30 +233,28 @@ fileInput.addEventListener('change', async (e) => {
   const ctx = getAudioCtx();
   const arrayBuffer = await file.arrayBuffer();
   customAudioBuffer = await ctx.decodeAudioData(arrayBuffer);
-  usingCustomAudio = true;
   currentName.textContent = 'Aktuell: ' + file.name;
-  audioMenu.classList.add('hidden');
+  klangBtns.forEach(b => b.classList.remove('selected'));
 });
 
-useDemoBtn.addEventListener('click', () => {
-  usingCustomAudio = false;
-  customAudioBuffer = null;
-  currentName.textContent = 'Aktuell: Demo-Gong';
-  audioMenu.classList.add('hidden');
-});
-
-useKlang1Btn.addEventListener('click', async () => {
-  try {
-    const ctx = getAudioCtx();
-    const response = await fetch('klang1.mp3');
-    const arrayBuffer = await response.arrayBuffer();
-    customAudioBuffer = await ctx.decodeAudioData(arrayBuffer);
-    usingCustomAudio = true;
-    currentName.textContent = 'Aktuell: Klang 1';
-    audioMenu.classList.add('hidden');
-  } catch (e) {
-    console.error('Klang 1 konnte nicht geladen werden:', e);
-  }
+klangBtns.forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const file = btn.dataset.file;
+    const label = btn.dataset.label;
+    try {
+      const ctx = getAudioCtx();
+      const response = await fetch(encodeURI(file));
+      const arrayBuffer = await response.arrayBuffer();
+      customAudioBuffer = await ctx.decodeAudioData(arrayBuffer);
+      currentName.textContent = 'Aktuell: ' + label;
+      klangBtns.forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      localStorage.setItem('medi_klang_file', file);
+      localStorage.setItem('medi_klang_label', label);
+    } catch (e) {
+      console.error(label + ' konnte nicht geladen werden:', e);
+    }
+  });
 });
 
 // Abdunkelung einstellen
@@ -291,6 +276,7 @@ dimSlider.addEventListener('input', () => {
   dimOpacity = dimSlider.value / 100;
   updateDimLabel();
   updateDimSliderProgress();
+  localStorage.setItem('medi_abdunkelung', dimSlider.value);
 });
 
 // Flammen-Schein einstellen
@@ -320,7 +306,10 @@ function updateFlameSliderProgress() {
   flameSlider.style.setProperty('--progress', flameSlider.value + '%');
 }
 
-flameSlider.addEventListener('input', updateFlameGlow);
+flameSlider.addEventListener('input', () => {
+  updateFlameGlow();
+  localStorage.setItem('medi_flamme', flameSlider.value);
+});
 
 // Layout-Berechnung
 const timerArea = document.getElementById('timer-area');
@@ -369,7 +358,77 @@ window.addEventListener('load', initLayout);
 window.addEventListener('resize', initLayout);
 
 // Init
-updateDuration(40);
+const savedDauer = parseInt(localStorage.getItem('medi_dauer'));
+updateDuration((savedDauer >= 1 && savedDauer <= 90) ? savedDauer : 30);
+
+const savedDim = localStorage.getItem('medi_abdunkelung');
+const dimVal = savedDim !== null ? parseInt(savedDim) : 0;
+dimOpacity = dimVal / 100;
+dimSlider.value = dimVal;
 updateDimLabel();
 updateDimSliderProgress();
+
+const savedFlame = localStorage.getItem('medi_flamme');
+flameSlider.value = savedFlame !== null ? parseInt(savedFlame) : 60;
 updateFlameGlow();
+
+if (isIOS()) {
+  const hint = document.getElementById('ios-mute-hint');
+  if (hint) hint.style.display = 'block';
+}
+
+const versionEl = document.getElementById('app-version');
+if (versionEl) versionEl.textContent = APP_VERSION;
+
+// Gespeicherten Klang laden (Standard: Klangschale Morgenstern)
+async function autoLoadKlang(file, label) {
+  try {
+    const ctx = getAudioCtx();
+    const response = await fetch(encodeURI(file));
+    if (!response.ok) throw new Error('Datei nicht gefunden');
+    const arrayBuffer = await response.arrayBuffer();
+    customAudioBuffer = await ctx.decodeAudioData(arrayBuffer);
+    currentName.textContent = 'Aktuell: ' + label;
+    klangBtns.forEach(btn => btn.classList.toggle('selected', btn.dataset.file === file));
+  } catch (e) {
+    console.error('Auto-Laden fehlgeschlagen:', e);
+  }
+}
+
+const savedFile  = localStorage.getItem('medi_klang_file')  || 'Sounds/Klangschale Morgenstern.mp3';
+const savedLabel = localStorage.getItem('medi_klang_label') || 'Klangschale Morgenstern';
+autoLoadKlang(savedFile, savedLabel);
+
+// Update-Check
+async function checkForUpdate() {
+  const btn    = document.getElementById('update-btn');
+  const status = document.getElementById('update-status');
+  btn.disabled = true;
+  btn.textContent = '⏳ Prüfe...';
+  try {
+    const res  = await fetch('app.js?t=' + Date.now(), { cache: 'no-store' });
+    const text = await res.text();
+    const match = text.match(/const APP_VERSION\s*=\s*'([^']+)'/);
+    const latest = match ? match[1] : null;
+    if (!latest) throw new Error('Version nicht lesbar');
+    if (latest === APP_VERSION) {
+      status.textContent = '✅ Du hast die aktuelle Version.';
+    } else {
+      status.innerHTML = '🆕 Update verfügbar! <button onclick="applyUpdate()" style="margin-left:6px;padding:4px 10px;border-radius:8px;border:none;background:#b47832;color:#fff;font-size:11px;font-weight:600;cursor:pointer;">Jetzt laden</button>';
+    }
+  } catch (e) {
+    status.textContent = '⚠️ Prüfung fehlgeschlagen.';
+  }
+  btn.textContent = '🔄 Auf Update prüfen';
+  btn.disabled = false;
+}
+
+async function applyUpdate() {
+  const status = document.getElementById('update-status');
+  status.textContent = '⏳ Wird geladen...';
+  try {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => caches.delete(k)));
+  } catch (e) {}
+  window.location.reload(true);
+}

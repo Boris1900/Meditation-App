@@ -20,15 +20,20 @@
   <!-- Menü: Audio-Dateien laden -->
   <div id="audio-menu" class="hidden">
     <div class="menu-content">
+      <button id="close-menu" class="menu-close-x" aria-label="Schließen">✕</button>
       <h2>Gong-Sound wählen</h2>
       <p class="menu-hint">Lade deine eigene MP3-Datei</p>
       <label class="upload-btn">
         <input type="file" id="audio-file-input" accept="audio/*">
         MP3 auswählen
       </label>
-      <div id="current-audio-name">Aktuell: Demo-Gong</div>
-      <button id="use-demo-gong" class="demo-btn">Demo-Gong verwenden</button>
-      <button id="use-klang1" class="demo-btn">Klang 1 verwenden</button>
+      <div id="current-audio-name">Kein Klang gewählt</div>
+      <button class="demo-btn klang-btn" data-file="Sounds/Klangschale Morgenstern.mp3" data-label="Klangschale Morgenstern">Klangschale Morgenstern</button>
+      <button class="demo-btn klang-btn" data-file="Sounds/Klangschale Mittagspause.mp3" data-label="Klangschale Mittagspause">Klangschale Mittagspause</button>
+      <button class="demo-btn klang-btn" data-file="Sounds/Klangschale Abendrot.mp3" data-label="Klangschale Abendrot">Klangschale Abendrot</button>
+      <div id="ios-mute-hint" style="display:none; background:#2a1f0a; border:1.5px solid #b47832; border-radius:10px; padding:10px 14px; font-size:12px; color:#e8c87a; line-height:1.5; margin-top:12px;">
+        📱 <strong>iPhone-Nutzer:</strong> Der seitliche Stummschalter muss <strong>ausgeschaltet</strong> sein (kein orangefarbener Streifen) – sonst ist kein Ton zu hören.
+      </div>
       <hr class="menu-divider">
       <h2>Abdunkelung</h2>
       <div class="dim-slider-row">
@@ -45,7 +50,10 @@
         <span class="dim-end-label">Stark</span>
       </div>
       <p id="flame-level-label">Mittel</p>
-      <button id="close-menu" class="close-btn">Schließen</button>
+      <hr class="menu-divider">
+      <button id="update-btn" onclick="checkForUpdate()" class="update-btn">🔄 Auf Update prüfen</button>
+      <div id="update-status"></div>
+      <div id="app-version"></div>
     </div>
   </div>
 
