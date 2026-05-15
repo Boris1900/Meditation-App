@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v0.7';
+const APP_VERSION = 'v0.9';
 
 // Geräteerkennung
 function isIOS() {
@@ -11,17 +11,37 @@ function isIOS() {
 // Audio
 let audioCtx = null;
 let customAudioBuffer = null;
+let rawAudioBuffer = null; // rohes ArrayBuffer – überlebt AudioContext-Neustarts
 
 function getAudioCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (!audioCtx || audioCtx.state === 'closed') {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    customAudioBuffer = null; // Buffer war an alten Context gebunden
+  }
   return audioCtx;
 }
 
 async function playGong() {
-  if (!customAudioBuffer) return;
+  if (!rawAudioBuffer) return;
   const ctx = getAudioCtx();
-  if (ctx.state === 'suspended') await ctx.resume();
+  if (ctx.state === 'suspended' || ctx.state === 'interrupted') {
+    try { await ctx.resume(); } catch (e) {}
+  }
+  if (!customAudioBuffer) {
+    try {
+      customAudioBuffer = await ctx.decodeAudioData(rawAudioBuffer.slice(0));
+    } catch (e) {
+      // Context beim Dekodieren gestorben – einmal neu versuchen
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      customAudioBuffer = null;
+      try {
+        customAudioBuffer = await audioCtx.decodeAudioData(rawAudioBuffer.slice(0));
+      } catch (e2) {
+        console.error('Dekodierung fehlgeschlagen:', e2);
+        return;
+      }
+    }
+  }
   const source = ctx.createBufferSource();
   source.buffer = customAudioBuffer;
   source.connect(ctx.destination);
@@ -230,9 +250,8 @@ closeMenu.addEventListener('click', () => {
 fileInput.addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
-  const ctx = getAudioCtx();
-  const arrayBuffer = await file.arrayBuffer();
-  customAudioBuffer = await ctx.decodeAudioData(arrayBuffer);
+  rawAudioBuffer = await file.arrayBuffer();
+  customAudioBuffer = null; // wird beim nächsten Abspielen frisch dekodiert
   currentName.textContent = 'Aktuell: ' + file.name;
   klangBtns.forEach(b => b.classList.remove('selected'));
 });
@@ -242,10 +261,10 @@ klangBtns.forEach(btn => {
     const file = btn.dataset.file;
     const label = btn.dataset.label;
     try {
-      const ctx = getAudioCtx();
       const response = await fetch(encodeURI(file));
-      const arrayBuffer = await response.arrayBuffer();
-      customAudioBuffer = await ctx.decodeAudioData(arrayBuffer);
+      if (!response.ok) throw new Error('Datei nicht gefunden');
+      rawAudioBuffer = await response.arrayBuffer();
+      customAudioBuffer = null; // wird beim nächsten Abspielen frisch dekodiert
       currentName.textContent = 'Aktuell: ' + label;
       klangBtns.forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
@@ -381,13 +400,13 @@ const versionEl = document.getElementById('app-version');
 if (versionEl) versionEl.textContent = APP_VERSION;
 
 // Gespeicherten Klang laden (Standard: Klangschale Morgenstern)
+// Nur fetch – kein AudioContext nötig, Dekodierung erst beim ersten Abspielen
 async function autoLoadKlang(file, label) {
   try {
-    const ctx = getAudioCtx();
     const response = await fetch(encodeURI(file));
     if (!response.ok) throw new Error('Datei nicht gefunden');
-    const arrayBuffer = await response.arrayBuffer();
-    customAudioBuffer = await ctx.decodeAudioData(arrayBuffer);
+    rawAudioBuffer = await response.arrayBuffer();
+    customAudioBuffer = null;
     currentName.textContent = 'Aktuell: ' + label;
     klangBtns.forEach(btn => btn.classList.toggle('selected', btn.dataset.file === file));
   } catch (e) {
