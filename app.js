@@ -71,6 +71,7 @@ const closeMenu   = document.getElementById('close-menu');
 const fileInput   = document.getElementById('audio-file-input');
 const currentName = document.getElementById('current-audio-name');
 const useDemoBtn  = document.getElementById('use-demo-gong');
+const useKlang1Btn = document.getElementById('use-klang1');
 const dimSlider   = document.getElementById('dim-slider');
 const dimLevelLabel = document.getElementById('dim-level-label');
 const flameSlider = document.getElementById('flame-slider');
@@ -254,6 +255,20 @@ useDemoBtn.addEventListener('click', () => {
   customAudioBuffer = null;
   currentName.textContent = 'Aktuell: Demo-Gong';
   audioMenu.classList.add('hidden');
+});
+
+useKlang1Btn.addEventListener('click', async () => {
+  try {
+    const ctx = getAudioCtx();
+    const response = await fetch('klang1.mp3');
+    const arrayBuffer = await response.arrayBuffer();
+    customAudioBuffer = await ctx.decodeAudioData(arrayBuffer);
+    usingCustomAudio = true;
+    currentName.textContent = 'Aktuell: Klang 1';
+    audioMenu.classList.add('hidden');
+  } catch (e) {
+    console.error('Klang 1 konnte nicht geladen werden:', e);
+  }
 });
 
 // Abdunkelung einstellen
