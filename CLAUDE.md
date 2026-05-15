@@ -20,7 +20,7 @@ MeditationsApp/
 └── CLAUDE.md         # Diese Datei
 ```
 
-## Aktueller Stand (nach Session 9 – v1.16)
+## Aktueller Stand (nach Session 10 – v1.20)
 
 ### Alles was funktioniert
 - Layout, Timer 1–90 Min, Wake Lock
@@ -69,14 +69,29 @@ MeditationsApp/
 
 ### Akut – Ungeklärter Bug (Priorität hoch)
 
-**Weiße Linie oben am Hintergrundbild (hartnäckig, seit v1.9–v1.16 nicht gelöst)**
-- Linie erscheint **nicht sofort**, sondern erst nach einer Weile nach App-Start
-- Nach Update-Reload (Cache-Flush) ist sie kurzzeitig weg – kommt dann aber wieder
-- **Nur auf Android (OnePlus 5 / Chrome)** – auf iOS nicht reproduzierbar
-- **Exakte Reproduktion:** Screen-Off → Screen-On → Android-Statusbar erscheint kurz oben → zieht sich zurück → weiße Linie bleibt
-- **Ursache (klar):** Android-Chrome ändert beim Statusbar-Ein/Ausblenden kurz die Viewport-Höhe. Das Hintergrundbild springt nicht sauber zurück wenn der Viewport wieder wächst.
-- **Richtiger Fix-Ansatz:** `visibilitychange`-Event abfangen (wenn Screen wieder angeht) + ggf. `visualViewport resize`-Event → Hintergrund neu zeichnen / Repaint erzwingen
-- Bisherige Ansätze haben nicht dauerhaft geholfen
+**Weiße Linie oben – hartnäckig, bisher nicht gelöst (v1.9–v1.20)**
+
+**Exakte Reproduktion:**
+- Screen-Off → Screen-On → Android-Statusbar erscheint kurz → zieht sich zurück → weiße Linie bleibt oben
+- Nur auf Android (OnePlus 5 / Chrome), iOS kein Problem
+- Statusbar manuell runterziehen und wieder hochziehen: KEIN Problem → visualViewport.resize greift dann
+
+**Was wir wissen:**
+- Der Viewport-Resize (Statusbar) passiert **während die Seite noch hidden ist** – bevor `visibilitychange` feuert. Deshalb greifen Event-basierte Reparatur-Ansätze zu spät.
+- `visualViewport.resize` funktioniert beim manuellen Statusbar-Test, nicht beim Screen-On.
+- `z-index: -1` auf `#app-bg` hatte problematisches Verhalten hinter dem body-Stacking-Kontext → auf `z-index: 0` geändert (v1.20).
+- Selbst mit `html { background-color: #1a1a1a }` ist die Linie noch weiß – sie kommt also nicht vom html-Element, sondern vermutlich aus dem Android/Chrome-Rendering selbst.
+
+**Aktueller Stand v1.20 (noch ungetestet ob es hilft):**
+- `#app-bg`: `position: fixed; z-index: 0; height: window.screen.height`
+- `html`: `background-color: #1a1a1a` (Fallback)
+- `visibilitychange`: Repaint sofort + nach 150ms + nach 400ms
+- `visualViewport.resize`: Repaint wenn Viewport wächst
+
+**Nächste Ansätze falls v1.20 nicht hilft:**
+- Möglichkeit: Linie liegt im Browser-Chrome (oberhalb HTML), dann hilft kein CSS-Fix → `theme-color` oder nativer Wrapper nötig
+- Möglichkeit: `#app-bg` noch ohne `position: fixed` testen, direkt als body-Hintergrund mit anderem Trick
+- Möglichkeit: `overscroll-behavior: none` auf html/body
 
 ### Mittelfristig
 - **Nativer iOS-Wrapper** via PWABuilder/Capacitor (Stummschalter-Bypass)
