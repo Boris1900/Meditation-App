@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.8';
+const APP_VERSION = 'v1.10';
 
 // Geräteerkennung
 function isIOS() {
@@ -80,6 +80,8 @@ const dimSlider   = document.getElementById('dim-slider');
 const dimLevelLabel = document.getElementById('dim-level-label');
 const flameSlider = document.getElementById('flame-slider');
 const flameLevelLabel = document.getElementById('flame-level-label');
+const flickerCheckbox = document.getElementById('flicker-checkbox');
+const flameFlicker = document.getElementById('flame-flicker');
 
 // Timer-Anzeige: jede Ziffer in fixen Span, verhindert iOS-Ruckeln
 function renderTimer(timeStr) {
@@ -337,6 +339,15 @@ flameSlider.addEventListener('input', () => {
   localStorage.setItem('medi_flamme', flameSlider.value);
 });
 
+// Flammen-Flackern ein/aus
+function setFlicker(enabled) {
+  flameFlicker.classList.toggle('hidden', !enabled);
+  flickerCheckbox.checked = enabled;
+  localStorage.setItem('medi_flackern', enabled ? '1' : '0');
+}
+
+flickerCheckbox.addEventListener('change', () => setFlicker(flickerCheckbox.checked));
+
 // Layout-Berechnung
 const timerArea = document.getElementById('timer-area');
 
@@ -397,6 +408,9 @@ updateDimSliderProgress();
 const savedFlame = localStorage.getItem('medi_flamme');
 flameSlider.value = savedFlame !== null ? parseInt(savedFlame) : 60;
 updateFlameGlow();
+
+const savedFlackern = localStorage.getItem('medi_flackern');
+setFlicker(savedFlackern !== '0');
 
 if (isIOS()) {
   const hint = document.getElementById('ios-mute-hint');

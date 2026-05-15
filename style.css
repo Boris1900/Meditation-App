@@ -1,6 +1,18 @@
 html {
-  background: url('background.png') center center / cover no-repeat fixed;
-  background-color: #e8d8b0;
+  background-color: #1a1a1a;
+}
+
+/* Hintergrundbild auf dediziertem Div – vermeidet Android-Chrome-Bug mit
+   background-attachment:fixed (1px-Linie oben durch Subpixel-Rundung). */
+#bg {
+  position: fixed;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: url('background.png') center center / cover no-repeat;
+  z-index: -1;
+  pointer-events: none;
 }
 
 * {
@@ -49,6 +61,69 @@ body {
   74%  { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
   88%  { opacity: 0.65; transform: translate(-50%, -50%) scale(1.02); }
   100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Flackernde Kerzenflamme – kleines Element direkt über der Flamme im Bild */
+.flicker-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(212,168,83,0.75);
+  font-size: 0.85rem;
+  font-style: italic;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+}
+.flicker-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #d4a853;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+#flame-flicker.hidden { display: none; }
+
+#flame-flicker {
+  position: fixed;
+  left: var(--flame-x, 50%);
+  top: var(--flame-y, 50%);
+  width: 14px;
+  height: 24px;
+  border-radius: 50% 50% 35% 35%;
+  background: radial-gradient(ellipse at 50% 75%, #fff8c0 0%, #ffe040 25%, #ff8010 60%, rgba(255,60,0,0) 100%);
+  filter: blur(2px);
+  pointer-events: none;
+  z-index: 1;
+  transform: translate(-50%, -100%);
+  animation:
+    flicker-sway   1.8s ease-in-out infinite alternate,
+    flicker-scale  2.3s ease-in-out infinite alternate,
+    flicker-fade   3.1s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+@keyframes flicker-sway {
+  0%   { transform: translate(-53%, -34%) scaleY(0.95) scaleX(1.04); }
+  25%  { transform: translate(-48%, -34%) scaleY(1.08) scaleX(0.94); }
+  55%  { transform: translate(-52%, -34%) scaleY(0.98) scaleX(1.02); }
+  80%  { transform: translate(-46%, -34%) scaleY(1.05) scaleX(0.96); }
+  100% { transform: translate(-51%, -34%) scaleY(0.93) scaleX(1.05); }
+}
+
+@keyframes flicker-scale {
+  0%   { filter: blur(2px); }
+  40%  { filter: blur(1.5px); }
+  70%  { filter: blur(2.5px); }
+  100% { filter: blur(1.8px); }
+}
+
+@keyframes flicker-fade {
+  0%   { opacity: 0.75; }
+  25%  { opacity: 0.95; }
+  55%  { opacity: 0.68; }
+  80%  { opacity: 0.98; }
+  100% { opacity: 0.78; }
 }
 
 /* Kein Schleier */

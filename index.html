@@ -18,6 +18,9 @@
 </head>
 <body>
 
+  <!-- Hintergrundbild (fixed-Div statt background-attachment:fixed – Android-stabil) -->
+  <div id="bg"></div>
+
   <!-- Dimm-Overlay -->
   <div id="overlay"></div>
 
@@ -54,6 +57,10 @@
         <span class="dim-end-label">Stark</span>
       </div>
       <p id="flame-level-label">Mittel</p>
+      <label class="flicker-toggle">
+        <input type="checkbox" id="flicker-checkbox">
+        <span>Flamme flackern</span>
+      </label>
       <hr class="menu-divider">
       <button id="update-btn" onclick="checkForUpdate()" class="update-btn">🔄 Auf Update prüfen</button>
       <div id="update-status"></div>
@@ -63,6 +70,9 @@
 
   <!-- Flammen-Schein (sanftes Pulsieren um das Teelicht) -->
   <div id="flame-glow"></div>
+
+  <!-- Flammen-Flackern (kleines Element direkt auf der Kerzenflamme) -->
+  <div id="flame-flicker"></div>
 
   <!-- Hauptbereich -->
   <main>
