@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.5';
+const APP_VERSION = 'v1.6';
 
 // Geräteerkennung
 function isIOS() {
@@ -456,6 +456,13 @@ async function applyUpdate() {
   try {
     const keys = await caches.keys();
     await Promise.all(keys.map(k => caches.delete(k)));
+  } catch (e) {}
+  try {
+    await Promise.all([
+      fetch('index.html', { cache: 'reload' }),
+      fetch('app.js',    { cache: 'reload' }),
+      fetch('style.css', { cache: 'reload' }),
+    ]);
   } catch (e) {}
   window.location.href = window.location.pathname + '?v=' + Date.now();
 }
