@@ -1,5 +1,6 @@
 html {
-  background: #e8d8b0;
+  background: url('background.png') center center / cover no-repeat fixed;
+  background-color: #e8d8b0;
 }
 
 * {
@@ -11,7 +12,7 @@ html {
 
 body {
   font-family: 'Georgia', serif;
-  background: #1a1a1a;
+  background: transparent;
   color: #fff;
   height: 100dvh;
   overflow: hidden;
@@ -19,18 +20,6 @@ body {
   flex-direction: column;
   position: relative;
   user-select: none;
-}
-
-/* Hintergrundbild – top: -2px deckt feine helle Linie am oberen Viewport-Rand ab */
-body::before {
-  content: '';
-  position: fixed;
-  top: -15px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('background.png') center center / cover no-repeat;
-  z-index: 0;
 }
 
 /* Flammen-Schein: liegt zwischen Hintergrund und Inhalt, pulsiert sanft */
