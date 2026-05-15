@@ -1,5 +1,5 @@
 html {
-  background: url('background.png') center center / cover no-repeat #1a1a1a;
+  background: url('background.jpg') center center / cover no-repeat #1a1a1a;
   min-height: 100%;
 }
 
@@ -12,7 +12,7 @@ html {
 
 body {
   font-family: 'Georgia', serif;
-  background: url('background.png') center center / cover no-repeat #1a1a1a;
+  background: url('background.jpg') center center / cover no-repeat #1a1a1a;
   color: #fff;
   height: 100dvh;
   overflow: hidden;
