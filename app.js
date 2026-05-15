@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.1';
+const APP_VERSION = 'v1.2';
 
 // Geräteerkennung
 function isIOS() {
@@ -457,5 +457,10 @@ async function applyUpdate() {
     const keys = await caches.keys();
     await Promise.all(keys.map(k => caches.delete(k)));
   } catch (e) {}
-  window.location.reload(true);
+  window.location.href = window.location.pathname + '?v=' + Date.now();
+}
+
+// Cache-Buster-Parameter nach Update-Reload wieder entfernen
+if (window.location.search) {
+  history.replaceState(null, '', window.location.pathname);
 }
