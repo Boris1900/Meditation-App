@@ -2,19 +2,6 @@ html {
   background-color: #1a1a1a;
 }
 
-/* Hintergrundbild auf dediziertem Div – vermeidet Android-Chrome-Bug mit
-   background-attachment:fixed (1px-Linie oben durch Subpixel-Rundung). */
-#bg {
-  position: fixed;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: url('background.png') center center / cover no-repeat;
-  z-index: -1;
-  pointer-events: none;
-}
-
 * {
   margin: 0;
   padding: 0;
@@ -24,7 +11,7 @@ html {
 
 body {
   font-family: 'Georgia', serif;
-  background: transparent;
+  background: url('background.png') center center / cover no-repeat #1a1a1a;
   color: #fff;
   height: 100dvh;
   overflow: hidden;
@@ -32,6 +19,19 @@ body {
   flex-direction: column;
   position: relative;
   user-select: none;
+}
+
+/* Schwarze 2px-Leiste ganz oben – schluckt Subpixel-Artefakt am oberen Bildrand auf Android */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #1a1a1a;
+  z-index: 200;
+  pointer-events: none;
 }
 
 /* Flammen-Schein: liegt zwischen Hintergrund und Inhalt, pulsiert sanft */
