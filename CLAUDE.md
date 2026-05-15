@@ -12,30 +12,48 @@ MeditationsApp/
 ├── app.js            # Gesamte App-Logik
 ├── manifest.json     # PWA-Manifest (Homescreen-Installation)
 ├── background.png    # Hintergrundbild (V0.3: Buddha unten, Bambus, Kerze)
-├── gong.png          # Gong-Bild (freigestellt, RGBA PNG, V0.1)
-├── klang1.mp3        # Eingebauter Klang (781 KB, im Menü auswählbar)
+├── gong.png          # Gong-Bild (freigestellt, RGBA PNG)
+├── Sounds/           # Alle Klangschalen-MP3s
+│   ├── Klangschale Morgenstern.mp3
+│   ├── Klangschale Mittagspause.mp3
+│   └── Klangschale Abendrot.mp3
 └── CLAUDE.md         # Diese Datei
 ```
 
-## Aktueller Stand (nach Session 4 – abgeschlossen)
+## Aktueller Stand (nach Session 7 – v1.8)
 
 ### Alles was funktioniert
-- Layout, Gong-Animation (leichtes Zucken noch bekannt), Timer 1–90 Min
-- Audio-Menü mit einheitlichem Georgia-Font, goldene Buttons
-- Demo-Gong (synthetisch) + Klang 1 (eingebaut) + MP3-Upload
-- Wake Lock
+- Layout, Timer 1–90 Min, Wake Lock
 - Abdunkelung: einstellbar 0–95%, manuelle Kontrolle
-- **Flammen-Schein-Slider: Intensität und Größe einstellbar (Aus bis Sehr stark)**
-- **iOS Safari Audio-Fix: AudioContext wird per `resume()` aufgeweckt**
-- Timer-Positionierung: per Bildgeometrie-Rechnung exakt zwischen Gong und Buddha
-- Gong-Größe: dynamisch, so groß wie möglich ohne Überlappung
-- Flammen-Schein: sanft pulsierendes warmes Leuchten, exakt auf Teelicht positioniert
-- Navigation: nur Musiknoten-Icon, blendet während Meditation sanft aus
-- START/STOP-Label: mittig auf der Gong-Scheibe (skaliert mit Gonggröße)
-- Timer-Anzeige springt beim Stoppen nicht mehr
+- Flammen-Schein: Intensität und Größe einstellbar (Aus bis Sehr stark)
+- Gong-Animation: rotateX vorwärts-rückwärts, sauber ohne Zucken, weiches Ausschwingen
+- Gong-Animation läuft immer zu Ende bevor sie neu starten kann
+- `transform-origin: top center` permanent auf #gong (kein Konflikt mit :active)
+- `perspective: 800px` auf #gong-container (nicht in Keyframes)
+- Klangschalen-Menü: 3 Klangschalen (Morgenstern, Mittagspause, Abendrot) – neue kürzere Samples (24–32 Sek., 44.1 kHz)
+- Aktiver Klang-Button farbig markiert (Klasse `.selected`)
+- Menü bleibt offen nach Klang-Auswahl – nur X-Button oben rechts schließt
+- iOS Stummschalter-Hinweis (nur auf iPhone/iPad via isIOS())
+- iOS/Android-Erkennung via isIOS()
+- Update-Check-Button im Menü (vergleicht APP_VERSION in app.js)
+- Menü scrollbar (max-height: 88vh, overflow-y: auto)
 - PWA Manifest + Homescreen-Installation
 - GitHub Pages: https://boris1900.github.io/Meditation-App/
-- .gitignore für Bild-Backups
+- localStorage: merkt Klang, Meditationszeit, Abdunkelung, Flammen-Schein
+- Versionsnummer dezent im Menü (APP_VERSION in app.js)
+- iOS PWA Audio-Bug gefixt: rawAudioBuffer trennt Fetch von Decode, AudioContext wird erst beim Tippen erstellt
+- App-Icon: icon-1024.png (Bambus-Hintergrund + Gong zentriert, 88%), apple-touch-icon in index.html
+- **iOS Timer-Fix (v1.1–v1.5):** Jede Ziffer in festem `<span>` (renderTimer()), verhindert Wandern. Auf iOS: Merriweather 700 (lining-nums, gleichmäßige Höhen). Android bleibt Georgia.
+- **Hintergrundbild (v1.8):** Direkt auf `html`-Element (background-attachment: fixed), body::before entfernt – keine weiße Linie mehr auf Android/iOS, auch nicht beim Menü-Wechsel.
+- **Update-Funktion (v1.6):** CSS/JS werden vor Reload mit `cache: reload` frisch geladen. Auf iOS funktioniert der Update-Reload noch nicht zuverlässig → dort über Safari direkt laden.
+
+### Erststart-Defaults (wenn localStorage leer)
+| Einstellung | Default |
+|---|---|
+| Klang | Klangschale Morgenstern |
+| Meditationszeit | 30 Minuten |
+| Abdunkelung | Keine (0%) |
+| Flammen-Schein | Mittel (60%) |
 
 ### Tipp-Logik
 | Situation | Tap auf Gong | Tap woanders |
@@ -44,138 +62,39 @@ MeditationsApp/
 | Timer läuft, hell | Stoppen + Klang + Schwingen | Sofort abdunkeln |
 | Timer gestoppt | Starten + Klang + Schwingen | – |
 
-**Wichtig:** Nach dem Aufhellen dunkelt die App NICHT automatisch wieder ab.
-Nur Tap auf dunkles Display → aufhellen. Tap auf helles Display → sofort abdunkeln.
-Die einzige automatische Abdunkelung: 3 Sekunden nach Timer-Start.
-
----
-
-## Session 3 – Was neu gemacht wurde
-
-### 1. Weiße Pixellinie oben (3-teilige Lösung)
-- `html { background: #1a1a1a; }` als Fallback
-- `body::before { top: -2px; }` – Hintergrundbild 2px nach oben versetzt
-- `<meta name="viewport" content="..., viewport-fit=cover">` in index.html
-
-### 2. Timer-Positionierung per Bildgeometrie
-Statt zu raten: echte Bildkoordinaten berechnen.
-
-```javascript
-const IMG_W = 852, IMG_H = 1846;  // Pixelmaße background.png
-const BUDDHA_PCT = 0.54;           // Buddha-Kopfkrone bei 54% Bildhöhe
-const GONG_ASPECT = 312 / 360;     // Seitenverhältnis gong.png
-const MIN_TIMER_ZONE = 115;        // Mindestplatz für Timer+Slider in px
-
-function getBuddhaScreenY() {
-  const scale = Math.max(window.innerWidth / IMG_W, window.innerHeight / IMG_H);
-  const offsetY = (IMG_H * scale - window.innerHeight) / 2;
-  return Math.round(IMG_H * BUDDHA_PCT * scale - offsetY);
-}
-```
-
-`initLayout()` berechnet maximale Gonggröße, positioniert Timer-Area per `requestAnimationFrame` nach `getBoundingClientRect()`.
-
-### 3. Dynamische Gonggröße
-Gong wird so groß wie möglich, aber Buddha und Timer-Zone bleiben frei:
-```javascript
-const gongH = Math.min(360, buddhaY - MIN_TIMER_ZONE);
-```
-
-### 4. Flammen-Schein
-Position ebenfalls per Bildgeometrie:
-```javascript
-const FLAME_X_PCT = 0.85;  // X-Position des Teelichts im Bild
-const FLAME_Y_PCT = 0.72;  // Y-Position des Teelichts im Bild
-```
-Pulsierender Radial-Gradient (`mix-blend-mode: screen`), 6,5-Sekunden-Zyklus.
-
-### 5. Abdunkelung (korrigierte Logik)
-- `scheduleAutoDim()` wird nur einmal aufgerufen: 3s nach Timer-Start
-- Overlay-Tap → `brighten()` ohne erneutes `scheduleAutoDim`
-- Display-Tap (hell, Timer läuft) → sofort `dim()`
-
-### 6. Navigation
-- Linkes Icon (Uhr) entfernt – nur noch Musiknoten-Icon
-- Nav blendet bei laufendem Timer mit `opacity: 0` aus (1,2s Übergang)
-- Slider/Controls blendet mit `opacity: 0` aus (0,6s) – kein Layout-Sprung
-
-### 7. START/STOP-Label
-```css
-#gong-label {
-  position: absolute;
-  top: 54%;  /* visuelle Mitte der Gong-Scheibe */
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-```
-
-### 8. Menü-Design
-Einheitlicher Georgia-Serif-Font, goldene Buttons (`rgba(180,120,50,...)`), abgerundete Ecken.
-
----
-
----
-
-## Session 4 – Was neu gemacht wurde
-
-### 1. Flammen-Schein per Slider einstellbar
-Neuer Slider im Menü unter Abdunkelung. Steuert:
-- **Alpha-Werte** des Radial-Gradienten via CSS-Variablen `--flame-a1`, `--flame-a2`
-- **Größe** des Leuchtkreises via `--flame-size` (180px Aus → 400px Sehr stark)
-
-Beschriftung dynamisch: Aus / Sehr leicht / Leicht / Mittel / Stark / Sehr stark.
-
-### 2. Klang 1 als eingebaute Soundoption
-- `klang1.mp3` (781 KB) liegt direkt im Repo
-- Neuer Button „Klang 1 verwenden" im Menü
-- Wird per `fetch` geladen und über die bestehende `customAudioBuffer`-Mechanik abgespielt
-- Boris kann später weitere eingebaute Klänge analog hinzufügen
-
-### 3. iOS Safari AudioContext-Fix
-```javascript
-function getAudioCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  return audioCtx;
-}
-```
-Safari startet AudioContext immer im suspended-Zustand. Ohne `resume()` ist auf iPhone kein Ton zu hören.
-
----
-
-## WICHTIGE Erkenntnis: iOS Stummschalter-Problem
-
-**Apple verbietet allen Browsern auf iPhone den Klang bei aktivem Stummschalter.**
-Das betrifft Safari, Chrome, Firefox, Edge – alle nutzen WebKit, alle respektieren den Schalter.
-HTML5-Audio, Web Audio API, Video-Audio – kein Unterschied.
-
-**Auf Android (Chrome) funktioniert es problemlos** – dort ist Medien- und Klingelton-Lautstärke getrennt.
-
-**Konsequenz:** Wer die App auf iPhone bei stummem Handy nutzen will (Katharina!), braucht
-einen **nativen Wrapper** (PWABuilder oder Capacitor). Dafür nötig:
-- Apple Developer Account (99 $/Jahr)
-- TestFlight für private Verteilung
-- Synergie: gleicher Account nutzbar für TinnitusTracker (gleiches Problem dort!)
-
-**Status:** Vorerst aufgeschoben. Erst Stummschalter-Hinweis im Menü, dann später ggf. nativer Weg.
-
 ---
 
 ## Bekannte offene Punkte / Nächste Schritte
 
-### Akut für nächste Session
-1. **Stummschalter-Hinweis im Menü** einbauen (z.B. „💡 Für Klang: iPhone-Stummschalter aus")
-2. **Versionsnummer sichtbar machen** – kleines, dezentes Label
-3. Versions-Workflow: bei jeder Änderung Versionsnummer hochzählen
+### Akut (nächste Session)
+
+1. **Flammen-Animation (sanft flackern):** Die Kerze unten rechts in der Klangschale soll animiert wirken.
+   - **Kein Photoshop nötig** – Flammenposition ist bereits im Code bekannt: `FLAME_X_PCT = 0.85`, `FLAME_Y_PCT = 0.72` in `app.js` (wird schon für den Feuerschein genutzt).
+   - **Ansatz:** Kleines CSS-Element (orange/gelb, unscharf per `filter: blur`) exakt über die statische Flamme im Hintergrundbild legen. Per CSS-Keyframes sanft schwanken (leichtes `translateX` + `scaleY`) und in Helligkeit pulsieren (`opacity`). Wirkt wie echtes Flackern – kein extra PNG, kein Ausschneiden.
+   - **Ton:** Sehr sanft und zart – kein wildes Flackern, eher ruhige lebendige Flamme.
 
 ### Mittelfristig
-- **Nativer iOS-Wrapper** via PWABuilder/Capacitor (sobald Apple-Developer-Account angeschafft)
-- **Gong-Animation zuckt noch** – Schwung-Keyframes weiter verfeinern
+- **Nativer iOS-Wrapper** via PWABuilder/Capacitor (Stummschalter-Bypass)
+- Gong-Animation: Schwung-Keyframes ggf. weiter verfeinern
+- Weitere Klangschalen einfach hinzufügbar (Muster: eine Zeile HTML + MP3 in Sounds/)
 
 ### Aufgeschoben
-- Multi-MP3-Feature: bis zu 3 eigene MP3s mit Auswahl
-- Service Worker (Offline-PWA) – braucht erst Internet beim Laden
-- Buddha-Daumen-Animation (Boris' Idee – brauchte separates Hand-PNG)
+- Multi-MP3-Feature: eigene Uploads dauerhaft speichern
+- Service Worker (Offline-PWA)
+
+---
+
+## Audio-Architektur (wichtig!)
+- **Kein synthetischer Demo-Gong mehr** – wurde in Session 5 entfernt
+- Alle Sounds liegen als MP3 im `Sounds/`-Ordner
+- Web Audio API: `AudioContext` → `BufferSource` → `destination`
+- iOS AudioContext-Fix: `resume()` wird vor jedem `source.start()` awaited
+- Klang-Buttons haben `data-file` und `data-label` Attribute → generischer Handler
+- Neue Klangschale hinzufügen: HTML-Zeile + MP3-Datei, kein JS nötig
+
+## Versions-Workflow
+Bei jeder Änderung in `app.js` die Zeile `const APP_VERSION = 'v1.0'` hochzählen.
+Update-Check-Button im Menü prüft dies automatisch.
 
 ---
 
@@ -192,12 +111,7 @@ npx serve -p 3456 .
 ```
 http://localhost:3456
 
-## Bilder-Versionen (in C:\Users\Boris\Projekte\Medi App\)
-- Hintergrundbild_V0.3.png (aktuell aktiv) – Buddha unten, Bokeh oben
-- Gong_V0.1.png (aktuell aktiv) – freigestellter Bronze-Gong mit Bügel
-
 ## Kontext für neue Session
 - Boris ist Heilpraktiker, kein Entwickler – beurteilt visuell, misst keine Pixel
-- Boris testet auf OnePlus 5 in Chrome (mit URL-Bar, NICHT als PWA)
-- Debug-Overlay-Strategie hat funktioniert (stilles Messen im Hintergrund)
-- Boris möchte immer erst gefragt werden, bevor etwas implementiert wird
+- Boris testet auf OnePlus 5 in Chrome und iPhone (Katharina)
+- Wichtig: iOS PWA Audio-Bug ist bekannt und dokumentiert, Fix-Plan steht oben
