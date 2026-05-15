@@ -1,6 +1,7 @@
 html {
   min-height: 100%;
   background-color: #1a1a1a;
+  color-scheme: dark;
 }
 
 /* Hintergrundbild: position:fixed, Höhe per JS auf window.screen.height fixiert.
