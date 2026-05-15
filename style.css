@@ -21,14 +21,16 @@ body {
   user-select: none;
 }
 
-/* Schwarze 2px-Leiste ganz oben – schluckt Subpixel-Artefakt am oberen Bildrand auf Android */
+/* Schwarze Leiste ganz oben – deckt Safe-Area + Subpixel-Artefakt ab.
+   Wenn keine Safe-Area (env() = 0), bleiben 4px. Bei Notch/Display-Cutout
+   wird die Leiste so hoch wie der System-Insetbereich. */
 body::before {
   content: "";
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 2px;
+  height: calc(4px + env(safe-area-inset-top, 0px));
   background: #1a1a1a;
   z-index: 200;
   pointer-events: none;
