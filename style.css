@@ -1,5 +1,6 @@
 html {
   min-height: 100%;
+  background-color: #1a1a1a;
 }
 
 /* Hintergrundbild: position:fixed, Höhe per JS auf window.screen.height fixiert.
@@ -22,6 +23,7 @@ html {
 
 body {
   font-family: 'Georgia', serif;
+  background-color: #1a1a1a;
   color: #fff;
   height: 100dvh;
   overflow: hidden;

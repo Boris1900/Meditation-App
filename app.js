@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.18';
+const APP_VERSION = 'v1.19';
 
 // Geräteerkennung
 function isIOS() {
@@ -409,14 +409,13 @@ function positionTimerArea() {
 window.addEventListener('load', initLayout);
 window.addEventListener('resize', initLayout);
 
-// Nach Screen-On: warten bis Statusbar-Animation fertig (~400ms), dann Hintergrund und Layout neu setzen
+// Nach Screen-On: sofort + mehrfach Repaint, da Viewport-Resize während hidden passiert
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    setTimeout(() => {
-      fixBgHeight();
-      initLayout();
-      forceRepaint();
-    }, 400);
+    fixBgHeight();
+    forceRepaint();
+    setTimeout(() => { forceRepaint(); }, 150);
+    setTimeout(() => { fixBgHeight(); initLayout(); forceRepaint(); }, 400);
   }
 });
 
