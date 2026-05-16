@@ -87,8 +87,8 @@ body {
   position: fixed;
   left: var(--flame-x, 50%);
   top: var(--flame-y, 50%);
-  width: 14px;
-  height: 24px;
+  width: 16px;
+  height: 28px;
   border-radius: 50% 50% 35% 35%;
   background: radial-gradient(ellipse at 50% 75%, #fff8c0 0%, #ffe040 25%, #ff8010 60%, rgba(255,60,0,0) 100%);
   filter: blur(2px);
@@ -96,33 +96,33 @@ body {
   z-index: 1;
   transform: translate(-50%, -100%);
   animation:
-    flicker-sway   1.8s ease-in-out infinite alternate,
-    flicker-scale  2.3s ease-in-out infinite alternate,
-    flicker-fade   3.1s ease-in-out infinite alternate;
+    flicker-sway   1.3s ease-in-out infinite alternate,
+    flicker-scale  1.9s ease-in-out infinite alternate,
+    flicker-fade   2.3s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
 
 @keyframes flicker-sway {
-  0%   { transform: translate(-53%, -34%) scaleY(0.95) scaleX(1.04); }
-  25%  { transform: translate(-48%, -34%) scaleY(1.08) scaleX(0.94); }
-  55%  { transform: translate(-52%, -34%) scaleY(0.98) scaleX(1.02); }
-  80%  { transform: translate(-46%, -34%) scaleY(1.05) scaleX(0.96); }
-  100% { transform: translate(-51%, -34%) scaleY(0.93) scaleX(1.05); }
+  0%   { transform: translate(-57%, -34%) scaleY(0.86) scaleX(1.10); }
+  22%  { transform: translate(-43%, -34%) scaleY(1.16) scaleX(0.88); }
+  48%  { transform: translate(-55%, -34%) scaleY(0.90) scaleX(1.08); }
+  73%  { transform: translate(-42%, -34%) scaleY(1.12) scaleX(0.91); }
+  100% { transform: translate(-54%, -34%) scaleY(0.84) scaleX(1.11); }
 }
 
 @keyframes flicker-scale {
   0%   { filter: blur(2px); }
-  40%  { filter: blur(1.5px); }
-  70%  { filter: blur(2.5px); }
-  100% { filter: blur(1.8px); }
+  30%  { filter: blur(1px); }
+  65%  { filter: blur(3px); }
+  100% { filter: blur(1.4px); }
 }
 
 @keyframes flicker-fade {
-  0%   { opacity: 0.75; }
-  25%  { opacity: 0.95; }
-  55%  { opacity: 0.68; }
-  80%  { opacity: 0.98; }
-  100% { opacity: 0.78; }
+  0%   { opacity: 0.55; }
+  20%  { opacity: 1.0; }
+  50%  { opacity: 0.50; }
+  78%  { opacity: 0.97; }
+  100% { opacity: 0.60; }
 }
 
 /* Dimm-Overlay */
