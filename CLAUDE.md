@@ -23,7 +23,7 @@ MeditationsApp/
 └── CLAUDE.md               # Diese Datei
 ```
 
-## Aktueller Stand (Session 14 – v1.38)
+## Aktueller Stand (Session 14 – v1.39)
 
 ### Alles was funktioniert
 - Layout, Timer 1–90 Min, Wake Lock
@@ -57,7 +57,7 @@ MeditationsApp/
 - **PWA:** Nur Chrome (Android) unterstützt Installation mit Icon + Vollbild. Firefox nicht.
 - **Update-Funktion (v1.6):** CSS/JS werden vor Reload mit `cache: reload` frisch geladen. Auf iOS funktioniert der Update-Reload noch nicht zuverlässig → dort über Safari direkt laden.
 
-### Änderungen Session 14 (v1.36–v1.38)
+### Änderungen Session 14 (v1.36–v1.39)
 - **Aura-Größe (v1.36):** `AURA_SIZE_PCT` von 0.22 → 0.46 (~179px auf 390px-Viewport, entspricht test_eyes.html)
 - **Buddha-Intervall (v1.36):** 30–45 Sek. zum Testen (ursprünglich 60–90 Sek. – nach Tests wieder anpassen)
 - **iOS-Positionierungsfix (v1.37):** Neue Hilfsfunktion `bgViewH()` – auf iOS wird `screen.height` statt `window.innerHeight` genutzt, damit Flammen- und Aura-Position mit `fixBgHeight()` übereinstimmt. Auf Android unverändert `innerHeight`.
@@ -67,6 +67,7 @@ MeditationsApp/
   - Sanftes Flackern max. ±1.5°, scaleY 0.94–1.05
   - Hellere Flammenfarbe: weiß-gelber Kern, orange Rand
   - Position: `FLAME_X_PCT = 0.8449`, `FLAME_Y_PCT = 0.7378` (per Test-HTML kalibriert)
+- **Aura-Bug fix (v1.39):** z-index von 51 → 49 (unter Dimm-Overlay). Aura wird jetzt bei Abdunkelung mitgedimmt statt grell herauszustechen. Gleichzeitig alle Opacity-Werte ca. +15% für mehr Grundleuchtkraft.
 
 ### Flammen-Architektur (wichtig für spätere Änderungen)
 ```
@@ -113,13 +114,14 @@ Flamme und Aura sind beim Erststart absichtlich aus – im Browser (kein PWA) w�
 
 ## Bekannte offene Punkte / Nächste Schritte
 
-### Bekannter Bug – akzeptiert, kein Fix geplant
+### Bekannter Bug – offen, nächste Session angehen
 
 **Weiße Linie oben nach Screen-Off → Screen-On (Android)**
 - Tritt nur auf Android (OnePlus 5 / Chrome) auf, iOS kein Problem
 - Ursache: Chrome-internes Rendering-Artefakt beim Neuaufbau nach Screen-On, nicht durch CSS/JS behebbar
-- Zahlreiche Ansätze versucht (v1.17–v1.28): color-scheme, DOM-Reset, Overlay, blur/focus Events – alle ohne Erfolg
-- **Akzeptierte Lösung:** 5-Minuten Wake Lock nach Meditationsende – Nutzer schließen die App danach normalerweise. Weiße Linie tritt dann kaum auf.
+- Bereits versucht (v1.17–v1.28): color-scheme, DOM-Reset, Overlay, blur/focus Events – alle ohne Erfolg
+- **Bisherige Lösung:** 5-Minuten Wake Lock nach Meditationsende – Linie tritt selten auf
+- **Nächster Schritt:** In neuer Session neue Ansätze versuchen. Mittelfristig: nativer Android-Wrapper (Capacitor) als einzig sichere Lösung.
 
 ### Offen / Nach Tests anpassen
 - **Buddha-Intervall:** Aktuell 30–45 Sek. (Test). Nach Abschluss der Tests auf 60–90 Sek. zurücksetzen.
