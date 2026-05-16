@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meditation-v1.41';
+const CACHE_NAME = 'meditation-v1.42';
 
 const CACHE_FILES = [
   './',

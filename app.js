@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.41';
+const APP_VERSION = 'v1.42';
 
 // Geräteerkennung
 function isIOS() {
@@ -527,7 +527,7 @@ document.addEventListener('visibilitychange', () => {
     fadeOverlayOut();
     fixBgHeight();
     initLayout();
-    if (isRunning) requestWakeLock();
+    requestWakeLock();
   }
 });
 
@@ -571,6 +571,8 @@ if (isIOS()) {
   if (hint) hint.style.display = 'block';
   document.body.classList.add('ios');
 }
+
+requestWakeLock();
 
 const versionEl = document.getElementById('app-version');
 if (versionEl) versionEl.textContent = APP_VERSION;
