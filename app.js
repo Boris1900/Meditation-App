@@ -435,10 +435,14 @@ function fixBgHeight() {
 
 function positionAura() {
   const scale   = Math.max(window.innerWidth / IMG_W, window.innerHeight / IMG_H);
-  const offsetX = (IMG_W * scale - window.innerWidth)  / 2;
-  const offsetY = (IMG_H * scale - window.innerHeight) / 2;
-  const auraX   = Math.round(IMG_W * AURA_X_PCT  * scale - offsetX);
-  const auraY   = Math.round(IMG_H * AURA_Y_PCT  * scale - offsetY);
+  const offsetX = (IMG_W * scale - window.innerWidth) / 2;
+  // X: Buddha-Mitte horizontal
+  const auraX  = Math.round(IMG_W * AURA_X_PCT * scale - offsetX);
+  // Y: relativ zur echten Buddha-Krone auf dem Bildschirm + Kopfzentrum
+  const buddhaY    = getBuddhaScreenY();
+  const headOffset = Math.round(IMG_H * 0.05 * scale);
+  const auraY      = buddhaY + headOffset;
+  // Größe: 22% der gerenderten Bildbreite
   const auraSize = Math.round(IMG_W * AURA_SIZE_PCT * scale);
   document.documentElement.style.setProperty('--aura-x',    auraX    + 'px');
   document.documentElement.style.setProperty('--aura-y',    auraY    + 'px');
@@ -536,7 +540,7 @@ updateDimLabel();
 updateDimSliderProgress();
 
 const savedFlame = localStorage.getItem('medi_flamme');
-flameSlider.value = savedFlame !== null ? parseInt(savedFlame) : 60;
+flameSlider.value = savedFlame !== null ? parseInt(savedFlame) : 0;
 updateFlameGlow();
 
 const savedFlackern = localStorage.getItem('medi_flackern');
