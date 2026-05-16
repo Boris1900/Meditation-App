@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.23';
+const APP_VERSION = 'v1.24';
 
 // Geräteerkennung
 function isIOS() {
@@ -61,6 +61,7 @@ let autoDimTimeout = null;
 
 // Wake Lock
 let wakeLock = null;
+let wakeLockExtendTimer = null;
 
 // DOM
 const gongEl      = document.getElementById('gong');
@@ -126,6 +127,7 @@ function formatTime(totalSeconds) {
 }
 
 function startTimer() {
+  if (wakeLockExtendTimer) { clearTimeout(wakeLockExtendTimer); wakeLockExtendTimer = null; }
   remainingSeconds = durationMinutes * 60;
   isRunning = true;
   gongLabel.textContent = 'STOP';
@@ -163,6 +165,9 @@ function finishTimer() {
   stopTimer();
   playGong();
   swingGong();
+  // Nachklang: Screen noch 5 Minuten anlassen nach Ende der Meditation
+  requestWakeLock();
+  wakeLockExtendTimer = setTimeout(releaseWakeLock, 5 * 60 * 1000);
 }
 
 // Gong-Animation
@@ -409,10 +414,20 @@ function positionTimerArea() {
 window.addEventListener('load', initLayout);
 window.addEventListener('resize', initLayout);
 
-// Nach Screen-On: Hintergrund-DOM-Reset + Wake Lock neu anfordern wenn Timer läuft
+// Nach Screen-On: schwarz überblenden (deckt weiße Linie ab) + Wake Lock erneuern
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    // Hintergrund-Element kurz raus und neu einsetzen – erzwingt sauberen Neuaufbau
+    // Idee A: Overlay kurz schwarz, dann aufblenden – weiße Linie unsichtbar
+    if (!isRunning) {
+      overlay.style.transition = 'none';
+      overlay.style.opacity = '1';
+      overlay.style.pointerEvents = 'none';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        overlay.style.transition = 'opacity 1.5s ease';
+        overlay.style.opacity = '0';
+      }));
+    }
+    // Hintergrund-DOM-Reset
     const bg = document.getElementById('app-bg');
     if (bg && bg.parentNode) {
       const parent = bg.parentNode;
