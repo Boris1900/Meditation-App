@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.25';
+const APP_VERSION = 'v1.26';
 
 // Geräteerkennung
 function isIOS() {
@@ -414,18 +414,25 @@ function positionTimerArea() {
 window.addEventListener('load', initLayout);
 window.addEventListener('resize', initLayout);
 
-// Nach Screen-On: schwarz überblenden (deckt weiße Linie ab) + Wake Lock erneuern
+// Screen-Off: Overlay präventiv auf schwarz – beim nächsten Screen-On ist kein weißer Frame möglich
+let overlayWasPreventive = false;
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) {
-    // Idee A: Overlay kurz schwarz, dann aufblenden – weiße Linie unsichtbar
+  if (document.hidden) {
+    // Screen geht aus: Overlay sofort schwarz schalten (Timer muss nicht laufen)
     if (!isRunning) {
       overlay.style.transition = 'none';
       overlay.style.opacity = '1';
       overlay.style.pointerEvents = 'none';
-      requestAnimationFrame(() => requestAnimationFrame(() => {
+      overlayWasPreventive = true;
+    }
+  } else {
+    // Screen kommt an: sanft aufblenden wenn Overlay präventiv gesetzt war
+    if (overlayWasPreventive) {
+      overlayWasPreventive = false;
+      requestAnimationFrame(() => {
         overlay.style.transition = 'opacity 1.5s ease';
         overlay.style.opacity = '0';
-      }));
+      });
     }
     // Hintergrund-DOM-Reset
     const bg = document.getElementById('app-bg');
