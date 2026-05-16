@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.21';
+const APP_VERSION = 'v1.22';
 
 // Geräteerkennung
 function isIOS() {
@@ -409,13 +409,23 @@ function positionTimerArea() {
 window.addEventListener('load', initLayout);
 window.addEventListener('resize', initLayout);
 
-// Nach Screen-On: sofort + mehrfach Repaint, da Viewport-Resize während hidden passiert
+// Nach Screen-On: Hintergrund-DOM-Reset + Wake Lock neu anfordern wenn Timer läuft
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    fixBgHeight();
-    forceRepaint();
-    setTimeout(() => { forceRepaint(); }, 150);
-    setTimeout(() => { fixBgHeight(); initLayout(); forceRepaint(); }, 400);
+    // Hintergrund-Element kurz raus und neu einsetzen – erzwingt sauberen Neuaufbau
+    const bg = document.getElementById('app-bg');
+    if (bg && bg.parentNode) {
+      const parent = bg.parentNode;
+      const next = bg.nextSibling;
+      parent.removeChild(bg);
+      requestAnimationFrame(() => {
+        parent.insertBefore(bg, next);
+        fixBgHeight();
+        initLayout();
+      });
+    }
+    // Wake Lock neu anfordern wenn Meditation läuft
+    if (isRunning) requestWakeLock();
   }
 });
 
