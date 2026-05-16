@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.47';
+const APP_VERSION = 'v1.48';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
