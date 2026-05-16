@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.34';
+const APP_VERSION = 'v1.35';
 
 // Geräteerkennung
 function isIOS() {
@@ -82,7 +82,8 @@ const dimLevelLabel = document.getElementById('dim-level-label');
 const flameSlider = document.getElementById('flame-slider');
 const flameLevelLabel = document.getElementById('flame-level-label');
 const flickerCheckbox = document.getElementById('flicker-checkbox');
-const flameFlicker = document.getElementById('flame-flicker');
+const flameFlicker    = document.getElementById('flame-flicker');
+const buddhaCheckbox  = document.getElementById('buddha-checkbox');
 const bgSmile     = document.getElementById('bg-smile');
 const buddhaAura  = document.getElementById('buddha-aura');
 
@@ -207,7 +208,7 @@ function triggerBuddhaSmile() {
 
 function scheduleBuddhaSmile() {
   clearTimeout(buddhaSmileTimer);
-  if (!isRunning) return;
+  if (!isRunning || !buddhaCheckbox.checked) return;
   const delay = 60000 + Math.random() * 30000; // 60–90 Sek.
   buddhaSmileTimer = setTimeout(() => {
     triggerBuddhaSmile();
@@ -397,6 +398,14 @@ function setFlicker(enabled) {
 
 flickerCheckbox.addEventListener('change', () => setFlicker(flickerCheckbox.checked));
 
+function setBuddha(enabled) {
+  buddhaCheckbox.checked = enabled;
+  localStorage.setItem('medi_buddha', enabled ? '1' : '0');
+  if (!enabled) stopBuddhaSmile();
+  else if (isRunning) scheduleBuddhaSmile();
+}
+buddhaCheckbox.addEventListener('change', () => setBuddha(buddhaCheckbox.checked));
+
 // Layout-Berechnung
 const timerArea = document.getElementById('timer-area');
 
@@ -544,7 +553,10 @@ flameSlider.value = savedFlame !== null ? parseInt(savedFlame) : 0;
 updateFlameGlow();
 
 const savedFlackern = localStorage.getItem('medi_flackern');
-setFlicker(savedFlackern !== '0');
+setFlicker(savedFlackern === '1'); // Default: aus
+
+const savedBuddha = localStorage.getItem('medi_buddha');
+setBuddha(savedBuddha === '1'); // Default: aus
 
 if (isIOS()) {
   const hint = document.getElementById('ios-mute-hint');
