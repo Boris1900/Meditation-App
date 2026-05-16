@@ -159,11 +159,39 @@ Oder direkt: Dateien `index.html`, `app.js` aus Commit `e784187` wiederherstelle
 
 ## Versions-Workflow
 Bei jeder Änderung **beide** Versionsnummern hochzählen – immer synchron halten:
-1. `app.js` Zeile 2: `const APP_VERSION = 'v1.40'` → z.B. `'v1.41'`
-2. `sw.js` Zeile 1: `const CACHE_NAME = 'meditation-v1.40'` → z.B. `'meditation-v1.41'`
+1. `app.js` Zeile 2: `const APP_VERSION = 'v1.43'` → z.B. `'v1.44'`
+2. `sw.js` Zeile 1: `const CACHE_NAME = 'meditation-v1.43'` → z.B. `'meditation-v1.44'`
 
 Der Update-Check-Button im Menü prüft APP_VERSION automatisch.
 Der Service Worker erkennt die neue CACHE_NAME und lädt alle Dateien frisch aus dem Netz.
+
+## Update-Workflow: iOS + Android synchron halten
+
+**Dateien immer im Hauptordner bearbeiten** (nie direkt in `www/`).
+
+### Nach jeder Änderung:
+
+**iOS (PWA – GitHub Pages):**
+```
+git add ... && git commit && git push
+```
+→ iOS-Nutzer bekommen Update automatisch beim nächsten App-Öffnen.
+
+**Android (APK):**
+```
+.\build-android.ps1
+```
+→ Dann in Android Studio: Shift+Shift → "Generate APKs" → APK umbenennen → verteilen.
+
+Das Skript `build-android.ps1` kopiert alle Web-Dateien nach `www/` und führt `npx cap sync android` aus.
+
+### Neue Datei hinzugefügt? (z.B. neues Bild, neue MP3)
+→ Datei auch in `build-android.ps1` in die Copy-Liste eintragen!
+
+### Android-Projektstruktur (nicht anfassen):
+- `android/` – von Capacitor verwaltet, nicht manuell bearbeiten
+- `www/` – wird by `build-android.ps1` automatisch befüllt
+- `assets/icon-only.png` – Quelle für App-Icons (1024x1024)
 
 ---
 

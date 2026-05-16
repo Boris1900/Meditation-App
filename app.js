@@ -1,5 +1,14 @@
 // Version
-const APP_VERSION = 'v1.42';
+const APP_VERSION = 'v1.43';
+
+// Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
+window.addEventListener('load', () => {
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    const { StatusBar } = window.Capacitor.Plugins;
+    StatusBar.setOverlaysWebView({ overlay: true });
+    StatusBar.setStyle({ style: 'DARK' });
+  }
+});
 
 // Geräteerkennung
 function isIOS() {
