@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.35';
+const APP_VERSION = 'v1.36';
 
 // Geräteerkennung
 function isIOS() {
@@ -209,7 +209,7 @@ function triggerBuddhaSmile() {
 function scheduleBuddhaSmile() {
   clearTimeout(buddhaSmileTimer);
   if (!isRunning || !buddhaCheckbox.checked) return;
-  const delay = 60000 + Math.random() * 30000; // 60–90 Sek.
+  const delay = 30000 + Math.random() * 15000; // 30–45 Sek. (TEST)
   buddhaSmileTimer = setTimeout(() => {
     triggerBuddhaSmile();
     scheduleBuddhaSmile();
@@ -415,7 +415,7 @@ const FLAME_X_PCT = 0.85;   // Flammen-Mitte X (rechts unten im Bild)
 const FLAME_Y_PCT = 0.72;   // Flammen-Mitte Y
 const AURA_X_PCT  = 0.28;   // Aura-Mitte X (Buddha-Kopf)
 const AURA_Y_PCT  = 0.59;   // Aura-Mitte Y
-const AURA_SIZE_PCT = 0.22; // Aura-Durchmesser als % der Bildbreite
+const AURA_SIZE_PCT = 0.46; // Aura-Durchmesser als % der Bildbreite
 const GONG_ASPECT = 312 / 360;
 const MIN_TIMER_ZONE = 115; // px Mindestplatz für Timer + Slider
 

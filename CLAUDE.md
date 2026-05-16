@@ -20,7 +20,7 @@ MeditationsApp/
 └── CLAUDE.md         # Diese Datei
 ```
 
-## Aktueller Stand (nach Session 13 – v1.33)
+## Aktueller Stand (nach Session 13 – v1.35)
 
 ### Alles was funktioniert
 - Layout, Timer 1–90 Min, Wake Lock
@@ -65,7 +65,7 @@ Alle Nutzereinstellungen werden sofort in localStorage gespeichert und beim näc
 | Klang | Klangschale Morgenstern |
 | Meditationszeit | 30 Minuten |
 | Abdunkelung | Keine (0%) |
-| Flammen-Schein | Mittel (60%) |
+| Flammen-Schein | Keine (0%) |
 
 ### Tipp-Logik
 | Situation | Tap auf Gong | Tap woanders |
