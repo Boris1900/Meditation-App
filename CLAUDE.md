@@ -112,16 +112,29 @@ Flamme und Aura sind beim Erststart absichtlich aus – im Browser (kein PWA) w�
 
 ---
 
+## Backup-Stand vor Service-Worker-Einbau
+
+**Stabiler Stand: v1.39** – Commit `e784187`
+Falls der Service Worker schiefläuft → zurück mit:
+```
+git revert --no-commit e784187..HEAD
+git commit -m "Revert: zurück auf v1.39"
+git push
+```
+Oder direkt: Dateien `index.html`, `app.js` aus Commit `e784187` wiederherstellen und `sw.js` löschen.
+
+---
+
 ## Bekannte offene Punkte / Nächste Schritte
 
-### Bekannter Bug – offen, nächste Session angehen
+### Bekannter Bug – in Session 15 angegangen
 
-**Weiße Linie oben nach Screen-Off → Screen-On (Android)**
+**Weiße Linie oben nach Screen-Off → Screen-On / nach Reload (Android)**
 - Tritt nur auf Android (OnePlus 5 / Chrome) auf, iOS kein Problem
-- Ursache: Chrome-internes Rendering-Artefakt beim Neuaufbau nach Screen-On, nicht durch CSS/JS behebbar
+- Ursache: Chrome-internes Rendering-Artefakt – Ladebalken/-UI sichtbar während Seite neu aufbaut
 - Bereits versucht (v1.17–v1.28): color-scheme, DOM-Reset, Overlay, blur/focus Events – alle ohne Erfolg
-- **Bisherige Lösung:** 5-Minuten Wake Lock nach Meditationsende – Linie tritt selten auf
-- **Nächster Schritt:** In neuer Session neue Ansätze versuchen. Mittelfristig: nativer Android-Wrapper (Capacitor) als einzig sichere Lösung.
+- Versucht in Session 15 (v1.39.1): Inline `background:#000` im Head – hat nicht geholfen (Linie kommt aus Chrome-UI, nicht Seiteninhalt)
+- **Lösung Session 15:** Service Worker → App lädt aus lokalem Cache, kein Ladebalken mehr
 
 ### Offen / Nach Tests anpassen
 - **Buddha-Intervall:** Aktuell 30–45 Sek. (Test). Nach Abschluss der Tests auf 60–90 Sek. zurücksetzen.
@@ -133,7 +146,6 @@ Flamme und Aura sind beim Erststart absichtlich aus – im Browser (kein PWA) w�
 
 ### Aufgeschoben
 - Multi-MP3-Feature: eigene Uploads dauerhaft speichern
-- Service Worker (Offline-PWA)
 
 ---
 
@@ -146,8 +158,12 @@ Flamme und Aura sind beim Erststart absichtlich aus – im Browser (kein PWA) w�
 - Neue Klangschale hinzufügen: HTML-Zeile + MP3-Datei, kein JS nötig
 
 ## Versions-Workflow
-Bei jeder Änderung in `app.js` die Zeile `const APP_VERSION = 'v1.0'` hochzählen.
-Update-Check-Button im Menü prüft dies automatisch.
+Bei jeder Änderung **beide** Versionsnummern hochzählen – immer synchron halten:
+1. `app.js` Zeile 2: `const APP_VERSION = 'v1.40'` → z.B. `'v1.41'`
+2. `sw.js` Zeile 1: `const CACHE_NAME = 'meditation-v1.40'` → z.B. `'meditation-v1.41'`
+
+Der Update-Check-Button im Menü prüft APP_VERSION automatisch.
+Der Service Worker erkennt die neue CACHE_NAME und lädt alle Dateien frisch aus dem Netz.
 
 ---
 
