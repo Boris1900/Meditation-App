@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.46';
+const APP_VERSION = 'v1.47';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -631,7 +631,10 @@ async function checkForUpdate() {
   btn.disabled = true;
   btn.textContent = '⏳ Prüfe...';
   try {
-    const res  = await fetch('app.js?t=' + Date.now(), { cache: 'no-store' });
+    const baseUrl = (window.Capacitor && window.Capacitor.isNativePlatform())
+      ? 'https://boris1900.github.io/Meditation-App/'
+      : '';
+    const res  = await fetch(baseUrl + 'app.js?t=' + Date.now(), { cache: 'no-store' });
     const text = await res.text();
     const match = text.match(/const APP_VERSION\s*=\s*'([^']+)'/);
     const latest = match ? match[1] : null;
