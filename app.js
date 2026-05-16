@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.33-test';
+const APP_VERSION = 'v1.34';
 
 // Geräteerkennung
 function isIOS() {
@@ -208,7 +208,7 @@ function triggerBuddhaSmile() {
 function scheduleBuddhaSmile() {
   clearTimeout(buddhaSmileTimer);
   if (!isRunning) return;
-  const delay = 8000; // TEST – danach auf 60000 + Math.random() * 30000 zurücksetzen
+  const delay = 60000 + Math.random() * 30000; // 60–90 Sek.
   buddhaSmileTimer = setTimeout(() => {
     triggerBuddhaSmile();
     scheduleBuddhaSmile();
