@@ -20,7 +20,7 @@ MeditationsApp/
 └── CLAUDE.md         # Diese Datei
 ```
 
-## Aktueller Stand (nach Session 10 – v1.20)
+## Aktueller Stand (nach Session 11 – v1.25)
 
 ### Alles was funktioniert
 - Layout, Timer 1–90 Min, Wake Lock
@@ -45,8 +45,15 @@ MeditationsApp/
 - App-Icon: icon-1024.png (Bambus-Hintergrund + Gong zentriert, 88%), apple-touch-icon in index.html
 - **iOS Timer-Fix (v1.1–v1.5):** Jede Ziffer in festem `<span>` (renderTimer()), verhindert Wandern. Auf iOS: Merriweather 700 (lining-nums, gleichmäßige Höhen). Android bleibt Georgia.
 - **Hintergrundbild (v1.8):** Direkt auf `html`-Element (background-attachment: fixed), body::before entfernt.
-- **Flammen-Animation (v1.9):** CSS-Element exakt über Kerzen-Position (`FLAME_X_PCT = 0.85`, `FLAME_Y_PCT = 0.72`), sanftes Flackern per Keyframes (translateX + scaleY + opacity) – sehr ruhig, lebendig.
+- **Flammen-Animation (v1.9):** CSS-Element exakt über Kerzen-Position (`FLAME_X_PCT = 0.85`, `FLAME_Y_PCT = 0.72`), sanftes Flackern per Keyframes (translateX + scaleY + opacity).
+- **Flamme intensiver (v1.23):** Seitwärtsbewegung ±7%, ScaleY 0.84–1.16, Opacity 0.50–1.0, schnellerer Takt.
+- **Screen-On Einblenden (v1.24):** Bei Screen-On und Timer gestoppt → Overlay kurz schwarz, 1.5s aufblenden – weiße Linie unsichtbar.
+- **Nachklang Wake Lock (v1.24):** Nach Timer-Ende Screen noch 5 Minuten anlassen.
+- **Abdunkelungs-Hinweis (v1.25):** Tipp im Menü unter dem Slider erklärt das Aufhell-vor-Stopp-Verhalten.
 - **Update-Funktion (v1.6):** CSS/JS werden vor Reload mit `cache: reload` frisch geladen. Auf iOS funktioniert der Update-Reload noch nicht zuverlässig → dort über Safari direkt laden.
+
+### Einstellungen werden gespeichert
+Alle Nutzereinstellungen werden sofort in localStorage gespeichert und beim nächsten Start wiederhergestellt: Timer-Zeit, Abdunkelung, Flammen-Schein, Flackern, Klang.
 
 ### Erststart-Defaults (wenn localStorage leer)
 | Einstellung | Default |
