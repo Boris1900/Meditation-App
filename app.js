@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.37';
+const APP_VERSION = 'v1.38';
 
 // Geräteerkennung
 function isIOS() {
@@ -411,8 +411,8 @@ const timerArea = document.getElementById('timer-area');
 
 const IMG_W = 852, IMG_H = 1846;
 const BUDDHA_PCT  = 0.54;   // Buddha-Kopfkrone bei 54% der Bildhöhe
-const FLAME_X_PCT = 0.85;   // Flammen-Mitte X (rechts unten im Bild)
-const FLAME_Y_PCT = 0.72;   // Flammen-Mitte Y
+const FLAME_X_PCT = 0.8449; // Flammen-Fuß X
+const FLAME_Y_PCT = 0.7378; // Flammen-Fuß Y
 const AURA_X_PCT  = 0.28;   // Aura-Mitte X (Buddha-Kopf)
 const AURA_Y_PCT  = 0.59;   // Aura-Mitte Y
 const AURA_SIZE_PCT = 0.46; // Aura-Durchmesser als % der Bildbreite

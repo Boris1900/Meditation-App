@@ -133,46 +133,54 @@ body {
 
 #flame-flicker.hidden { display: none; }
 
+/* Ankerpunkt = Fuß der Flamme, Größe 0 */
 #flame-flicker {
   position: fixed;
   left: var(--flame-x, 50%);
   top: var(--flame-y, 50%);
-  width: 16px;
-  height: 28px;
-  border-radius: 50% 50% 35% 35%;
-  background: radial-gradient(ellipse at 50% 75%, #fff8c0 0%, #ffe040 25%, #ff8010 60%, rgba(255,60,0,0) 100%);
-  filter: blur(2px);
+  width: 0;
+  height: 0;
   pointer-events: none;
   z-index: 1;
-  transform: translate(-50%, -100%);
+}
+
+/* Flamme wächst von unten nach oben – Fuß bleibt fix */
+#flame-flicker::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 14px;
+  height: 30px;
+  transform-origin: bottom center;
+  background: radial-gradient(ellipse at 50% 85%,
+    rgba(255,245,180,1.00)  0%,
+    rgba(255,190, 60, 0.95) 30%,
+    rgba(255,110, 10, 0.60) 62%,
+    transparent            100%);
+  border-radius: 50% 50% 30% 30%;
+  filter: blur(1px);
   animation:
-    flicker-sway   1.3s ease-in-out infinite alternate,
-    flicker-scale  1.9s ease-in-out infinite alternate,
-    flicker-fade   2.3s ease-in-out infinite alternate;
+    flicker-move 1.8s ease-in-out infinite alternate,
+    flicker-fade 2.3s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
 
-@keyframes flicker-sway {
-  0%   { transform: translate(-57%, -34%) scaleY(0.86) scaleX(1.10); }
-  22%  { transform: translate(-43%, -34%) scaleY(1.16) scaleX(0.88); }
-  48%  { transform: translate(-55%, -34%) scaleY(0.90) scaleX(1.08); }
-  73%  { transform: translate(-42%, -34%) scaleY(1.12) scaleX(0.91); }
-  100% { transform: translate(-54%, -34%) scaleY(0.84) scaleX(1.11); }
-}
-
-@keyframes flicker-scale {
-  0%   { filter: blur(2px); }
-  30%  { filter: blur(1px); }
-  65%  { filter: blur(3px); }
-  100% { filter: blur(1.4px); }
+@keyframes flicker-move {
+  0%   { transform: translateX(-50%) rotate(-1.5deg) scaleY(0.95); }
+  18%  { transform: translateX(-50%) rotate( 1.0deg) scaleY(1.04); }
+  36%  { transform: translateX(-50%) rotate(-1.0deg) scaleY(0.97); }
+  54%  { transform: translateX(-50%) rotate( 1.5deg) scaleY(1.05); }
+  72%  { transform: translateX(-50%) rotate(-0.5deg) scaleY(0.94); }
+  100% { transform: translateX(-50%) rotate( 1.0deg) scaleY(1.02); }
 }
 
 @keyframes flicker-fade {
-  0%   { opacity: 0.55; }
-  20%  { opacity: 1.0; }
-  50%  { opacity: 0.50; }
-  78%  { opacity: 0.97; }
-  100% { opacity: 0.60; }
+  0%   { opacity: 0.60; }
+  25%  { opacity: 1.00; }
+  55%  { opacity: 0.65; }
+  80%  { opacity: 0.95; }
+  100% { opacity: 0.70; }
 }
 
 /* Dimm-Overlay */
