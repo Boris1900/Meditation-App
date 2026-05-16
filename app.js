@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.36';
+const APP_VERSION = 'v1.37';
 
 // Geräteerkennung
 function isIOS() {
@@ -419,16 +419,23 @@ const AURA_SIZE_PCT = 0.46; // Aura-Durchmesser als % der Bildbreite
 const GONG_ASPECT = 312 / 360;
 const MIN_TIMER_ZONE = 115; // px Mindestplatz für Timer + Slider
 
+// Auf iOS nutzt fixBgHeight() screen.height – Positionierung muss dasselbe tun
+function bgViewH() {
+  return isIOS() ? window.screen.height : window.innerHeight;
+}
+
 function getBuddhaScreenY() {
-  const scale = Math.max(window.innerWidth / IMG_W, window.innerHeight / IMG_H);
-  const offsetY = (IMG_H * scale - window.innerHeight) / 2;
+  const h = bgViewH();
+  const scale = Math.max(window.innerWidth / IMG_W, h / IMG_H);
+  const offsetY = (IMG_H * scale - h) / 2;
   return Math.round(IMG_H * BUDDHA_PCT * scale - offsetY);
 }
 
 function positionFlame() {
-  const scale = Math.max(window.innerWidth / IMG_W, window.innerHeight / IMG_H);
+  const h = bgViewH();
+  const scale = Math.max(window.innerWidth / IMG_W, h / IMG_H);
   const offsetX = (IMG_W * scale - window.innerWidth) / 2;
-  const offsetY = (IMG_H * scale - window.innerHeight) / 2;
+  const offsetY = (IMG_H * scale - h) / 2;
   const flameX = Math.round(IMG_W * FLAME_X_PCT * scale - offsetX);
   const flameY = Math.round(IMG_H * FLAME_Y_PCT * scale - offsetY);
   document.documentElement.style.setProperty('--flame-x', flameX + 'px');
@@ -443,7 +450,8 @@ function fixBgHeight() {
 }
 
 function positionAura() {
-  const scale   = Math.max(window.innerWidth / IMG_W, window.innerHeight / IMG_H);
+  const h = bgViewH();
+  const scale   = Math.max(window.innerWidth / IMG_W, h / IMG_H);
   const offsetX = (IMG_W * scale - window.innerWidth) / 2;
   // X: Buddha-Mitte horizontal
   const auraX  = Math.round(IMG_W * AURA_X_PCT * scale - offsetX);
