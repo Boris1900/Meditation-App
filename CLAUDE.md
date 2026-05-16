@@ -76,10 +76,17 @@ Für Positionierung: `test_aura_v136.html` nutzen.
 - `@capacitor/assets` – Icon-Generierung
 
 ### Build-Workflow
+⚠️ **Reihenfolge zwingend einhalten – sonst landet alte Version in der APK!**
+
+1. Code-Änderungen in den Hauptdateien vornehmen (`app.js`, `style.css`, etc.)
+2. Versionsnummer hochzählen in `app.js` (APP_VERSION) und `sw.js` (CACHE_NAME)
+3. Erst dann das Build-Skript ausführen:
 ```powershell
 .\build-android.ps1          # Web-Dateien → www/ + npx cap sync android
 ```
-Dann Android Studio: **Shift+Shift → "Generate APKs"** → APK umbenennen → verteilen.
+4. Android Studio: **Shift+Shift → "Generate APKs"** → APK umbenennen → verteilen.
+
+**Niemals** `build-android.ps1` ausführen bevor alle Änderungen gemacht sind – das Skript kopiert den aktuellen Stand, nicht den späteren.
 
 **APK liegt in:** `android/app/build/outputs/apk/debug/app-debug.apk`
 
@@ -108,8 +115,13 @@ Bei jeder Änderung **beide** hochzählen:
 ## Offene Punkte
 
 ### Nächste Session
-- **Android Navigationsleiste verdeckt Menü-Button unten** – Android-Systemleiste (Back/Home/Recent) überlagert den Nav-Button der App. Muss mit Edge-to-Edge Insets gefixt werden (bottom padding auf #bottom-nav).
+- **Buddha-Lächeln beim START** – `triggerBuddhaSmileOnce()` wird in `startTimer()` aufgerufen, aber die Opacity ändert sich nicht sichtbar. Beim STOP funktioniert es korrekt. Ursache noch unklar – in nächster Session debuggen.
 - **Buddha-Intervall:** Von 30–45 Sek. auf 60–90 Sek. zurücksetzen (nach Tests)
+
+### Bereits erledigt (Session 16)
+- Android Navigationsleiste fix: `env(safe-area-inset-bottom)` auf `#bottom-nav`
+- Datei `background_lächeln_v0.3.jpg` → `background_laecheln_v0.3.jpg` (Umlaut entfernt)
+- Buddha-Lächeln + Halo bei Meditations-ENDE (Stop + Timer abgelaufen)
 
 ### Mittelfristig
 - Play Store (25€ einmalig) für breitere Patienten-Verteilung

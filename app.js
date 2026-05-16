@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.45';
+const APP_VERSION = 'v1.46';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -150,6 +150,7 @@ function startTimer() {
   requestWakeLock();
   scheduleAutoDim();
   scheduleBuddhaSmile();
+  triggerBuddhaSmileOnce();
 
   timerInterval = setInterval(() => {
     remainingSeconds--;
@@ -172,6 +173,7 @@ function stopTimer() {
   releaseWakeLock();
   brighten();
   stopBuddhaSmile();
+  triggerBuddhaSmileOnce();
   updateDuration(durationMinutes);
 }
 
@@ -213,6 +215,23 @@ function triggerBuddhaSmile() {
   setTimeout(() => {
     buddhaSmileBusy = false;
   }, 8000);
+}
+
+function triggerBuddhaSmileOnce() {
+  if (!buddhaCheckbox.checked) return;
+  bgSmile.style.transition    = 'none';
+  buddhaAura.style.transition = 'none';
+  bgSmile.style.opacity    = '0';
+  buddhaAura.style.opacity = '0';
+  void bgSmile.offsetHeight; // erzwingt Reflow
+  bgSmile.style.transition    = '';
+  buddhaAura.style.transition = '';
+  bgSmile.style.opacity    = '1';
+  buddhaAura.style.opacity = '1';
+  setTimeout(() => {
+    bgSmile.style.opacity    = '0';
+    buddhaAura.style.opacity = '0';
+  }, 6500);
 }
 
 function scheduleBuddhaSmile() {
