@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.26';
+const APP_VERSION = 'v1.27';
 
 // Geräteerkennung
 function isIOS() {
@@ -414,42 +414,43 @@ function positionTimerArea() {
 window.addEventListener('load', initLayout);
 window.addEventListener('resize', initLayout);
 
-// Screen-Off: Overlay präventiv auf schwarz – beim nächsten Screen-On ist kein weißer Frame möglich
+// Overlay präventiv schwarz – via visibilitychange UND blur (power-button)
 let overlayWasPreventive = false;
+
+function setOverlayBlack() {
+  if (!isRunning) {
+    overlay.style.transition = 'none';
+    overlay.style.opacity = '1';
+    overlay.style.pointerEvents = 'none';
+    overlayWasPreventive = true;
+  }
+}
+
+function fadeOverlayOut() {
+  if (overlayWasPreventive) {
+    overlayWasPreventive = false;
+    requestAnimationFrame(() => {
+      overlay.style.transition = 'opacity 1.5s ease';
+      overlay.style.opacity = '0';
+    });
+  }
+}
+
+// Screen-Off via visibilitychange
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
-    // Screen geht aus: Overlay sofort schwarz schalten (Timer muss nicht laufen)
-    if (!isRunning) {
-      overlay.style.transition = 'none';
-      overlay.style.opacity = '1';
-      overlay.style.pointerEvents = 'none';
-      overlayWasPreventive = true;
-    }
+    setOverlayBlack();
   } else {
-    // Screen kommt an: sanft aufblenden wenn Overlay präventiv gesetzt war
-    if (overlayWasPreventive) {
-      overlayWasPreventive = false;
-      requestAnimationFrame(() => {
-        overlay.style.transition = 'opacity 1.5s ease';
-        overlay.style.opacity = '0';
-      });
-    }
-    // Hintergrund-DOM-Reset
-    const bg = document.getElementById('app-bg');
-    if (bg && bg.parentNode) {
-      const parent = bg.parentNode;
-      const next = bg.nextSibling;
-      parent.removeChild(bg);
-      requestAnimationFrame(() => {
-        parent.insertBefore(bg, next);
-        fixBgHeight();
-        initLayout();
-      });
-    }
-    // Wake Lock neu anfordern wenn Meditation läuft
+    fadeOverlayOut();
+    fixBgHeight();
+    initLayout();
     if (isRunning) requestWakeLock();
   }
 });
+
+// Screen-Off via window blur (fängt Power-Button zuverlässiger ab)
+window.addEventListener('blur', setOverlayBlack);
+window.addEventListener('focus', fadeOverlayOut);
 
 // Viewport-Resize (Statusbar erscheint/verschwindet): Repaint wenn Viewport wächst
 if (window.visualViewport) {
