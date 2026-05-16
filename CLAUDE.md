@@ -44,6 +44,7 @@ MeditationsApp/
 - **v1.41:** `overscroll-behavior: none` gegen Pull-to-Refresh
 - **v1.42:** Wake Lock sofort beim Laden + bei Screen-on (nicht nur beim Timer)
 - **v1.43:** Android APK via Capacitor – StatusBar transparent, Icon, dunkler Splash
+- **v1.44:** Update-Button zeigt auf Android "APK laden" mit GitHub-Release-Link. APK-Namenskonvention ab jetzt: `MeditationApp-v1.XX.apk` (kein Suffix mehr!)
 
 ### Weiße Linie Android – Fazit Session 15
 - **Power-Button** überschreibt Wake Lock → Chrome lädt neu → weiße Linie bleibt
@@ -107,8 +108,7 @@ Bei jeder Änderung **beide** hochzählen:
 ## Offene Punkte
 
 ### Nächste Session
-- **GitHub Releases einrichten:** APK hochladen, URL dokumentieren
-- **Update-Button erweitern:** Bei neuer Version APK-Download-Link anzeigen (nur Android/Capacitor)
+- **Android Navigationsleiste verdeckt Menü-Button unten** – Android-Systemleiste (Back/Home/Recent) überlagert den Nav-Button der App. Muss mit Edge-to-Edge Insets gefixt werden (bottom padding auf #bottom-nav).
 - **Buddha-Intervall:** Von 30–45 Sek. auf 60–90 Sek. zurücksetzen (nach Tests)
 
 ### Mittelfristig
