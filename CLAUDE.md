@@ -20,7 +20,7 @@ MeditationsApp/
 └── CLAUDE.md         # Diese Datei
 ```
 
-## Aktueller Stand (nach Session 11 – v1.25)
+## Aktueller Stand (nach Session 12 – v1.32)
 
 ### Alles was funktioniert
 - Layout, Timer 1–90 Min, Wake Lock
@@ -49,7 +49,10 @@ MeditationsApp/
 - **Flamme intensiver (v1.23):** Seitwärtsbewegung ±7%, ScaleY 0.84–1.16, Opacity 0.50–1.0, schnellerer Takt.
 - **Screen-On Einblenden (v1.24):** Bei Screen-On und Timer gestoppt → Overlay kurz schwarz, 1.5s aufblenden – weiße Linie unsichtbar.
 - **Nachklang Wake Lock (v1.24):** Nach Timer-Ende Screen noch 5 Minuten anlassen.
-- **Abdunkelungs-Hinweis (v1.25):** Tipp im Menü unter dem Slider erklärt das Aufhell-vor-Stopp-Verhalten.
+- **Abdunkelungs-Hinweis (v1.29):** „Dunkelt das Display nach dem Start automatisch ab. Antippen hellt es wieder auf." – direkt unter der Überschrift, dezent kursiv.
+- **Impressum (v1.32):** „© Tinnituspraxis Seedorf · Ahrensburg" – ganz unten im Menü unter der Versionsnummer.
+- **Wake Lock nach Meditationsende (v1.24):** Screen bleibt 5 Minuten nach Timer-Ende an (Nachklang-Phase). Neuer Timer cancelt den Extend-Timer.
+- **PWA:** Nur Chrome (Android) unterstützt Installation mit Icon + Vollbild. Firefox nicht.
 - **Update-Funktion (v1.6):** CSS/JS werden vor Reload mit `cache: reload` frisch geladen. Auf iOS funktioniert der Update-Reload noch nicht zuverlässig → dort über Safari direkt laden.
 
 ### Einstellungen werden gespeichert
