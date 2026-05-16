@@ -34,6 +34,55 @@ body {
   user-select: none;
 }
 
+/* Buddha-Lächeln: liegt knapp über app-bg, unter dem Overlay */
+#bg-smile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 0;
+  background: url('background_lächeln_v0.3.jpg') center center / cover no-repeat;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+  pointer-events: none;
+}
+
+/* Buddha-Aura: goldener Heiligenschein, liegt über dem Overlay */
+#buddha-aura {
+  position: fixed;
+  left: var(--aura-x, 28%);
+  top: var(--aura-y, 59%);
+  width: var(--aura-size, 180px);
+  height: var(--aura-size, 180px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    transparent               0%,
+    transparent              40%,
+    rgba(255, 230, 80, 0.08) 45%,
+    rgba(255, 220, 70, 0.35) 50%,
+    rgba(255, 210, 60, 0.60) 55%,
+    rgba(255, 200, 50, 0.55) 60%,
+    rgba(255, 185, 35, 0.25) 68%,
+    rgba(255, 170, 25, 0.08) 77%,
+    transparent              88%);
+  -webkit-mask-image: linear-gradient(to bottom,
+    black             0%,
+    black            58%,
+    rgba(0,0,0,0.20) 78%,
+    transparent      92%);
+  mask-image: linear-gradient(to bottom,
+    black             0%,
+    black            58%,
+    rgba(0,0,0,0.20) 78%,
+    transparent      92%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 51;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+
 /* Flammen-Schein: liegt zwischen Hintergrund und Inhalt, pulsiert sanft */
 #flame-glow {
   position: fixed;

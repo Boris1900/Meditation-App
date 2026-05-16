@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.32';
+const APP_VERSION = 'v1.33';
 
 // Geräteerkennung
 function isIOS() {
@@ -83,6 +83,8 @@ const flameSlider = document.getElementById('flame-slider');
 const flameLevelLabel = document.getElementById('flame-level-label');
 const flickerCheckbox = document.getElementById('flicker-checkbox');
 const flameFlicker = document.getElementById('flame-flicker');
+const bgSmile     = document.getElementById('bg-smile');
+const buddhaAura  = document.getElementById('buddha-aura');
 
 // Timer-Anzeige: jede Ziffer in fixen Span, verhindert iOS-Ruckeln
 function renderTimer(timeStr) {
@@ -137,6 +139,7 @@ function startTimer() {
   plusBtn.disabled = true;
   requestWakeLock();
   scheduleAutoDim();
+  scheduleBuddhaSmile();
 
   timerInterval = setInterval(() => {
     remainingSeconds--;
@@ -158,6 +161,7 @@ function stopTimer() {
   plusBtn.disabled = false;
   releaseWakeLock();
   brighten();
+  stopBuddhaSmile();
   updateDuration(durationMinutes);
 }
 
@@ -177,6 +181,46 @@ function swingGong() {
   gongEl.addEventListener('animationend', () => {
     gongEl.classList.remove('swinging');
   }, { once: true });
+}
+
+// Buddha-Lächeln + Aura
+let buddhaSmileTimer = null;
+let buddhaSmileBusy  = false;
+
+function triggerBuddhaSmile() {
+  if (buddhaSmileBusy || !isRunning) return;
+  buddhaSmileBusy = true;
+
+  bgSmile.style.opacity    = '1';
+  buddhaAura.style.opacity = '1';
+
+  // 5 Sek. sichtbar, dann ausblenden
+  setTimeout(() => {
+    bgSmile.style.opacity    = '0';
+    buddhaAura.style.opacity = '0';
+  }, 6500);
+
+  setTimeout(() => {
+    buddhaSmileBusy = false;
+  }, 8000);
+}
+
+function scheduleBuddhaSmile() {
+  clearTimeout(buddhaSmileTimer);
+  if (!isRunning) return;
+  const delay = 60000 + Math.random() * 30000; // 60–90 Sek.
+  buddhaSmileTimer = setTimeout(() => {
+    triggerBuddhaSmile();
+    scheduleBuddhaSmile();
+  }, delay);
+}
+
+function stopBuddhaSmile() {
+  clearTimeout(buddhaSmileTimer);
+  buddhaSmileTimer = null;
+  buddhaSmileBusy  = false;
+  bgSmile.style.opacity    = '0';
+  buddhaAura.style.opacity = '0';
 }
 
 // Dimm-Logik
@@ -357,9 +401,12 @@ flickerCheckbox.addEventListener('change', () => setFlicker(flickerCheckbox.chec
 const timerArea = document.getElementById('timer-area');
 
 const IMG_W = 852, IMG_H = 1846;
-const BUDDHA_PCT = 0.54;   // Buddha-Kopfkrone bei 54% der Bildhöhe
-const FLAME_X_PCT = 0.85;  // Flammen-Mitte X (rechts unten im Bild)
-const FLAME_Y_PCT = 0.72;  // Flammen-Mitte Y
+const BUDDHA_PCT  = 0.54;   // Buddha-Kopfkrone bei 54% der Bildhöhe
+const FLAME_X_PCT = 0.85;   // Flammen-Mitte X (rechts unten im Bild)
+const FLAME_Y_PCT = 0.72;   // Flammen-Mitte Y
+const AURA_X_PCT  = 0.28;   // Aura-Mitte X (Buddha-Kopf)
+const AURA_Y_PCT  = 0.59;   // Aura-Mitte Y
+const AURA_SIZE_PCT = 0.22; // Aura-Durchmesser als % der Bildbreite
 const GONG_ASPECT = 312 / 360;
 const MIN_TIMER_ZONE = 115; // px Mindestplatz für Timer + Slider
 
@@ -380,8 +427,22 @@ function positionFlame() {
 }
 
 function fixBgHeight() {
+  const h = window.screen.height + 'px';
   const bg = document.getElementById('app-bg');
-  if (bg) bg.style.height = window.screen.height + 'px';
+  if (bg) bg.style.height = h;
+  if (bgSmile) bgSmile.style.height = h;
+}
+
+function positionAura() {
+  const scale   = Math.max(window.innerWidth / IMG_W, window.innerHeight / IMG_H);
+  const offsetX = (IMG_W * scale - window.innerWidth)  / 2;
+  const offsetY = (IMG_H * scale - window.innerHeight) / 2;
+  const auraX   = Math.round(IMG_W * AURA_X_PCT  * scale - offsetX);
+  const auraY   = Math.round(IMG_H * AURA_Y_PCT  * scale - offsetY);
+  const auraSize = Math.round(IMG_W * AURA_SIZE_PCT * scale);
+  document.documentElement.style.setProperty('--aura-x',    auraX    + 'px');
+  document.documentElement.style.setProperty('--aura-y',    auraY    + 'px');
+  document.documentElement.style.setProperty('--aura-size', auraSize + 'px');
 }
 
 function forceRepaint() {
@@ -401,6 +462,7 @@ function initLayout() {
   document.documentElement.style.setProperty('--gong-height', gongH + 'px');
   document.documentElement.style.setProperty('--gong-width', gongW + 'px');
   positionFlame();
+  positionAura();
   requestAnimationFrame(positionTimerArea);
 }
 

@@ -20,7 +20,7 @@ MeditationsApp/
 └── CLAUDE.md         # Diese Datei
 ```
 
-## Aktueller Stand (nach Session 12 – v1.32)
+## Aktueller Stand (nach Session 13 – v1.33)
 
 ### Alles was funktioniert
 - Layout, Timer 1–90 Min, Wake Lock
@@ -51,6 +51,7 @@ MeditationsApp/
 - **Nachklang Wake Lock (v1.24):** Nach Timer-Ende Screen noch 5 Minuten anlassen.
 - **Abdunkelungs-Hinweis (v1.29):** „Dunkelt das Display nach dem Start automatisch ab. Antippen hellt es wieder auf." – direkt unter der Überschrift, dezent kursiv.
 - **Impressum (v1.32):** „© Tinnituspraxis Seedorf · Ahrensburg" – ganz unten im Menü unter der Versionsnummer.
+- **Buddha-Lächeln + Aura (v1.33):** Während der Meditation lächelt der Buddha alle 60–90 Sek. zufällig (Überblendung zu `background_lächeln_v0.3.jpg`). Gleichzeitig erscheint ein goldener Heiligenschein (`#buddha-aura`) – Ring mit transparenter Mitte, untere Hälfte ausblendet (liegt über dem Dimm-Overlay, leuchtet auch im Dunkeln). Position und Größe skalieren per JS wie die Flamme. Dateien: `background_lächeln_v0.3.jpg`, CSS-Klassen `#bg-smile` + `#buddha-aura`.
 - **Wake Lock nach Meditationsende (v1.24):** Screen bleibt 5 Minuten nach Timer-Ende an (Nachklang-Phase). Neuer Timer cancelt den Extend-Timer.
 - **PWA:** Nur Chrome (Android) unterstützt Installation mit Icon + Vollbild. Firefox nicht.
 - **Update-Funktion (v1.6):** CSS/JS werden vor Reload mit `cache: reload` frisch geladen. Auf iOS funktioniert der Update-Reload noch nicht zuverlässig → dort über Safari direkt laden.
