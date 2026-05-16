@@ -2,6 +2,7 @@ html {
   min-height: 100%;
   background-color: #1a1a1a;
   color-scheme: dark;
+  overscroll-behavior: none;
 }
 
 /* Hintergrundbild: position:fixed, Höhe per JS auf window.screen.height fixiert.

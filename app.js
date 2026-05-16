@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.40';
+const APP_VERSION = 'v1.41';
 
 // Geräteerkennung
 function isIOS() {
