@@ -2,7 +2,7 @@
 
 ## Übersicht
 Persönliche Meditations-Timer-App für Boris Seedorf. Vorbild: "Meditation Time" App.
-Technologie: Reines HTML/CSS/JavaScript (PWA, keine Frameworks).
+Technologie: Reines HTML/CSS/JavaScript (PWA + Android APK via Capacitor).
 
 ## Dateistruktur
 ```
@@ -10,206 +10,127 @@ MeditationsApp/
 ├── index.html              # Haupt-HTML
 ├── style.css               # Alle Styles
 ├── app.js                  # Gesamte App-Logik
-├── manifest.json           # PWA-Manifest (Homescreen-Installation)
-├── background.png          # Hintergrundbild (V0.3: Buddha unten, Bambus, Kerze)
-├── background_lächeln_v0.3.jpg  # Buddha-Lächeln-Bild (für Smile-Animation)
+├── sw.js                   # Service Worker (Offline + Cache)
+├── manifest.json           # PWA-Manifest
+├── background.jpg          # Hintergrundbild (Buddha, Bambus, Kerze)
+├── background_lächeln_v0.3.jpg  # Buddha-Lächeln-Bild
 ├── gong.png                # Gong-Bild (freigestellt, RGBA PNG)
-├── Sounds/                 # Alle Klangschalen-MP3s
-│   ├── Klangschale Morgenstern.mp3
-│   ├── Klangschale Mittagspause.mp3
-│   └── Klangschale Abendrot.mp3
-├── test_aura_v136.html     # Testseite: Buddha-Aura (Zyklus, Größe)
-├── test_flamme.html        # Testseite: Flammen-Position + Animation
+├── Sounds/                 # Klangschalen-MP3s
+├── www/                    # Kopie der Web-Dateien für Android APK (nicht manuell bearbeiten)
+├── android/                # Capacitor Android-Projekt (nicht manuell bearbeiten)
+├── assets/icon-only.png   # Quelle App-Icons 1024x1024
+├── build-android.ps1       # Build-Skript für Android APK
+├── test_aura_v136.html     # Testseite: Buddha-Aura
+├── test_flamme.html        # Testseite: Flammen-Position
 └── CLAUDE.md               # Diese Datei
 ```
 
-## Aktueller Stand (Session 14 – v1.39)
+## Aktueller Stand (Session 15 – v1.43)
 
 ### Alles was funktioniert
-- Layout, Timer 1–90 Min, Wake Lock
-- Abdunkelung: einstellbar 0–95%, manuelle Kontrolle
-- Flammen-Schein: Intensität und Größe einstellbar (Aus bis Sehr stark)
-- Gong-Animation: rotateX vorwärts-rückwärts, sauber ohne Zucken, weiches Ausschwingen
-- Gong-Animation läuft immer zu Ende bevor sie neu starten kann
-- `transform-origin: top center` permanent auf #gong (kein Konflikt mit :active)
-- `perspective: 800px` auf #gong-container (nicht in Keyframes)
-- Klangschalen-Menü: 3 Klangschalen (Morgenstern, Mittagspause, Abendrot) – neue kürzere Samples (24–32 Sek., 44.1 kHz)
-- Aktiver Klang-Button farbig markiert (Klasse `.selected`)
-- Menü bleibt offen nach Klang-Auswahl – nur X-Button oben rechts schließt
-- iOS Stummschalter-Hinweis (nur auf iPhone/iPad via isIOS())
-- iOS/Android-Erkennung via isIOS()
-- Update-Check-Button im Menü (vergleicht APP_VERSION in app.js)
-- Menü scrollbar (max-height: 88vh, overflow-y: auto)
-- PWA Manifest + Homescreen-Installation
+- Layout, Timer 1–90 Min, Wake Lock (ab Seitenstart, nicht erst beim Timer)
+- Abdunkelung 0–95%, Flammen-Schein, Flackern, Buddha-Lächeln + Aura
+- Gong-Animation: rotateX, sauber, weiches Ausschwingen
+- Klangschalen-Menü: 3 Sounds, localStorage, Update-Check-Button
+- PWA (iOS Safari + Android Chrome), GitHub Pages
+- **Service Worker (v1.40):** Offline-Nutzung, Cache-First, automatische Updates
+- **Wake Lock ab Start (v1.42):** Screen bleibt an sobald App offen ist
+- **Android APK (v1.43):** Capacitor, StatusBar transparent, richtiges Icon, dunkler Splash
 - GitHub Pages: https://boris1900.github.io/Meditation-App/
-- localStorage: merkt Klang, Meditationszeit, Abdunkelung, Flammen-Schein
-- Versionsnummer dezent im Menü (APP_VERSION in app.js)
-- iOS PWA Audio-Bug gefixt: rawAudioBuffer trennt Fetch von Decode, AudioContext wird erst beim Tippen erstellt
-- App-Icon: icon-1024.png (Bambus-Hintergrund + Gong zentriert, 88%), apple-touch-icon in index.html
-- **iOS Timer-Fix (v1.1–v1.5):** Jede Ziffer in festem `<span>` (renderTimer()), verhindert Wandern. Auf iOS: Merriweather 700 (lining-nums, gleichmäßige Höhen). Android bleibt Georgia.
-- **Hintergrundbild (v1.8):** Direkt auf `html`-Element (background-attachment: fixed), body::before entfernt.
-- **Screen-On Einblenden (v1.24):** Bei Screen-On und Timer gestoppt → Overlay kurz schwarz, 1.5s aufblenden – weiße Linie unsichtbar.
-- **Nachklang Wake Lock (v1.24):** Nach Timer-Ende Screen noch 5 Minuten anlassen.
-- **Abdunkelungs-Hinweis (v1.29):** „Dunkelt das Display nach dem Start automatisch ab. Antippen hellt es wieder auf." – direkt unter der Überschrift, dezent kursiv.
-- **Impressum (v1.32):** „© Tinnituspraxis Seedorf · Ahrensburg" – ganz unten im Menü unter der Versionsnummer.
-- **Buddha-Lächeln + Aura (v1.33):** Während der Meditation lächelt der Buddha alle 30–45 Sek. zufällig (TEST; später verlängern auf 60–90 Sek.). Überblendung zu `background_lächeln_v0.3.jpg`. Gleichzeitig goldener Heiligenschein (`#buddha-aura`) – Ring mit transparenter Mitte, untere Hälfte ausgeblendet. Läuft nur wenn Timer aktiv. Dateien: `background_lächeln_v0.3.jpg`, CSS-Klassen `#bg-smile` + `#buddha-aura`.
-- **Wake Lock nach Meditationsende (v1.24):** Screen bleibt 5 Minuten nach Timer-Ende an (Nachklang-Phase). Neuer Timer cancelt den Extend-Timer.
-- **PWA:** Nur Chrome (Android) unterstützt Installation mit Icon + Vollbild. Firefox nicht.
-- **Update-Funktion (v1.6):** CSS/JS werden vor Reload mit `cache: reload` frisch geladen. Auf iOS funktioniert der Update-Reload noch nicht zuverlässig → dort über Safari direkt laden.
 
-### Änderungen Session 14 (v1.36–v1.39)
-- **Aura-Größe (v1.36):** `AURA_SIZE_PCT` von 0.22 → 0.46 (~179px auf 390px-Viewport, entspricht test_eyes.html)
-- **Buddha-Intervall (v1.36):** 30–45 Sek. zum Testen (ursprünglich 60–90 Sek. – nach Tests wieder anpassen)
-- **iOS-Positionierungsfix (v1.37):** Neue Hilfsfunktion `bgViewH()` – auf iOS wird `screen.height` statt `window.innerHeight` genutzt, damit Flammen- und Aura-Position mit `fixBgHeight()` übereinstimmt. Auf Android unverändert `innerHeight`.
-- **Flamme neu (v1.38):**
-  - Fuß der Flamme ist fixiert (`transform-origin: bottom center` via `::before` Pseudo-Element)
-  - Sway + Scale in einer Animation `flicker-move` kombiniert (kein transform-Konflikt mehr)
-  - Sanftes Flackern max. ±1.5°, scaleY 0.94–1.05
-  - Hellere Flammenfarbe: weiß-gelber Kern, orange Rand
-  - Position: `FLAME_X_PCT = 0.8449`, `FLAME_Y_PCT = 0.7378` (per Test-HTML kalibriert)
-- **Aura-Bug fix (v1.39):** z-index von 51 → 49 (unter Dimm-Overlay). Aura wird jetzt bei Abdunkelung mitgedimmt statt grell herauszustechen. Gleichzeitig alle Opacity-Werte ca. +15% für mehr Grundleuchtkraft.
+### Änderungen Session 15 (v1.39.1–v1.43)
+- **v1.39.1:** Inline `background:#000` im Head (hat weiße Linie nicht behoben)
+- **v1.40:** Service Worker → Offline-Support, Cache-First-Strategie
+- **v1.41:** `overscroll-behavior: none` gegen Pull-to-Refresh
+- **v1.42:** Wake Lock sofort beim Laden + bei Screen-on (nicht nur beim Timer)
+- **v1.43:** Android APK via Capacitor – StatusBar transparent, Icon, dunkler Splash
 
-### Flammen-Architektur (wichtig für spätere Änderungen)
+### Weiße Linie Android – Fazit Session 15
+- **Power-Button** überschreibt Wake Lock → Chrome lädt neu → weiße Linie bleibt
+- Webtech-Grenze erreicht. Lösung nur via nativem Wrapper (Capacitor APK löst es vollständig)
+- In der APK: Problem nicht vorhanden, da kein Chrome-Reload
+
+### Flammen-Architektur
 ```
-#flame-flicker          → Ankerpunkt (width/height: 0), position: fixed bei --flame-x/y
-#flame-flicker::before  → sichtbare Flamme, position: absolute, bottom: 0
-                          transform-origin: bottom center
-                          animation: flicker-move + flicker-fade
+#flame-flicker → Ankerpunkt, position: fixed bei --flame-x/y
+::before       → sichtbare Flamme, transform-origin: bottom center
+FLAME_X_PCT = 0.8449, FLAME_Y_PCT = 0.7378
 ```
-Die PCT-Werte (FLAME_X_PCT, FLAME_Y_PCT) zeigen auf den **Fuß** der Flamme (Kerzen-Docht).
-Für neue Positionierung: `test_flamme.html` öffnen – zeigt direkt die neuen PCT-Werte an.
+Für Positionierung: `test_flamme.html` nutzen.
 
 ### Aura-Architektur
 ```
-AURA_SIZE_PCT = 0.46    → ~179px auf 390px-Viewport
-AURA_X_PCT    = 0.28
-AURA_Y_PCT    = 0.59
-bgViewH()               → iOS: screen.height / Android: innerHeight (für korrekte Skalierung)
+AURA_SIZE_PCT = 0.46, AURA_X_PCT = 0.28, AURA_Y_PCT = 0.59
+bgViewH() → iOS: screen.height / Android: innerHeight
 ```
-Für neue Positionierung: `test_aura_v136.html` öffnen.
-
-### Einstellungen werden gespeichert
-Alle Nutzereinstellungen werden sofort in localStorage gespeichert und beim nächsten Start wiederhergestellt: Timer-Zeit, Abdunkelung, Flammen-Schein, Flackern, Klang.
-
-### Erststart-Defaults (wenn localStorage leer)
-| Einstellung | Default |
-|---|---|
-| Klang | Klangschale Morgenstern |
-| Meditationszeit | 30 Minuten |
-| Abdunkelung | Keine (0%) |
-| Flammen-Schein | Keine (0%) |
-| Flackern | Aus |
-| Buddha/Aura | Aus |
-
-Flamme und Aura sind beim Erststart absichtlich aus – im Browser (kein PWA) wäre die Positionierung auf unbekannten Viewports falsch.
-
-### Tipp-Logik
-| Situation | Tap auf Gong | Tap woanders |
-|---|---|---|
-| Timer läuft, abgedunkelt | – (Overlay fängt ab) | Aufhellen (bleibt hell) |
-| Timer läuft, hell | Stoppen + Klang + Schwingen | Sofort abdunkeln |
-| Timer gestoppt | Starten + Klang + Schwingen | – |
+Für Positionierung: `test_aura_v136.html` nutzen.
 
 ---
 
-## Backup-Stand vor Service-Worker-Einbau
+## Android APK – Capacitor-Setup
 
-**Stabiler Stand: v1.39** – Commit `e784187`
-Falls der Service Worker schiefläuft → zurück mit:
+### Installierte Pakete
+- `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`
+- `@capacitor/status-bar` – StatusBar transparent
+- `@capacitor/assets` – Icon-Generierung
+
+### Build-Workflow
+```powershell
+.\build-android.ps1          # Web-Dateien → www/ + npx cap sync android
 ```
-git revert --no-commit e784187..HEAD
-git commit -m "Revert: zurück auf v1.39"
-git push
-```
-Oder direkt: Dateien `index.html`, `app.js` aus Commit `e784187` wiederherstellen und `sw.js` löschen.
+Dann Android Studio: **Shift+Shift → "Generate APKs"** → APK umbenennen → verteilen.
+
+**APK liegt in:** `android/app/build/outputs/apk/debug/app-debug.apk`
+
+### Neue Datei hinzugefügt?
+→ Auch in `build-android.ps1` in die Copy-Liste eintragen!
+
+### APK-Verteilung
+- Nutzer brauchen "Installation aus unbekannten Quellen" einmalig aktivieren
+- Kein Play Store nötig – direkte APK-Weitergabe per Link/WhatsApp
+- **Geplant:** GitHub Releases als APK-Host + Update-Button lädt neue APK direkt herunter
 
 ---
-
-## Bekannte offene Punkte / Nächste Schritte
-
-### Bekannter Bug – in Session 15 angegangen
-
-**Weiße Linie oben nach Screen-Off → Screen-On / nach Reload (Android)**
-- Tritt nur auf Android (OnePlus 5 / Chrome) auf, iOS kein Problem
-- Ursache: Chrome-internes Rendering-Artefakt – Ladebalken/-UI sichtbar während Seite neu aufbaut
-- Bereits versucht (v1.17–v1.28): color-scheme, DOM-Reset, Overlay, blur/focus Events – alle ohne Erfolg
-- Versucht in Session 15 (v1.39.1): Inline `background:#000` im Head – hat nicht geholfen (Linie kommt aus Chrome-UI, nicht Seiteninhalt)
-- **Lösung Session 15:** Service Worker → App lädt aus lokalem Cache, kein Ladebalken mehr
-
-### Offen / Nach Tests anpassen
-- **Buddha-Intervall:** Aktuell 30–45 Sek. (Test). Nach Abschluss der Tests auf 60–90 Sek. zurücksetzen.
-
-### Mittelfristig
-- **Nativer iOS-Wrapper** via PWABuilder/Capacitor (Stummschalter-Bypass)
-- Gong-Animation: Schwung-Keyframes ggf. weiter verfeinern
-- Weitere Klangschalen einfach hinzufügbar (Muster: eine Zeile HTML + MP3 in Sounds/)
-
-### Aufgeschoben
-- Multi-MP3-Feature: eigene Uploads dauerhaft speichern
-
----
-
-## Audio-Architektur (wichtig!)
-- **Kein synthetischer Demo-Gong mehr** – wurde in Session 5 entfernt
-- Alle Sounds liegen als MP3 im `Sounds/`-Ordner
-- Web Audio API: `AudioContext` → `BufferSource` → `destination`
-- iOS AudioContext-Fix: `resume()` wird vor jedem `source.start()` awaited
-- Klang-Buttons haben `data-file` und `data-label` Attribute → generischer Handler
-- Neue Klangschale hinzufügen: HTML-Zeile + MP3-Datei, kein JS nötig
 
 ## Versions-Workflow
-Bei jeder Änderung **beide** Versionsnummern hochzählen – immer synchron halten:
-1. `app.js` Zeile 2: `const APP_VERSION = 'v1.43'` → z.B. `'v1.44'`
-2. `sw.js` Zeile 1: `const CACHE_NAME = 'meditation-v1.43'` → z.B. `'meditation-v1.44'`
+Bei jeder Änderung **beide** hochzählen:
+1. `app.js` Zeile 2: `const APP_VERSION = 'v1.43'`
+2. `sw.js` Zeile 1: `const CACHE_NAME = 'meditation-v1.43'`
 
-Der Update-Check-Button im Menü prüft APP_VERSION automatisch.
-Der Service Worker erkennt die neue CACHE_NAME und lädt alle Dateien frisch aus dem Netz.
-
-## Update-Workflow: iOS + Android synchron halten
-
+## iOS + Android synchron halten
 **Dateien immer im Hauptordner bearbeiten** (nie direkt in `www/`).
-
-### Nach jeder Änderung:
-
-**iOS (PWA – GitHub Pages):**
-```
-git add ... && git commit && git push
-```
-→ iOS-Nutzer bekommen Update automatisch beim nächsten App-Öffnen.
-
-**Android (APK):**
-```
-.\build-android.ps1
-```
-→ Dann in Android Studio: Shift+Shift → "Generate APKs" → APK umbenennen → verteilen.
-
-Das Skript `build-android.ps1` kopiert alle Web-Dateien nach `www/` und führt `npx cap sync android` aus.
-
-### Neue Datei hinzugefügt? (z.B. neues Bild, neue MP3)
-→ Datei auch in `build-android.ps1` in die Copy-Liste eintragen!
-
-### Android-Projektstruktur (nicht anfassen):
-- `android/` – von Capacitor verwaltet, nicht manuell bearbeiten
-- `www/` – wird by `build-android.ps1` automatisch befüllt
-- `assets/icon-only.png` – Quelle für App-Icons (1024x1024)
+- iOS: `git push` → GitHub Pages → automatisches Update
+- Android: `.\build-android.ps1` → APK bauen → verteilen
 
 ---
 
-## Wichtige Arbeitsregel (Session 3 festgelegt)
-**Immer erst fragen, bevor eine Idee umgesetzt wird.** Boris entscheidet, was gebaut wird –
-Claude schlägt vor und wartet auf Freigabe.
+## Offene Punkte
+
+### Nächste Session
+- **GitHub Releases einrichten:** APK hochladen, URL dokumentieren
+- **Update-Button erweitern:** Bei neuer Version APK-Download-Link anzeigen (nur Android/Capacitor)
+- **Buddha-Intervall:** Von 30–45 Sek. auf 60–90 Sek. zurücksetzen (nach Tests)
+
+### Mittelfristig
+- Play Store (25€ einmalig) für breitere Patienten-Verteilung
+- Weitere Klangschalen (Muster: eine Zeile HTML + MP3, kein JS nötig)
+
+### Aufgeschoben
+- Multi-MP3-Feature, Service Worker für iOS optimieren
 
 ---
+
+## Wichtige Arbeitsregel
+**Immer erst fragen, bevor eine Idee umgesetzt wird.**
 
 ## Lokaler Entwicklungsserver
 ```
-cd C:\Users\Boris\Projekte\MeditationsApp
 npx serve -p 3456 .
 ```
-http://localhost:3456
 
 ## Kontext für neue Session
-- Boris ist Heilpraktiker, kein Entwickler – beurteilt visuell, misst keine Pixel
-- Boris testet auf OnePlus 5 in Chrome und iPhone (Katharina)
-- Wichtig: iOS PWA Audio-Bug ist bekannt und dokumentiert, Fix-Plan steht oben
-- Test-HTMLs nutzen: `test_flamme.html` für Flamme, `test_aura_v136.html` für Aura
+- Boris: Heilpraktiker, kein Entwickler, beurteilt visuell
+- Testet auf OnePlus 5 (Android 10, Chrome) und iPhone (Katharina, iOS/Safari)
+- Android APK: Capacitor, Android Studio Panda 4, debug APK
+- StatusBar: transparent via `@capacitor/status-bar` (`setOverlaysWebView`)
+- Backup v1.39: Commit `e784187`

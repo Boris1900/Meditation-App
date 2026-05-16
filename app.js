@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.43';
+const APP_VERSION = 'v1.44';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -619,6 +619,9 @@ async function checkForUpdate() {
     if (!latest) throw new Error('Version nicht lesbar');
     if (latest === APP_VERSION) {
       status.textContent = '✅ Du hast die aktuelle Version.';
+    } else if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+      const apkUrl = `https://github.com/Boris1900/Meditation-App/releases/download/${latest}/MeditationApp-${latest}.apk`;
+      status.innerHTML = `🆕 Update verfügbar! <button onclick="window.open('${apkUrl}','_system')" style="margin-left:6px;padding:4px 10px;border-radius:8px;border:none;background:#b47832;color:#fff;font-size:11px;font-weight:600;cursor:pointer;">APK laden</button>`;
     } else {
       status.innerHTML = '🆕 Update verfügbar! <button onclick="applyUpdate()" style="margin-left:6px;padding:4px 10px;border-radius:8px;border:none;background:#b47832;color:#fff;font-size:11px;font-weight:600;cursor:pointer;">Jetzt laden</button>';
     }
