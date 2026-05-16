@@ -74,31 +74,13 @@ Alle Nutzereinstellungen werden sofort in localStorage gespeichert und beim näc
 
 ## Bekannte offene Punkte / Nächste Schritte
 
-### Akut – Ungeklärter Bug (Priorität hoch)
+### Bekannter Bug – akzeptiert, kein Fix geplant
 
-**Weiße Linie oben – hartnäckig, bisher nicht gelöst (v1.9–v1.20)**
-
-**Exakte Reproduktion:**
-- Screen-Off → Screen-On → Android-Statusbar erscheint kurz → zieht sich zurück → weiße Linie bleibt oben
-- Nur auf Android (OnePlus 5 / Chrome), iOS kein Problem
-- Statusbar manuell runterziehen und wieder hochziehen: KEIN Problem → visualViewport.resize greift dann
-
-**Was wir wissen:**
-- Der Viewport-Resize (Statusbar) passiert **während die Seite noch hidden ist** – bevor `visibilitychange` feuert. Deshalb greifen Event-basierte Reparatur-Ansätze zu spät.
-- `visualViewport.resize` funktioniert beim manuellen Statusbar-Test, nicht beim Screen-On.
-- `z-index: -1` auf `#app-bg` hatte problematisches Verhalten hinter dem body-Stacking-Kontext → auf `z-index: 0` geändert (v1.20).
-- Selbst mit `html { background-color: #1a1a1a }` ist die Linie noch weiß – sie kommt also nicht vom html-Element, sondern vermutlich aus dem Android/Chrome-Rendering selbst.
-
-**Aktueller Stand v1.20 (noch ungetestet ob es hilft):**
-- `#app-bg`: `position: fixed; z-index: 0; height: window.screen.height`
-- `html`: `background-color: #1a1a1a` (Fallback)
-- `visibilitychange`: Repaint sofort + nach 150ms + nach 400ms
-- `visualViewport.resize`: Repaint wenn Viewport wächst
-
-**Nächste Ansätze falls v1.20 nicht hilft:**
-- Möglichkeit: Linie liegt im Browser-Chrome (oberhalb HTML), dann hilft kein CSS-Fix → `theme-color` oder nativer Wrapper nötig
-- Möglichkeit: `#app-bg` noch ohne `position: fixed` testen, direkt als body-Hintergrund mit anderem Trick
-- Möglichkeit: `overscroll-behavior: none` auf html/body
+**Weiße Linie oben nach Screen-Off → Screen-On (Android)**
+- Tritt nur auf Android (OnePlus 5 / Chrome) auf, iOS kein Problem
+- Ursache: Chrome-internes Rendering-Artefakt beim Neuaufbau nach Screen-On, nicht durch CSS/JS behebbar
+- Zahlreiche Ansätze versucht (v1.17–v1.28): color-scheme, DOM-Reset, Overlay, blur/focus Events – alle ohne Erfolg
+- **Akzeptierte Lösung:** 5-Minuten Wake Lock nach Meditationsende – Nutzer schließen die App danach normalerweise. Weiße Linie tritt dann kaum auf.
 
 ### Mittelfristig
 - **Nativer iOS-Wrapper** via PWABuilder/Capacitor (Stummschalter-Bypass)
