@@ -116,9 +116,14 @@ Bei jeder Änderung **beide** hochzählen:
 
 ## Offene Punkte
 
-### Nächste Session
-- **Buddha-Intervall:** Aktuell 30–45 Sek. – Boris findet das gut so, erstmal lassen
-- **Aura-Position:** Halo erscheint etwas zu hoch (vor Schultern). `AURA_Y_PCT = 0.59` → evtl. auf ~0.63 erhöhen. Testseite: `test_aura_v136.html`
+### Nächste Session (v1.50)
+- **"Lebendiger Buddha"-Checkbox entfernen** – Katharina (Frau von Boris) bemängelt, dass der Menüpunkt Verwirrung stiftet. Funktion soll immer aktiv sein, kein Schalter mehr.
+  - Checkbox aus HTML entfernen
+  - `buddhaCheckbox`-Referenzen aus JS entfernen
+  - `triggerBuddhaSmile`, `triggerBuddhaSmileOnce`, `scheduleBuddhaSmile` laufen immer (keine Checkbox-Prüfung)
+  - Lächeln + Aura immer: bei Start, bei Stop/Ende, alle 30–45 Sek. während Timer läuft
+- **Buddha-Intervall:** Aktuell 30–45 Sek. – Boris findet das gut so, bleibt so
+- **Aura-Position:** Halo leicht zu hoch. `AURA_Y_PCT = 0.59` → evtl. ~0.63. Testseite: `test_aura_v136.html`
 
 ### Mittelfristig
 - Play Store (25€ einmalig) für breitere Patienten-Verteilung
