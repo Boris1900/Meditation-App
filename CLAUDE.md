@@ -29,7 +29,7 @@ MeditationsApp/
 
 ### Alles was funktioniert
 - Layout, Timer 1–90 Min, Wake Lock (ab Seitenstart, nicht erst beim Timer)
-- Abdunkelung 0–95%, Flammen-Schein, Flackern, Buddha-Lächeln + Aura
+- Abdunkelung 0–95%, Flammen-Schein + Flackern via „Lebendige Flamme"-Checkbox, Buddha-Lächeln + Aura (immer aktiv)
 - Gong-Animation: rotateX, sauber, weiches Ausschwingen
 - Klangschalen-Menü: 3 Sounds, localStorage, Update-Check-Button
 - PWA (iOS Safari + Android Chrome), GitHub Pages
@@ -37,13 +37,14 @@ MeditationsApp/
 - **Wake Lock ab Start (v1.42):** Screen bleibt an sobald App offen ist
 - **Android APK (v1.43):** Capacitor, StatusBar transparent, richtiges Icon, dunkler Splash
 - **Update-Funktion (v1.47):** APK prüft GitHub Pages auf neue Version, bietet direkten APK-Download
-- **Buddha-Lächeln bei Start + Ende (v1.46/v1.47):** `triggerBuddhaSmileOnce()` bei Start und Stop/Ablauf
+- **Buddha-Lächeln bei Start + Ende (v1.46/v1.47):** `triggerBuddhaSmileOnce()` bei Start und Stop/Ablauf, alle 30–45 Sek. während Timer läuft
 - **Android Navigationsleiste (v1.45):** `env(safe-area-inset-bottom)` auf `#bottom-nav`
 - GitHub Pages: https://boris1900.github.io/Meditation-App/
 
 ### Änderungen Session 17 (v1.50–v1.52)
-- **v1.50:** "Lebendiger Buddha"-Checkbox entfernt – Funktion immer aktiv (kein Schalter mehr). Katharina hatte gemängelt, dass der Menüpunkt Verwirrung stiftet.
-- **v1.51:** Flammen-Regler entfernt. Neue Checkbox „Lebendige Flamme" 🕯️ – ein = Flackern + Schein Stärke 30 (leicht), aus = alles weg.
+- **v1.50:** „Lebendiger Buddha"-Checkbox entfernt – Funktion läuft jetzt immer
+- **v1.51:** Flammen-Regler entfernt. Neue Checkbox „Lebendige Flamme" 🕯️ – ein = Flackern + Schein Stärke 30 (leicht), aus = alles weg
+- **v1.52:** Kerzensymbol 🕯️ aus Kursiv herausgenommen (stand schief)
 
 ### Änderungen Session 16 (v1.44–v1.49)
 - **v1.44:** Update-Button zeigt auf Android "APK laden" mit GitHub-Release-Link. APK-Namenskonvention ab jetzt: `MeditationApp-v1.XX.apk` (kein Suffix mehr!)
@@ -108,8 +109,8 @@ Für Positionierung: `test_aura_v136.html` nutzen.
 
 ## Versions-Workflow
 Bei jeder Änderung **beide** hochzählen:
-1. `app.js` Zeile 2: `const APP_VERSION = 'v1.43'`
-2. `sw.js` Zeile 1: `const CACHE_NAME = 'meditation-v1.43'`
+1. `app.js` Zeile 2: `const APP_VERSION = 'v1.52'`
+2. `sw.js` Zeile 1: `const CACHE_NAME = 'meditation-v1.52'`
 
 ## iOS + Android synchron halten
 **Dateien immer im Hauptordner bearbeiten** (nie direkt in `www/`).
@@ -121,8 +122,7 @@ Bei jeder Änderung **beide** hochzählen:
 ## Offene Punkte
 
 ### Nächste Session
-- **Buddha-Intervall:** 30–45 Sek. – passt so
-- **Aura-Position:** `AURA_Y_PCT = 0.59` – zuletzt OK, so lassen
+- Keine offenen Punkte
 
 ### Mittelfristig
 - Play Store (25€ einmalig) für breitere Patienten-Verteilung
