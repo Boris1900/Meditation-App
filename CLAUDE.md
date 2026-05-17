@@ -25,7 +25,7 @@ MeditationsApp/
 └── CLAUDE.md               # Diese Datei
 ```
 
-## Aktueller Stand (Session 15 – v1.43)
+## Aktueller Stand (Session 16 – v1.48)
 
 ### Alles was funktioniert
 - Layout, Timer 1–90 Min, Wake Lock (ab Seitenstart, nicht erst beim Timer)
@@ -36,15 +36,17 @@ MeditationsApp/
 - **Service Worker (v1.40):** Offline-Nutzung, Cache-First, automatische Updates
 - **Wake Lock ab Start (v1.42):** Screen bleibt an sobald App offen ist
 - **Android APK (v1.43):** Capacitor, StatusBar transparent, richtiges Icon, dunkler Splash
+- **Update-Funktion (v1.47):** APK prüft GitHub Pages auf neue Version, bietet direkten APK-Download
+- **Buddha-Lächeln bei Start + Ende (v1.46/v1.47):** `triggerBuddhaSmileOnce()` bei Start und Stop/Ablauf
+- **Android Navigationsleiste (v1.45):** `env(safe-area-inset-bottom)` auf `#bottom-nav`
 - GitHub Pages: https://boris1900.github.io/Meditation-App/
 
-### Änderungen Session 15 (v1.39.1–v1.43)
-- **v1.39.1:** Inline `background:#000` im Head (hat weiße Linie nicht behoben)
-- **v1.40:** Service Worker → Offline-Support, Cache-First-Strategie
-- **v1.41:** `overscroll-behavior: none` gegen Pull-to-Refresh
-- **v1.42:** Wake Lock sofort beim Laden + bei Screen-on (nicht nur beim Timer)
-- **v1.43:** Android APK via Capacitor – StatusBar transparent, Icon, dunkler Splash
+### Änderungen Session 16 (v1.44–v1.47)
 - **v1.44:** Update-Button zeigt auf Android "APK laden" mit GitHub-Release-Link. APK-Namenskonvention ab jetzt: `MeditationApp-v1.XX.apk` (kein Suffix mehr!)
+- **v1.45:** Android Navigationsleiste fix (`env(safe-area-inset-bottom)`), Dateiname `background_laecheln` (Umlaut entfernt)
+- **v1.46:** Buddha-Lächeln + Halo bei Meditations-Start und -Ende (`triggerBuddhaSmileOnce`)
+- **v1.47:** Update-Check holt `app.js` von GitHub Pages statt lokalem Bundle (war fundamental kaputt)
+- **v1.48:** Update-Funktion erstmals erfolgreich getestet – Bekannte kann ab jetzt selbst updaten
 
 ### Weiße Linie Android – Fazit Session 15
 - **Power-Button** überschreibt Wake Lock → Chrome lädt neu → weiße Linie bleibt
@@ -115,13 +117,8 @@ Bei jeder Änderung **beide** hochzählen:
 ## Offene Punkte
 
 ### Nächste Session
-- **Buddha-Lächeln beim START** – `triggerBuddhaSmileOnce()` wird in `startTimer()` aufgerufen, aber die Opacity ändert sich nicht sichtbar. Beim STOP funktioniert es korrekt. Ursache noch unklar – in nächster Session debuggen.
-- **Buddha-Intervall:** Von 30–45 Sek. auf 60–90 Sek. zurücksetzen (nach Tests)
-
-### Bereits erledigt (Session 16)
-- Android Navigationsleiste fix: `env(safe-area-inset-bottom)` auf `#bottom-nav`
-- Datei `background_lächeln_v0.3.jpg` → `background_laecheln_v0.3.jpg` (Umlaut entfernt)
-- Buddha-Lächeln + Halo bei Meditations-ENDE (Stop + Timer abgelaufen)
+- **Buddha-Intervall:** Aktuell 30–45 Sek. – Boris findet das gut so, erstmal lassen
+- **Aura-Position:** Halo erscheint etwas zu hoch (vor Schultern). `AURA_Y_PCT = 0.59` → evtl. auf ~0.63 erhöhen. Testseite: `test_aura_v136.html`
 
 ### Mittelfristig
 - Play Store (25€ einmalig) für breitere Patienten-Verteilung
