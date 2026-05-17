@@ -25,7 +25,7 @@ MeditationsApp/
 └── CLAUDE.md               # Diese Datei
 ```
 
-## Aktueller Stand (Session 16 – v1.48)
+## Aktueller Stand (Session 17 – v1.50)
 
 ### Alles was funktioniert
 - Layout, Timer 1–90 Min, Wake Lock (ab Seitenstart, nicht erst beim Timer)
@@ -41,7 +41,10 @@ MeditationsApp/
 - **Android Navigationsleiste (v1.45):** `env(safe-area-inset-bottom)` auf `#bottom-nav`
 - GitHub Pages: https://boris1900.github.io/Meditation-App/
 
-### Änderungen Session 16 (v1.44–v1.47)
+### Änderungen Session 17 (v1.50)
+- **v1.50:** "Lebendiger Buddha"-Checkbox entfernt – Funktion immer aktiv (kein Schalter mehr). Katharina hatte gemängelt, dass der Menüpunkt Verwirrung stiftet.
+
+### Änderungen Session 16 (v1.44–v1.49)
 - **v1.44:** Update-Button zeigt auf Android "APK laden" mit GitHub-Release-Link. APK-Namenskonvention ab jetzt: `MeditationApp-v1.XX.apk` (kein Suffix mehr!)
 - **v1.45:** Android Navigationsleiste fix (`env(safe-area-inset-bottom)`), Dateiname `background_laecheln` (Umlaut entfernt)
 - **v1.46:** Buddha-Lächeln + Halo bei Meditations-Start und -Ende (`triggerBuddhaSmileOnce`)
@@ -116,14 +119,9 @@ Bei jeder Änderung **beide** hochzählen:
 
 ## Offene Punkte
 
-### Nächste Session (v1.50)
-- **"Lebendiger Buddha"-Checkbox entfernen** – Katharina (Frau von Boris) bemängelt, dass der Menüpunkt Verwirrung stiftet. Funktion soll immer aktiv sein, kein Schalter mehr.
-  - Checkbox aus HTML entfernen
-  - `buddhaCheckbox`-Referenzen aus JS entfernen
-  - `triggerBuddhaSmile`, `triggerBuddhaSmileOnce`, `scheduleBuddhaSmile` laufen immer (keine Checkbox-Prüfung)
-  - Lächeln + Aura immer: bei Start, bei Stop/Ende, alle 30–45 Sek. während Timer läuft
-- **Buddha-Intervall:** Aktuell 30–45 Sek. – Boris findet das gut so, bleibt so
-- **Aura-Position:** Halo leicht zu hoch. `AURA_Y_PCT = 0.59` → evtl. ~0.63. Testseite: `test_aura_v136.html`
+### Nächste Session
+- **Buddha-Intervall:** 30–45 Sek. – passt so
+- **Aura-Position:** `AURA_Y_PCT = 0.59` – zuletzt OK, so lassen
 
 ### Mittelfristig
 - Play Store (25€ einmalig) für breitere Patienten-Verteilung

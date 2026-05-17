@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.49';
+const APP_VERSION = 'v1.50';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -92,7 +92,6 @@ const flameSlider = document.getElementById('flame-slider');
 const flameLevelLabel = document.getElementById('flame-level-label');
 const flickerCheckbox = document.getElementById('flicker-checkbox');
 const flameFlicker    = document.getElementById('flame-flicker');
-const buddhaCheckbox  = document.getElementById('buddha-checkbox');
 const bgSmile     = document.getElementById('bg-smile');
 const buddhaAura  = document.getElementById('buddha-aura');
 
@@ -218,7 +217,6 @@ function triggerBuddhaSmile() {
 }
 
 function triggerBuddhaSmileOnce() {
-  if (!buddhaCheckbox.checked) return;
   bgSmile.style.transition    = 'none';
   buddhaAura.style.transition = 'none';
   bgSmile.style.opacity    = '0';
@@ -236,7 +234,7 @@ function triggerBuddhaSmileOnce() {
 
 function scheduleBuddhaSmile() {
   clearTimeout(buddhaSmileTimer);
-  if (!isRunning || !buddhaCheckbox.checked) return;
+  if (!isRunning) return;
   const delay = 30000 + Math.random() * 15000; // 30–45 Sek. (TEST)
   buddhaSmileTimer = setTimeout(() => {
     triggerBuddhaSmile();
@@ -426,14 +424,6 @@ function setFlicker(enabled) {
 
 flickerCheckbox.addEventListener('change', () => setFlicker(flickerCheckbox.checked));
 
-function setBuddha(enabled) {
-  buddhaCheckbox.checked = enabled;
-  localStorage.setItem('medi_buddha', enabled ? '1' : '0');
-  if (!enabled) stopBuddhaSmile();
-  else if (isRunning) scheduleBuddhaSmile();
-}
-buddhaCheckbox.addEventListener('change', () => setBuddha(buddhaCheckbox.checked));
-
 // Layout-Berechnung
 const timerArea = document.getElementById('timer-area');
 
@@ -590,9 +580,6 @@ updateFlameGlow();
 
 const savedFlackern = localStorage.getItem('medi_flackern');
 setFlicker(savedFlackern === '1'); // Default: aus
-
-const savedBuddha = localStorage.getItem('medi_buddha');
-setBuddha(savedBuddha === '1'); // Default: aus
 
 if (isIOS()) {
   const hint = document.getElementById('ios-mute-hint');
