@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.50';
+const APP_VERSION = 'v1.51';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -88,8 +88,6 @@ const currentName = document.getElementById('current-audio-name');
 const klangBtns   = document.querySelectorAll('.klang-btn');
 const dimSlider   = document.getElementById('dim-slider');
 const dimLevelLabel = document.getElementById('dim-level-label');
-const flameSlider = document.getElementById('flame-slider');
-const flameLevelLabel = document.getElementById('flame-level-label');
 const flickerCheckbox = document.getElementById('flicker-checkbox');
 const flameFlicker    = document.getElementById('flame-flicker');
 const bgSmile     = document.getElementById('bg-smile');
@@ -383,42 +381,22 @@ dimSlider.addEventListener('input', () => {
   localStorage.setItem('medi_abdunkelung', dimSlider.value);
 });
 
-// Flammen-Schein einstellen
-function updateFlameGlow() {
-  const v = flameSlider.value / 100;
+// Flammen-Schein einstellen (Wert 0–100)
+function updateFlameGlow(val) {
+  const v = val / 100;
   const a1 = Math.min(1.0, v * 1.5).toFixed(3);
   const a2 = Math.min(1.0, v * 0.85).toFixed(3);
-  const size = Math.round(180 + v * 220); // 180px bei 0%, 400px bei 100%
+  const size = Math.round(180 + v * 220);
   document.documentElement.style.setProperty('--flame-a1', a1);
   document.documentElement.style.setProperty('--flame-a2', a2);
   document.documentElement.style.setProperty('--flame-size', size + 'px');
-  updateFlameLevelLabel();
-  updateFlameSliderProgress();
 }
 
-function updateFlameLevelLabel() {
-  const v = parseInt(flameSlider.value);
-  if (v === 0)       flameLevelLabel.textContent = 'Aus';
-  else if (v <= 20)  flameLevelLabel.textContent = 'Sehr leicht';
-  else if (v <= 40)  flameLevelLabel.textContent = 'Leicht';
-  else if (v <= 60)  flameLevelLabel.textContent = 'Mittel';
-  else if (v <= 80)  flameLevelLabel.textContent = 'Stark';
-  else               flameLevelLabel.textContent = 'Sehr stark';
-}
-
-function updateFlameSliderProgress() {
-  flameSlider.style.setProperty('--progress', flameSlider.value + '%');
-}
-
-flameSlider.addEventListener('input', () => {
-  updateFlameGlow();
-  localStorage.setItem('medi_flamme', flameSlider.value);
-});
-
-// Flammen-Flackern ein/aus
+// Lebendige Flamme ein/aus
 function setFlicker(enabled) {
   flameFlicker.classList.toggle('hidden', !enabled);
   flickerCheckbox.checked = enabled;
+  updateFlameGlow(enabled ? 30 : 0);
   localStorage.setItem('medi_flackern', enabled ? '1' : '0');
 }
 
@@ -573,10 +551,6 @@ dimOpacity = dimVal / 100;
 dimSlider.value = dimVal;
 updateDimLabel();
 updateDimSliderProgress();
-
-const savedFlame = localStorage.getItem('medi_flamme');
-flameSlider.value = savedFlame !== null ? parseInt(savedFlame) : 0;
-updateFlameGlow();
 
 const savedFlackern = localStorage.getItem('medi_flackern');
 setFlicker(savedFlackern === '1'); // Default: aus

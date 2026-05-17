@@ -25,7 +25,7 @@ MeditationsApp/
 └── CLAUDE.md               # Diese Datei
 ```
 
-## Aktueller Stand (Session 17 – v1.50)
+## Aktueller Stand (Session 17 – v1.51)
 
 ### Alles was funktioniert
 - Layout, Timer 1–90 Min, Wake Lock (ab Seitenstart, nicht erst beim Timer)
@@ -41,8 +41,9 @@ MeditationsApp/
 - **Android Navigationsleiste (v1.45):** `env(safe-area-inset-bottom)` auf `#bottom-nav`
 - GitHub Pages: https://boris1900.github.io/Meditation-App/
 
-### Änderungen Session 17 (v1.50)
+### Änderungen Session 17 (v1.50–v1.51)
 - **v1.50:** "Lebendiger Buddha"-Checkbox entfernt – Funktion immer aktiv (kein Schalter mehr). Katharina hatte gemängelt, dass der Menüpunkt Verwirrung stiftet.
+- **v1.51:** Flammen-Regler entfernt. Neue Checkbox „Lebendige Flamme" 🕯️ – ein = Flackern + Schein Stärke 30 (leicht), aus = alles weg.
 
 ### Änderungen Session 16 (v1.44–v1.49)
 - **v1.44:** Update-Button zeigt auf Android "APK laden" mit GitHub-Release-Link. APK-Namenskonvention ab jetzt: `MeditationApp-v1.XX.apk` (kein Suffix mehr!)
