@@ -12,7 +12,7 @@ Copy-Item "$src\app.js"                        $www -Force
 Copy-Item "$src\sw.js"                         $www -Force
 Copy-Item "$src\manifest.json"                 $www -Force
 Copy-Item "$src\background.jpg"                $www -Force
-Copy-Item "$src\background_lächeln_v0.3.jpg"  $www -Force
+Copy-Item "$src\background_laecheln_v0.4.jpg"  $www -Force
 Copy-Item "$src\gong.png"                      $www -Force
 Copy-Item "$src\Sounds\*"                      "$www\Sounds\" -Force
 

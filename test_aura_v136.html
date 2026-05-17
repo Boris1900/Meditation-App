@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Test v1.36</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 100vw; height: 100vh; overflow: hidden; background: #1a1a1a; }
+
+    #app-bg {
+      position: fixed;
+      inset: 0;
+      background: url('background.png') center center / cover no-repeat;
+      z-index: 0;
+    }
+    #bg-smile {
+      position: fixed;
+      inset: 0;
+      background: url('background_laecheln_v0.4.jpg') center center / cover no-repeat;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+    }
+    #buddha-aura {
+      position: fixed;
+      left: var(--aura-x, 28%);
+      top: var(--aura-y, 59%);
+      width: var(--aura-size, 180px);
+      height: var(--aura-size, 180px);
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        transparent               0%,
+        transparent              40%,
+        rgba(255, 230, 80, 0.08) 45%,
+        rgba(255, 220, 70, 0.35) 50%,
+        rgba(255, 210, 60, 0.60) 55%,
+        rgba(255, 200, 50, 0.55) 60%,
+        rgba(255, 185, 35, 0.25) 68%,
+        rgba(255, 170, 25, 0.08) 77%,
+        transparent              88%);
+      -webkit-mask-image: linear-gradient(to bottom,
+        black             0%,
+        black            58%,
+        rgba(0,0,0,0.20) 78%,
+        transparent      92%);
+      mask-image: linear-gradient(to bottom,
+        black             0%,
+        black            58%,
+        rgba(0,0,0,0.20) 78%,
+        transparent      92%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 2s ease-in-out;
+    }
+    #bg-smile {
+      transition: opacity 2s ease-in-out;
+    }
+
+    #info {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      background: rgba(0,0,0,0.6);
+      color: #d4a853;
+      font-family: Georgia, serif;
+      font-size: 0.9rem;
+      padding: 10px 18px;
+      border-radius: 10px;
+      text-align: center;
+      letter-spacing: 0.08em;
+    }
+    #info span { font-size: 0.75rem; color: #aaa; display: block; margin-top: 4px; }
+
+    #controls {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      gap: 12px;
+    }
+    button {
+      background: rgba(0,0,0,0.55);
+      color: #d4a853;
+      border: 1px solid rgba(212,168,83,0.4);
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-family: Georgia, serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+    }
+    button:active { background: rgba(212,168,83,0.2); }
+  </style>
+</head>
+<body>
+  <div id="app-bg"></div>
+  <div id="bg-smile"></div>
+  <div id="buddha-aura"></div>
+
+  <div id="info">
+    Aura-Test v1.36
+    <span id="info-size">Größe wird berechnet…</span>
+  </div>
+
+  <div id="controls">
+    <button id="btn-show">Lächeln + Aura zeigen</button>
+    <button id="btn-hide">Ausblenden</button>
+    <button id="btn-auto">Auto-Zyklus starten</button>
+  </div>
+
+  <script>
+    const IMG_W = 852, IMG_H = 1846;
+    const AURA_X_PCT    = 0.28;
+    const AURA_Y_PCT    = 0.59;
+    const AURA_SIZE_PCT = 0.46; // v1.36
+    const BUDDHA_PCT    = 0.54;
+
+    const bgSmile   = document.getElementById('bg-smile');
+    const aura      = document.getElementById('buddha-aura');
+    const infoSize  = document.getElementById('info-size');
+
+    function getBuddhaScreenY() {
+      const scale = Math.max(window.innerWidth / IMG_W, window.innerHeight / IMG_H);
+      const offsetY = (IMG_H * scale - window.innerHeight) / 2;
+      return Math.round(IMG_H * BUDDHA_PCT * scale - offsetY);
+    }
+
+    function positionAura() {
+      const scale   = Math.max(window.innerWidth / IMG_W, window.innerHeight / IMG_H);
+      const offsetX = (IMG_W * scale - window.innerWidth) / 2;
+      const auraX   = Math.round(IMG_W * AURA_X_PCT * scale - offsetX);
+      const buddhaY = getBuddhaScreenY();
+      const headOff = Math.round(IMG_H * 0.05 * scale);
+      const auraY   = buddhaY + headOff;
+      const auraSize = Math.round(IMG_W * AURA_SIZE_PCT * scale);
+      document.documentElement.style.setProperty('--aura-x',    auraX    + 'px');
+      document.documentElement.style.setProperty('--aura-y',    auraY    + 'px');
+      document.documentElement.style.setProperty('--aura-size', auraSize + 'px');
+      infoSize.textContent = `Aura: ${auraSize}px · Viewport: ${window.innerWidth}×${window.innerHeight}`;
+    }
+
+    // Zyklus: alle 20 Sek. → 2s einblenden → 10s halten → 2s ausblenden
+    const INTERVAL_S  = 20;
+    const FADEIN_S    = 2;
+    const HOLD_S      = 10;
+    const FADEOUT_S   = 2;
+
+    let cycleTimer = null;
+    let countdown  = INTERVAL_S;
+    let running    = false;
+
+    function show() {
+      bgSmile.style.opacity = '1';
+      aura.style.opacity    = '1';
+    }
+    function hide() {
+      bgSmile.style.opacity = '0';
+      aura.style.opacity    = '0';
+    }
+
+    function runCycle() {
+      // Einblenden
+      show();
+      infoSize.textContent += ' · ▶ Eingeblendet';
+      // Nach HOLD_S + FADEIN_S ausblenden
+      cycleTimer = setTimeout(() => {
+        hide();
+        // Nächster Zyklus: INTERVAL_S nach Start dieses Zyklus
+        // Verbleibende Wartezeit = INTERVAL_S - FADEIN_S - HOLD_S
+        const nextWait = (INTERVAL_S - FADEIN_S - HOLD_S) * 1000;
+        cycleTimer = setTimeout(runCycle, nextWait);
+        startCountdown(INTERVAL_S);
+      }, (FADEIN_S + HOLD_S) * 1000);
+    }
+
+    function startCountdown(from) {
+      countdown = from;
+      const tick = setInterval(() => {
+        countdown--;
+        positionAura(); // aktualisiert auch infoSize
+        if (countdown <= 0) clearInterval(tick);
+      }, 1000);
+    }
+
+    function startAuto() {
+      running = true;
+      document.getElementById('btn-auto').textContent = 'Stop';
+      // Erster Zyklus sofort
+      runCycle();
+      startCountdown(INTERVAL_S);
+    }
+
+    function stopAuto() {
+      running = false;
+      clearTimeout(cycleTimer);
+      hide();
+      document.getElementById('btn-auto').textContent = 'Auto-Zyklus starten';
+    }
+
+    document.getElementById('btn-show').addEventListener('click', show);
+    document.getElementById('btn-hide').addEventListener('click', hide);
+    document.getElementById('btn-auto').addEventListener('click', () => {
+      if (running) stopAuto(); else startAuto();
+    });
+
+    positionAura();
+    window.addEventListener('resize', positionAura);
+
+    // Beim Laden direkt zeigen, dann Zyklus starten
+    show();
+    setTimeout(startAuto, 500);
+  </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meditation-v1.48';
+const CACHE_NAME = 'meditation-v1.49';
 
 const CACHE_FILES = [
   './',
@@ -7,7 +7,7 @@ const CACHE_FILES = [
   './app.js',
   './manifest.json',
   './background.jpg',
-  './background_laecheln_v0.3.jpg',
+  './background_laecheln_v0.4.jpg',
   './gong.png',
   './icon-1024.png',
   './Sounds/Klangschale Morgenstern.mp3',

@@ -42,7 +42,7 @@ body {
   left: 0;
   width: 100%;
   z-index: 0;
-  background: url('background_lächeln_v0.3.jpg') center center / cover no-repeat;
+  background: url('background_laecheln_v0.4.jpg') center center / cover no-repeat;
   opacity: 0;
   transition: opacity 1.5s ease-in-out;
   pointer-events: none;
