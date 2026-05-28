@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Augenblick</string>
+    <string name="title_activity_main">Augenblick</string>
+    <string name="package_name">de.tinnituspraxis.meditation</string>
+    <string name="custom_url_scheme">de.tinnituspraxis.meditation</string>
+</resources>

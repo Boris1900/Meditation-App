@@ -1,8 +1,12 @@
-# Meditations-App – Projektdokumentation
+# Augenblick – Projektdokumentation
 
 ## Übersicht
-Persönliche Meditations-Timer-App (Boris + Katharina). PWA + Android APK via Capacitor.
+Sanfter Meditations-Timer mit Klangschale, ursprünglich für Boris + Katharina, jetzt als
+"Augenblick"-App auch an Freunde und Interessierte weitergebbar. PWA + Android APK via Capacitor.
 GitHub Pages: https://boris1900.github.io/Meditation-App/ | Repo: Boris1900/Meditation-App
+
+**Hinweis:** Android-Paketname bleibt `de.tinnituspraxis.meditation` (Legacy, nicht sichtbar im
+Normalbetrieb). Wird erst beim großen Tinnitus-Meditations-Produkt sauber neu aufgesetzt.
 
 ## Dateistruktur
 ```
@@ -24,7 +28,7 @@ MeditationsApp/
 └── CLAUDE.md                    # Diese Datei
 ```
 
-## Aktueller Stand – v1.56
+## Aktueller Stand – v1.57
 - Timer 1–90 Min, Wake Lock ab App-Start, Abdunkelung 0–95%
 - **Lebendige Flamme** (Checkbox): Flackern + Schein Stärke 30 in einem Schalter; ausgegraut wenn Farbhintergrund aktiv
 - Buddha-Lächeln + Aura: immer aktiv bei Buddha-Hintergrund, bei Start/Stop + alle 30–45 Sek.
@@ -50,7 +54,7 @@ Weiße Linie Android (Power-Button → Chrome-Reload) → Webtech-Grenze, in der
 ⚠️ Reihenfolge einhalten – sonst landet alte Version in der APK!
 
 1. Änderungen in Hauptdateien vornehmen
-2. Version hochzählen: `app.js` (APP_VERSION) + `sw.js` (CACHE_NAME) → aktuell `v1.56`
+2. Version hochzählen: `app.js` (APP_VERSION) + `sw.js` (CACHE_NAME) → aktuell `v1.57`
 3. `.\build-android.ps1` ausführen
 4. APK per Gradle bauen:
    `$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"`
@@ -70,7 +74,7 @@ iOS: `git push` → GitHub Pages → Katharina tippt „Auf Update prüfen"
 **Feature A: Hintergrundfarbe** ✅ fertig in v1.54
 **Feature B: Zwischengong** ✅ fertig in v1.53
 **Feature C: Gong-Swing beim Zwischen-Gong** ✅ fertig in v1.55
-**Feature D: Gong-Welleneffekt bei Farbhintergrund** ✅ fertig in v1.56
+**Feature D: Gong-Welleneffekt bei Farbhintergrund** ✅ fertig in v1.57
 
 ### Mittelfristig
 - Play Store (25€), weitere Klangschalen

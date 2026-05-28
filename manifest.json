@@ -1,7 +1,7 @@
 {
-  "name": "Meditation Timer",
-  "short_name": "Meditation",
-  "description": "Persönlicher Meditations-Timer mit Gong",
+  "name": "Augenblick",
+  "short_name": "Augenblick",
+  "description": "Sanfter Meditations-Timer mit Klangschale",
   "start_url": "./",
   "display": "fullscreen",
   "orientation": "portrait",
