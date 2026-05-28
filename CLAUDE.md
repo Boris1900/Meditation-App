@@ -69,6 +69,10 @@ iOS: `git push` → GitHub Pages → Katharina tippt „Auf Update prüfen"
 
 **Neue Datei hinzugefügt?** → Auch in `build-android.ps1` + `sw.js` eintragen!
 
+**⚠️ v1.58 Release:** APK unter BEIDEN Namen hochladen (`Augenblick-v1.58.apk` und
+`MeditationApp-v1.58.apk`), damit v1.57-Installationen das Update finden. Ab v1.59 nur noch
+`Augenblick-vX.XX.apk` nötig.
+
 ## Offene Punkte
 
 **Feature A: Hintergrundfarbe** ✅ fertig in v1.54
