@@ -800,7 +800,7 @@ async function checkForUpdate() {
     if (latest === APP_VERSION) {
       status.textContent = '✅ Du hast die aktuelle Version.';
     } else if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-      const apkUrl = `https://github.com/Boris1900/Meditation-App/releases/download/${latest}/MeditationApp-${latest}.apk`;
+      const apkUrl = `https://github.com/Boris1900/Meditation-App/releases/download/${latest}/Augenblick-${latest}.apk`;
       status.innerHTML = `🆕 Update verfügbar! <button onclick="window.open('${apkUrl}','_system')" style="margin-left:6px;padding:4px 10px;border-radius:8px;border:none;background:#b47832;color:#fff;font-size:11px;font-weight:600;cursor:pointer;">APK laden</button>`;
     } else {
       status.innerHTML = '🆕 Update verfügbar! <button onclick="applyUpdate()" style="margin-left:6px;padding:4px 10px;border-radius:8px;border:none;background:#b47832;color:#fff;font-size:11px;font-weight:600;cursor:pointer;">Jetzt laden</button>';
