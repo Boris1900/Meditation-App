@@ -65,11 +65,15 @@ iOS: `git push` → GitHub Pages → Katharina tippt „Auf Update prüfen"
 - Kein Helligkeits-Slider – zu komplex, nicht nötig
 - Auswahl per localStorage speichern
 
+**Feature A: Hintergrundfarbe – zusätzliche Regel**
+- Wenn ein einfarbiger Hintergrund gewählt wird (also nicht „Buddha"): Lebendige Flamme automatisch deaktivieren (Checkbox aus, Flammen-Elemente ausblenden). Kerzenschein passt nicht zu einem einfarbigen Hintergrund.
+- Wenn zurück auf „Buddha" gewechselt wird: Flamme bleibt aus, User kann sie manuell wieder einschalten.
+
 **Feature B: Zwischengong**
 - Im Menü: Checkbox „Zwischen-Gong" an/aus + Slider darunter (nur sichtbar wenn an)
 - Slider: 1 Min bis (Gesamtzeit – 1 Min), in Minuten ab Start
 - Wenn Gesamtzeit kleiner als Zwischengong-Zeit → Zwischengong wird ignoriert (kein Fehler)
-- Auf dem Hauptscreen (nur wenn aktiv + Timer läuft): kleiner Countdown rechts neben dem Haupttimer, Label „Zwischen-Gong" drüber
+- Auf dem Hauptscreen (nur wenn aktiv + Timer läuft): kleiner Countdown rechts neben dem Haupttimer, KEIN Label darüber
 - Wenn Zwischengong feuert: Gong-Sound einmal abspielen, kleines Display verschwindet einfach (kein ✓, kein Effekt)
 - Einstellung per localStorage speichern
 

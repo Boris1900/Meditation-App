@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.52';
+const APP_VERSION = 'v1.53';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -63,6 +63,12 @@ let remainingSeconds = 0;
 let timerInterval = null;
 let isRunning = false;
 
+// Zwischen-Gong State
+let zgongEnabled   = false;
+let zgongMinutes   = 20;
+let zgongRemaining = 0;
+let zgongFired     = false;
+
 // Dimm-State
 let dimOpacity = 0;
 let isDimmed = false;
@@ -93,11 +99,26 @@ const flameFlicker    = document.getElementById('flame-flicker');
 const bgSmile     = document.getElementById('bg-smile');
 const buddhaAura  = document.getElementById('buddha-aura');
 
+// Zwischen-Gong DOM
+const zgongCheckbox      = document.getElementById('zgong-checkbox');
+const zgongSliderSection = document.getElementById('zgong-slider-section');
+const zgongSliderEl      = document.getElementById('zgong-slider');
+const zgongMaxLabel      = document.getElementById('zgong-max-label');
+const zgongValueLabel    = document.getElementById('zgong-value-label');
+const zgongDisplay       = document.getElementById('zgong-display');
+const zgongTimeEl        = document.getElementById('zgong-time');
+
 // Timer-Anzeige: jede Ziffer in fixen Span, verhindert iOS-Ruckeln
 function renderTimer(timeStr) {
   timerText.innerHTML = timeStr.split('').map(ch =>
     `<span class="${ch === ':' ? 'colon' : 'digit'}">${ch}</span>`
   ).join('');
+}
+
+function renderZgongTimer(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  zgongTimeEl.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
 }
 
 // Slider
@@ -113,6 +134,27 @@ function updateDuration(val) {
   renderTimer(formatTime(val * 60));
   updateSliderProgress();
   localStorage.setItem('medi_dauer', val);
+  updateZgongSliderRange();
+}
+
+function updateZgongSliderRange() {
+  const max = Math.max(1, durationMinutes - 1);
+  zgongSliderEl.max = max;
+  zgongMaxLabel.textContent = max + ' Min';
+  if (zgongMinutes > max) {
+    zgongMinutes = max;
+    zgongSliderEl.value = max;
+    zgongValueLabel.textContent = 'nach ' + zgongMinutes + ' Minuten';
+    localStorage.setItem('medi_zgong_minuten', zgongMinutes);
+  }
+  updateZgongSliderProgress();
+}
+
+function updateZgongSliderProgress() {
+  const max = parseInt(zgongSliderEl.max);
+  const val = parseInt(zgongSliderEl.value);
+  const pct = max > 1 ? ((val - 1) / (max - 1)) * 100 : 0;
+  zgongSliderEl.style.setProperty('--progress', pct + '%');
 }
 
 slider.addEventListener('input', () => {
@@ -149,9 +191,31 @@ function startTimer() {
   scheduleBuddhaSmile();
   triggerBuddhaSmileOnce();
 
+  // Zwischen-Gong initialisieren
+  zgongFired = false;
+  if (zgongEnabled && zgongMinutes < durationMinutes) {
+    zgongRemaining = zgongMinutes * 60;
+    renderZgongTimer(zgongRemaining);
+    zgongDisplay.classList.remove('hidden');
+  } else {
+    zgongRemaining = 0;
+    zgongDisplay.classList.add('hidden');
+  }
+
   timerInterval = setInterval(() => {
     remainingSeconds--;
     renderTimer(formatTime(remainingSeconds));
+
+    if (zgongEnabled && !zgongFired && zgongRemaining > 0) {
+      zgongRemaining--;
+      renderZgongTimer(zgongRemaining);
+      if (zgongRemaining === 0) {
+        zgongFired = true;
+        zgongDisplay.classList.add('hidden');
+        playGong();
+      }
+    }
+
     if (remainingSeconds <= 0) finishTimer();
   }, 1000);
 }
@@ -172,6 +236,11 @@ function stopTimer() {
   stopBuddhaSmile();
   triggerBuddhaSmileOnce();
   updateDuration(durationMinutes);
+
+  // Zwischen-Gong zurücksetzen
+  zgongFired = false;
+  zgongRemaining = 0;
+  zgongDisplay.classList.add('hidden');
 }
 
 function finishTimer() {
@@ -402,6 +471,20 @@ function setFlicker(enabled) {
 
 flickerCheckbox.addEventListener('change', () => setFlicker(flickerCheckbox.checked));
 
+// Zwischen-Gong Menü
+zgongCheckbox.addEventListener('change', () => {
+  zgongEnabled = zgongCheckbox.checked;
+  zgongSliderSection.classList.toggle('hidden', !zgongEnabled);
+  localStorage.setItem('medi_zgong_enabled', zgongEnabled ? '1' : '0');
+});
+
+zgongSliderEl.addEventListener('input', () => {
+  zgongMinutes = parseInt(zgongSliderEl.value);
+  zgongValueLabel.textContent = 'nach ' + zgongMinutes + ' Minuten';
+  updateZgongSliderProgress();
+  localStorage.setItem('medi_zgong_minuten', zgongMinutes);
+});
+
 // Layout-Berechnung
 const timerArea = document.getElementById('timer-area');
 
@@ -554,6 +637,19 @@ updateDimSliderProgress();
 
 const savedFlackern = localStorage.getItem('medi_flackern');
 setFlicker(savedFlackern === '1'); // Default: aus
+
+// Zwischen-Gong wiederherstellen
+const savedZgongEnabled = localStorage.getItem('medi_zgong_enabled');
+zgongEnabled = savedZgongEnabled === '1';
+zgongCheckbox.checked = zgongEnabled;
+zgongSliderSection.classList.toggle('hidden', !zgongEnabled);
+
+const savedZgongMin = parseInt(localStorage.getItem('medi_zgong_minuten'));
+if (!isNaN(savedZgongMin) && savedZgongMin >= 1) zgongMinutes = savedZgongMin;
+updateZgongSliderRange(); // setzt Max, klemmt Wert falls nötig
+zgongSliderEl.value = zgongMinutes;
+updateZgongSliderProgress();
+zgongValueLabel.textContent = 'nach ' + zgongMinutes + ' Minuten';
 
 if (isIOS()) {
   const hint = document.getElementById('ios-mute-hint');

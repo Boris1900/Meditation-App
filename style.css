@@ -599,3 +599,47 @@ body.running #controls {
   opacity: 0;
   pointer-events: none;
 }
+
+/* Zwischen-Gong: 3-Spalten-Grid damit Haupttimer immer mittig bleibt */
+#timer-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+  width: 100%;
+}
+
+/* Zwischen-Gong Anzeige rechts neben dem Haupttimer */
+#zgong-display {
+  display: inline-block;
+  position: relative;
+  margin-left: 16px;
+}
+#zgong-display.hidden { display: none; }
+
+#zgong-time {
+  display: block;
+  font-family: 'Georgia', serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: rgba(255,220,140,0.85);
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+  white-space: nowrap;
+}
+
+/* Zwischen-Gong Menü: Slider-Sektion */
+#zgong-slider-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#zgong-slider-section.hidden { display: none; }
+
+#zgong-value-label {
+  text-align: center;
+  font-size: 0.85rem;
+  color: rgba(212,168,83,0.75);
+  font-style: italic;
+  margin-top: -4px;
+  letter-spacing: 0.05em;
+}

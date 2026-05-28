@@ -65,6 +65,19 @@
         <span>Lebendige Flamme <span style="font-style:normal">🕯️</span></span>
       </label>
       <hr class="menu-divider">
+      <label class="flicker-toggle">
+        <input type="checkbox" id="zgong-checkbox">
+        <span>Zwischen-Gong <span style="font-style:normal">🔔</span></span>
+      </label>
+      <div id="zgong-slider-section" class="hidden">
+        <div class="dim-slider-row">
+          <span class="dim-end-label">1 Min</span>
+          <input type="range" id="zgong-slider" min="1" max="39" value="20" step="1">
+          <span class="dim-end-label" id="zgong-max-label">39 Min</span>
+        </div>
+        <p id="zgong-value-label">nach 20 Minuten</p>
+      </div>
+      <hr class="menu-divider">
       <button id="update-btn" onclick="checkForUpdate()" class="update-btn">🔄 Auf Update prüfen</button>
       <div id="update-status"></div>
       <div id="app-version"></div>
@@ -92,8 +105,14 @@
 
     <!-- Timer + Slider – wird per JS zwischen Gong und Nav zentriert -->
     <div id="timer-area">
-      <div id="timer-display">
-        <span id="timer-text">40:00</span>
+      <div id="timer-row">
+        <div id="timer-spacer"></div>
+        <div id="timer-display">
+          <span id="timer-text">40:00</span>
+        </div>
+        <div id="zgong-display" class="hidden">
+          <span id="zgong-time">--:--</span>
+        </div>
       </div>
       <div id="controls">
         <div class="slider-row">
