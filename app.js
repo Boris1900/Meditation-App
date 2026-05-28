@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.54';
+const APP_VERSION = 'v1.55';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -214,6 +214,7 @@ function startTimer() {
         zgongFired = true;
         zgongDisplay.classList.add('hidden');
         playGong();
+        swingGongZwischen();
       }
     }
 
@@ -253,12 +254,38 @@ function finishTimer() {
   wakeLockExtendTimer = setTimeout(releaseWakeLock, 5 * 60 * 1000);
 }
 
-// Gong-Animation
+// Gong-Animation (Haupttimer-Ende)
 function swingGong() {
   if (gongEl.classList.contains('swinging')) return;
   gongEl.classList.add('swinging');
   gongEl.addEventListener('animationend', () => {
     gongEl.classList.remove('swinging');
+  }, { once: true });
+}
+
+// Gong-Animation beim Zwischen-Gong: schwingt durch das Dimm-Overlay hindurch, blendet dann weich aus
+const gongContainer = document.getElementById('gong-container');
+function swingGongZwischen() {
+  if (gongEl.classList.contains('swinging')) return;
+  gongContainer.style.transition = 'none';
+  gongContainer.style.opacity = '1';
+  gongContainer.style.zIndex = '55';
+  gongEl.classList.add('swinging');
+  gongEl.addEventListener('animationend', () => {
+    gongEl.classList.remove('swinging');
+    // Zwei rAF-Durchläufe: erster lässt Browser opacity:1 committen,
+    // zweiter startet erst dann die Überblendung
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        gongContainer.style.transition = 'opacity 2.5s ease';
+        gongContainer.style.opacity = '0';
+        setTimeout(() => {
+          gongContainer.style.zIndex = '';
+          gongContainer.style.opacity = '';
+          gongContainer.style.transition = '';
+        }, 2700);
+      });
+    });
   }, { once: true });
 }
 
@@ -490,12 +517,16 @@ let currentBg = 'buddha';
 function setBg(key) {
   currentBg = key;
   const color = BG_OPTIONS[key];
-  if (color === null) {
+  const isBuddha = color === null;
+  if (isBuddha) {
     appBgEl.style.background = '';
   } else {
     appBgEl.style.background = color;
     if (flickerCheckbox.checked) setFlicker(false);
   }
+  const flickerSection = document.getElementById('flicker-section');
+  flickerSection.style.opacity = isBuddha ? '' : '0.35';
+  flickerSection.style.pointerEvents = isBuddha ? '' : 'none';
   document.querySelectorAll('.bg-swatch').forEach(s => {
     s.classList.toggle('selected', s.dataset.bg === key);
   });

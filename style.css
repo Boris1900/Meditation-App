@@ -389,9 +389,9 @@ main {
   pointer-events: none;
 }
 
-/* Gong – oben zentriert, größer */
+/* Gong – eigenes fixed-Element, z-index steuerbar für Zwischen-Gong-Swing */
 #gong-container {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
@@ -399,6 +399,7 @@ main {
   justify-content: center;
   perspective: 800px;
   pointer-events: none;
+  z-index: 1;
 }
 
 .cord { display: none; }

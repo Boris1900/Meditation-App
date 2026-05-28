@@ -59,11 +59,13 @@
         <span class="dim-end-label">Sehr dunkel</span>
       </div>
       <p id="dim-level-label">Stark</p>
-      <hr class="menu-divider">
-      <label class="flicker-toggle">
-        <input type="checkbox" id="flicker-checkbox">
-        <span>Lebendige Flamme <span style="font-style:normal">🕯️</span></span>
-      </label>
+      <div id="flicker-section">
+        <hr class="menu-divider">
+        <label class="flicker-toggle">
+          <input type="checkbox" id="flicker-checkbox">
+          <span>Lebendige Flamme <span style="font-style:normal">🕯️</span></span>
+        </label>
+      </div>
       <hr class="menu-divider">
       <label class="flicker-toggle">
         <input type="checkbox" id="zgong-checkbox">
@@ -128,17 +130,17 @@
   <!-- Flammen-Flackern (kleines Element direkt auf der Kerzenflamme) -->
   <div id="flame-flicker"></div>
 
+  <!-- Gong: eigenes fixed-Element, damit z-index beim Zwischen-Gong über Overlay gehoben werden kann -->
+  <div id="gong-container">
+    <div id="gong-cord-left" class="cord"></div>
+    <div id="gong-cord-right" class="cord"></div>
+    <div id="gong" title="Tippen zum Starten">
+      <span id="gong-label">START</span>
+    </div>
+  </div>
+
   <!-- Hauptbereich -->
   <main>
-
-    <!-- Gong -->
-    <div id="gong-container">
-      <div id="gong-cord-left" class="cord"></div>
-      <div id="gong-cord-right" class="cord"></div>
-      <div id="gong" title="Tippen zum Starten">
-        <span id="gong-label">START</span>
-      </div>
-    </div>
 
     <!-- Timer + Slider – wird per JS zwischen Gong und Nav zentriert -->
     <div id="timer-area">
