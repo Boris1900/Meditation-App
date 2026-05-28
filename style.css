@@ -475,8 +475,9 @@ main {
 
 body.ios #timer-text .digit {
   display: inline-block;
-  width: 0.62em;
+  width: 0.70em;
   text-align: center;
+  overflow: hidden;
   font-variant-numeric: lining-nums tabular-nums;
   vertical-align: top;
   font-family: 'Merriweather', Georgia, serif;
@@ -486,6 +487,22 @@ body.ios #timer-text .digit {
 body.ios #timer-text .colon {
   display: inline-block;
   width: 0.40em;
+  text-align: center;
+}
+
+/* Zwischen-Gong-Timer iOS: gleiche Fixbreiten-Logik */
+body.ios #zgong-time .digit {
+  display: inline-block;
+  width: 0.70em;
+  text-align: center;
+  overflow: hidden;
+  font-variant-numeric: lining-nums tabular-nums;
+  vertical-align: top;
+}
+
+body.ios #zgong-time .colon {
+  display: inline-block;
+  width: 0.38em;
   text-align: center;
 }
 

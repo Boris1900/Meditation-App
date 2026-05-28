@@ -28,7 +28,7 @@ MeditationsApp/
 └── CLAUDE.md                    # Diese Datei
 ```
 
-## Aktueller Stand – v1.57
+## Aktueller Stand – v1.58
 - Timer 1–90 Min, Wake Lock ab App-Start, Abdunkelung 0–95%
 - **Lebendige Flamme** (Checkbox): Flackern + Schein Stärke 30 in einem Schalter; ausgegraut wenn Farbhintergrund aktiv
 - Buddha-Lächeln + Aura: immer aktiv bei Buddha-Hintergrund, bei Start/Stop + alle 30–45 Sek.
@@ -54,7 +54,7 @@ Weiße Linie Android (Power-Button → Chrome-Reload) → Webtech-Grenze, in der
 ⚠️ Reihenfolge einhalten – sonst landet alte Version in der APK!
 
 1. Änderungen in Hauptdateien vornehmen
-2. Version hochzählen: `app.js` (APP_VERSION) + `sw.js` (CACHE_NAME) → aktuell `v1.57`
+2. Version hochzählen: `app.js` (APP_VERSION) + `sw.js` (CACHE_NAME) → aktuell `v1.58`
 3. `.\build-android.ps1` ausführen
 4. APK per Gradle bauen:
    `$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"`
@@ -74,8 +74,8 @@ gelöscht und über Safari neu hinzugefügt werden. Daten bleiben erhalten (hän
 
 **Neue Datei hinzugefügt?** → Auch in `build-android.ps1` + `sw.js` eintragen!
 
-**⚠️ v1.58 Release:** APK unter BEIDEN Namen hochladen (`Augenblick-v1.58.apk` und
-`MeditationApp-v1.58.apk`), damit v1.57-Installationen das Update finden. Ab v1.59 nur noch
+**⚠️ v1.59 Release:** APK unter BEIDEN Namen hochladen (`Augenblick-v1.59.apk` und
+`MeditationApp-v1.59.apk`), damit v1.57-Installationen das Update finden. Ab v1.60 nur noch
 `Augenblick-vX.XX.apk` nötig.
 
 ## Offene Punkte
@@ -84,6 +84,7 @@ gelöscht und über Safari neu hinzugefügt werden. Daten bleiben erhalten (hän
 **Feature B: Zwischengong** ✅ fertig in v1.53
 **Feature C: Gong-Swing beim Zwischen-Gong** ✅ fertig in v1.55
 **Feature D: Gong-Welleneffekt bei Farbhintergrund** ✅ fertig in v1.57
+**Fix: iOS-Timer-Zittern** ✅ fertig in v1.58 – Haupttimer + Zwischen-Gong-Timer zittern nicht mehr
 
 ### Mittelfristig
 - Play Store (25€), weitere Klangschalen

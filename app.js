@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.57';
+const APP_VERSION = 'v1.58';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -120,7 +120,10 @@ function renderTimer(timeStr) {
 function renderZgongTimer(seconds) {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
-  zgongTimeEl.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  const timeStr = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  zgongTimeEl.innerHTML = timeStr.split('').map(ch =>
+    `<span class="${ch === ':' ? 'colon' : 'digit'}">${ch}</span>`
+  ).join('');
 }
 
 // Slider
