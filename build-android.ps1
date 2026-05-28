@@ -14,6 +14,7 @@ Copy-Item "$src\manifest.json"                 $www -Force
 Copy-Item "$src\background.jpg"                $www -Force
 Copy-Item "$src\background_laecheln_v0.4.jpg"  $www -Force
 Copy-Item "$src\gong.png"                      $www -Force
+Copy-Item "$src\gong_ohne_halter.png"          $www -Force
 Copy-Item "$src\Sounds\*"                      "$www\Sounds\" -Force
 
 Write-Host "Starte Capacitor Sync..." -ForegroundColor Cyan

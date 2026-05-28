@@ -645,6 +645,33 @@ body.running #controls {
   letter-spacing: 0.05em;
 }
 
+/* Schallwelle beim Gong-Antippen (Farbmodus) */
+.welle {
+  position: fixed;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  box-shadow: 0 0 10px 4px rgba(255, 220, 130, 0.32);
+  filter: blur(3px);
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes welle-aus {
+  0%   { transform: translate(-50%, -50%) scale(1);    opacity: 0.45; }
+  50%  { opacity: 0.22; }
+  100% { transform: translate(-50%, -50%) scale(1.55); opacity: 0; }
+}
+
+.welle.aktiv { animation: welle-aus 3.5s ease-out forwards; }
+
+/* Gong ohne Halterung – bei einfarbigem Hintergrund */
+#gong.farbmodus {
+  background-image: url('gong_ohne_halter.png');
+}
+
 /* Hintergrundfarbe-Picker */
 #bg-color-picker {
   display: grid;

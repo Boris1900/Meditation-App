@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.55';
+const APP_VERSION = 'v1.56';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -99,6 +99,7 @@ const flameFlicker    = document.getElementById('flame-flicker');
 const bgSmile     = document.getElementById('bg-smile');
 const buddhaAura  = document.getElementById('buddha-aura');
 const appBgEl     = document.getElementById('app-bg');
+const welleEl     = document.getElementById('w0');
 
 // Zwischen-Gong DOM
 const zgongCheckbox      = document.getElementById('zgong-checkbox');
@@ -214,7 +215,7 @@ function startTimer() {
         zgongFired = true;
         zgongDisplay.classList.add('hidden');
         playGong();
-        swingGongZwischen();
+        if (currentBg === 'buddha') swingGongZwischen(); else fireWave();
       }
     }
 
@@ -248,10 +249,36 @@ function stopTimer() {
 function finishTimer() {
   stopTimer();
   playGong();
-  swingGong();
+  if (currentBg === 'buddha') swingGong(); else fireWave();
   // Nachklang: Screen noch 5 Minuten anlassen nach Ende der Meditation
   requestWakeLock();
   wakeLockExtendTimer = setTimeout(releaseWakeLock, 5 * 60 * 1000);
+}
+
+// Scheibenmitte + Durchmesser des gong_ohne_halter.png in Screen-Pixeln
+function discGeometry() {
+  const r     = gongEl.getBoundingClientRect();
+  const scale = Math.min(r.width / IMG_W_GONG, r.height / IMG_H_GONG);
+  const rendW = IMG_W_GONG * scale;
+  const rendH = IMG_H_GONG * scale;
+  const offX  = (r.width  - rendW) / 2;
+  const offY  = (r.height - rendH) / 2;
+  return {
+    x:    r.left + offX + rendW * 0.5,
+    y:    r.top  + offY + rendH * DISC_Y_PCT,
+    size: rendH * DISC_R_PCT * 2
+  };
+}
+
+function fireWave() {
+  const g = discGeometry();
+  welleEl.style.left   = g.x + 'px';
+  welleEl.style.top    = g.y + 'px';
+  welleEl.style.width  = g.size + 'px';
+  welleEl.style.height = g.size + 'px';
+  welleEl.classList.remove('aktiv');
+  void welleEl.offsetWidth;
+  welleEl.classList.add('aktiv');
 }
 
 // Gong-Animation (Haupttimer-Ende)
@@ -389,13 +416,13 @@ gongEl.addEventListener('click', (e) => {
 
   if (!isRunning) {
     playGong();
-    swingGong();
+    if (currentBg === 'buddha') swingGong(); else fireWave();
     setTimeout(() => startTimer(), 500);
   } else {
     // Nur erreichbar wenn NICHT abgedunkelt – Overlay fängt Klick ab wenn dimmed
     stopTimer();
     playGong();
-    swingGong();
+    if (currentBg === 'buddha') swingGong(); else fireWave();
   }
 });
 
@@ -520,8 +547,10 @@ function setBg(key) {
   const isBuddha = color === null;
   if (isBuddha) {
     appBgEl.style.background = '';
+    gongEl.classList.remove('farbmodus');
   } else {
     appBgEl.style.background = color;
+    gongEl.classList.add('farbmodus');
     if (flickerCheckbox.checked) setFlicker(false);
   }
   const flickerSection = document.getElementById('flicker-section');
@@ -562,6 +591,9 @@ const AURA_X_PCT  = 0.28;   // Aura-Mitte X (Buddha-Kopf)
 const AURA_Y_PCT  = 0.59;   // Aura-Mitte Y
 const AURA_SIZE_PCT = 0.46; // Aura-Durchmesser als % der Bildbreite
 const GONG_ASPECT = 312 / 360;
+const IMG_W_GONG = 1024, IMG_H_GONG = 1536;
+const DISC_Y_PCT = 0.537;
+const DISC_R_PCT = 0.292;
 const MIN_TIMER_ZONE = 115; // px Mindestplatz für Timer + Slider
 
 // Auf iOS nutzt fixBgHeight() screen.height – Positionierung muss dasselbe tun
