@@ -67,6 +67,11 @@ Weiße Linie Android (Power-Button → Chrome-Reload) → Webtech-Grenze, in der
 APK: `android\app\build\outputs\apk\debug\app-debug.apk`
 iOS: `git push` → GitHub Pages → Katharina tippt „Auf Update prüfen"
 
+**iOS-PWA bei Namensänderung:** iOS liest das Manifest nach dem ersten "Zum Home-Bildschirm"
+nicht neu ein. Der Homescreen-Name bleibt also der alte (z.B. "Meditation") auch nach Updates.
+Damit der neue Name (z.B. "Augenblick") außen erscheint, muss die PWA einmal vom Homescreen
+gelöscht und über Safari neu hinzugefügt werden. Daten bleiben erhalten (hängen an der URL).
+
 **Neue Datei hinzugefügt?** → Auch in `build-android.ps1` + `sw.js` eintragen!
 
 **⚠️ v1.58 Release:** APK unter BEIDEN Namen hochladen (`Augenblick-v1.58.apk` und
