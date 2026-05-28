@@ -55,8 +55,29 @@ iOS: `git push` → GitHub Pages → Katharina tippt „Auf Update prüfen"
 **Neue Datei hinzugefügt?** → Auch in `build-android.ps1` eintragen!
 
 ## Offene Punkte
-- Mittelfristig: Play Store (25€), weitere Klangschalen
-- Aufgeschoben: Multi-MP3, Service Worker iOS optimieren
+
+### Nächste Session – v1.53/v1.54
+
+**Feature A: Hintergrundfarbe wählen**
+- 8 tippbare Farbfelder im Menü: Schwarz, Sehr dunkel, Dunkelgrau, Dunkelblau, Dunkelgrün, Mittelgrün (Grasgrün), Warmes Gelb, Buddha (= zurück zum Bild)
+- Bei Farbwahl: Buddha-Hintergrundbild ausblenden, Vollfarbe einblenden
+- Timer-Text bleibt lesbar (hat bereits Textschatten, reicht für alle dunklen Farben)
+- Kein Helligkeits-Slider – zu komplex, nicht nötig
+- Auswahl per localStorage speichern
+
+**Feature B: Zwischengong**
+- Im Menü: Checkbox „Zwischen-Gong" an/aus + Slider darunter (nur sichtbar wenn an)
+- Slider: 1 Min bis (Gesamtzeit – 1 Min), in Minuten ab Start
+- Wenn Gesamtzeit kleiner als Zwischengong-Zeit → Zwischengong wird ignoriert (kein Fehler)
+- Auf dem Hauptscreen (nur wenn aktiv + Timer läuft): kleiner Countdown rechts neben dem Haupttimer, Label „Zwischen-Gong" drüber
+- Wenn Zwischengong feuert: Gong-Sound einmal abspielen, kleines Display verschwindet einfach (kein ✓, kein Effekt)
+- Einstellung per localStorage speichern
+
+### Mittelfristig
+- Play Store (25€), weitere Klangschalen
+
+### Aufgeschoben
+- Multi-MP3, Service Worker iOS optimieren
 
 ## Arbeitsregel
 **Immer erst fragen, bevor eine Idee umgesetzt wird.**
