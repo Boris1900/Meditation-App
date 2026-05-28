@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.53';
+const APP_VERSION = 'v1.54';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -98,6 +98,7 @@ const flickerCheckbox = document.getElementById('flicker-checkbox');
 const flameFlicker    = document.getElementById('flame-flicker');
 const bgSmile     = document.getElementById('bg-smile');
 const buddhaAura  = document.getElementById('buddha-aura');
+const appBgEl     = document.getElementById('app-bg');
 
 // Zwischen-Gong DOM
 const zgongCheckbox      = document.getElementById('zgong-checkbox');
@@ -266,7 +267,7 @@ let buddhaSmileTimer = null;
 let buddhaSmileBusy  = false;
 
 function triggerBuddhaSmile() {
-  if (buddhaSmileBusy || !isRunning) return;
+  if (buddhaSmileBusy || !isRunning || currentBg !== 'buddha') return;
   buddhaSmileBusy = true;
 
   bgSmile.style.opacity    = '1';
@@ -284,6 +285,7 @@ function triggerBuddhaSmile() {
 }
 
 function triggerBuddhaSmileOnce() {
+  if (currentBg !== 'buddha') return;
   bgSmile.style.transition    = 'none';
   buddhaAura.style.transition = 'none';
   bgSmile.style.opacity    = '0';
@@ -471,6 +473,39 @@ function setFlicker(enabled) {
 
 flickerCheckbox.addEventListener('change', () => setFlicker(flickerCheckbox.checked));
 
+// Hintergrundfarbe
+const BG_OPTIONS = {
+  'buddha':      null,
+  'schwarz':     '#000000',
+  'sehr-dunkel': '#111111',
+  'dunkelgrau':  '#222222',
+  'dunkelblau':  '#0a1828',
+  'dunkelgruen': '#0d3510',
+  'grasgruen':   '#246e1c',
+  'warmes-gelb': '#c8a400',
+};
+
+let currentBg = 'buddha';
+
+function setBg(key) {
+  currentBg = key;
+  const color = BG_OPTIONS[key];
+  if (color === null) {
+    appBgEl.style.background = '';
+  } else {
+    appBgEl.style.background = color;
+    if (flickerCheckbox.checked) setFlicker(false);
+  }
+  document.querySelectorAll('.bg-swatch').forEach(s => {
+    s.classList.toggle('selected', s.dataset.bg === key);
+  });
+  localStorage.setItem('medi_hintergrund', key);
+}
+
+document.querySelectorAll('.bg-swatch').forEach(btn => {
+  btn.addEventListener('click', () => setBg(btn.dataset.bg));
+});
+
 // Zwischen-Gong Menü
 zgongCheckbox.addEventListener('change', () => {
   zgongEnabled = zgongCheckbox.checked;
@@ -637,6 +672,9 @@ updateDimSliderProgress();
 
 const savedFlackern = localStorage.getItem('medi_flackern');
 setFlicker(savedFlackern === '1'); // Default: aus
+
+const savedBg = localStorage.getItem('medi_hintergrund') || 'buddha';
+setBg(savedBg);
 
 // Zwischen-Gong wiederherstellen
 const savedZgongEnabled = localStorage.getItem('medi_zgong_enabled');

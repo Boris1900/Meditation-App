@@ -643,3 +643,49 @@ body.running #controls {
   margin-top: -4px;
   letter-spacing: 0.05em;
 }
+
+/* Hintergrundfarbe-Picker */
+#bg-color-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.bg-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 6px 4px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.bg-swatch-color {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  display: block;
+  flex-shrink: 0;
+}
+
+.bg-swatch-label {
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.03em;
+  text-align: center;
+  line-height: 1.2;
+  font-family: 'Georgia', serif;
+}
+
+.bg-swatch.selected {
+  border-color: rgba(212,168,83,0.85);
+}
+
+.bg-swatch.selected .bg-swatch-label {
+  color: #d4a853;
+}
