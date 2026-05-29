@@ -477,7 +477,6 @@ body.ios #timer-text .digit {
   display: inline-block;
   width: 0.70em;
   text-align: center;
-  overflow: hidden;
   font-variant-numeric: lining-nums tabular-nums;
   vertical-align: top;
   font-family: 'Merriweather', Georgia, serif;
@@ -495,7 +494,6 @@ body.ios #zgong-time .digit {
   display: inline-block;
   width: 0.70em;
   text-align: center;
-  overflow: hidden;
   font-variant-numeric: lining-nums tabular-nums;
   vertical-align: top;
 }
