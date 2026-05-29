@@ -1,4 +1,4 @@
-const CACHE_NAME = 'augenblick-v1.59';
+const CACHE_NAME = 'augenblick-v1.60';
 
 const CACHE_FILES = [
   './',

@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.59';
+const APP_VERSION = 'v1.60';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -784,6 +784,21 @@ async function autoLoadKlang(file, label) {
 const savedFile  = localStorage.getItem('medi_klang_file')  || 'Sounds/Klangschale Morgenstern.mp3';
 const savedLabel = localStorage.getItem('medi_klang_label') || 'Klangschale Morgenstern';
 autoLoadKlang(savedFile, savedLabel);
+
+// Audio-Warm-up: beim ersten Antippen der Seite AudioContext erstellen
+// und Buffer dekodieren – so gibt es beim ersten Gong-Tap keine Verzögerung
+function warmUpAudio() {
+  document.removeEventListener('pointerdown', warmUpAudio);
+  if (!rawAudioBuffer) return;
+  const ctx = getAudioCtx();
+  if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+  if (!customAudioBuffer) {
+    ctx.decodeAudioData(rawAudioBuffer.slice(0))
+      .then(buf => { customAudioBuffer = buf; })
+      .catch(() => {});
+  }
+}
+document.addEventListener('pointerdown', warmUpAudio);
 
 // Update-Check
 async function checkForUpdate() {
