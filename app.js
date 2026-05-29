@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.61';
+const APP_VERSION = 'v1.62';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -73,6 +73,10 @@ let zgongFired     = false;
 let dimOpacity = 0;
 let isDimmed = false;
 let autoDimTimeout = null;
+
+// Berg-Modus: Gong kurz einblenden bei Tap
+let bergRevealTimeout = null;
+const bergTapLayer = document.getElementById('berg-tap-layer');
 
 // Wake Lock
 let wakeLock = null;
@@ -195,7 +199,13 @@ function startTimer() {
   scheduleAutoDim();
   scheduleBuddhaSmile();
   triggerBuddhaSmileOnce();
-  if (currentBg === 'berg') updateBergScene(0);
+  if (currentBg === 'berg') {
+    updateBergScene(0);
+    bergTapLayer.style.display = 'block';
+    gongContainer.style.transition = 'opacity 2s ease';
+    gongContainer.style.opacity = '0';
+    gongContainer.style.zIndex = '1';
+  }
 
   // Zwischen-Gong initialisieren
   zgongFired = false;
@@ -223,7 +233,8 @@ function startTimer() {
         zgongFired = true;
         zgongDisplay.classList.add('hidden');
         playGong();
-        if (currentBg === 'buddha') swingGongZwischen(); else fireWave();
+        if (currentBg === 'buddha') swingGongZwischen();
+        else if (currentBg !== 'berg') fireWave();
       }
     }
 
@@ -247,6 +258,14 @@ function stopTimer() {
   stopBuddhaSmile();
   triggerBuddhaSmileOnce();
   updateDuration(durationMinutes);
+  if (currentBg === 'berg') {
+    clearTimeout(bergRevealTimeout);
+    bergRevealTimeout = null;
+    bergTapLayer.style.display = 'none';
+    gongContainer.style.transition = 'opacity 1.5s ease';
+    gongContainer.style.opacity = '';
+    gongContainer.style.zIndex = '';
+  }
 
   // Zwischen-Gong zurücksetzen
   zgongFired = false;
@@ -383,7 +402,7 @@ function stopBuddhaSmile() {
 
 // Dimm-Logik
 function dim() {
-  if (dimOpacity === 0) return;
+  if (dimOpacity === 0 || currentBg === 'berg') return;
   overlay.style.transitionDuration = '3s';
   overlay.style.opacity = dimOpacity;
   overlay.style.pointerEvents = 'auto';
@@ -432,6 +451,22 @@ gongEl.addEventListener('click', (e) => {
     playGong();
     if (currentBg === 'buddha') swingGong(); else fireWave();
   }
+});
+
+// Berg-Tap-Layer: Tap → Gong erscheint kurz, verschwindet nach 2,5 Sek. automatisch
+bergTapLayer.addEventListener('click', (e) => {
+  e.stopPropagation();
+  clearTimeout(bergRevealTimeout);
+  gongContainer.style.transition = 'opacity 1s ease';
+  gongContainer.style.opacity = '0.7';
+  gongContainer.style.zIndex = '3';
+  bergRevealTimeout = setTimeout(() => {
+    if (isRunning && currentBg === 'berg') {
+      gongContainer.style.transition = 'opacity 1.5s ease';
+      gongContainer.style.opacity = '0';
+      gongContainer.style.zIndex = '1';
+    }
+  }, 2500);
 });
 
 // Tap auf Display (nicht Gong, nicht Nav) während Timer hell läuft → sofort abdunkeln
@@ -564,8 +599,10 @@ function createBergStars() {
     s.style.width  = size + 'px';
     s.style.height = size + 'px';
     s.style.left   = (Math.random() * 100).toFixed(1) + '%';
-    s.style.top    = (Math.random() * 58).toFixed(1) + '%';
-    s.style.opacity = (Math.random() * 0.55 + 0.25).toFixed(2);
+    const topPct = Math.random() * 30;
+    s.style.top    = topPct.toFixed(1) + '%';
+    const brightnessScale = 1 - (topPct / 30) * 0.85;
+    s.style.opacity = ((Math.random() * 0.55 + 0.25) * brightnessScale).toFixed(2);
   container.appendChild(s);
   }
   bergStarsCreated = true;
@@ -622,6 +659,11 @@ function setBg(key) {
   const flickerSection = document.getElementById('flicker-section');
   flickerSection.style.opacity = isBuddha ? '' : '0.35';
   flickerSection.style.pointerEvents = isBuddha ? '' : 'none';
+  const dimSection = document.getElementById('dim-section');
+  if (dimSection) {
+    dimSection.style.opacity = isBerg ? '0.35' : '';
+    dimSection.style.pointerEvents = isBerg ? 'none' : '';
+  }
   document.querySelectorAll('.bg-swatch').forEach(s => {
     s.classList.toggle('selected', s.dataset.bg === key);
   });

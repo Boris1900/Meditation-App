@@ -26,7 +26,7 @@ MeditationsApp/
 └── CLAUDE.md                    # Diese Datei
 ```
 
-## Aktueller Stand – v1.61 (lokal, noch nicht final)
+## Aktueller Stand – v1.62 (lokal, noch nicht gepusht)
 
 - Timer 1–90 Min, Wake Lock ab App-Start, Abdunkelung 0–95%
 - **Lebendige Flamme** (Checkbox): ausgegraut wenn Farbhintergrund aktiv
@@ -35,22 +35,15 @@ MeditationsApp/
 - **Zwischen-Gong** (Checkbox + Slider): Countdown rechts neben Haupttimer
 - **Hintergrundfarbe** (9 Felder): Buddha, Berge, Schwarz, Sehr dunkel, Dunkelgrau, Dunkelblau, Dunkelgrün, Grasgrün, Warmes Gelb
 - **Gong-Welleneffekt** (Farbmodus + Bergmodus): weicher Schallwellen-Ring statt Swing
-- **Berglandschaft-Hintergrund (v1.61):** Dynamischer Sonnenaufgang im Meditationsverlauf:
-  - Start: fast schwarz (overlay 0.90), Sterne im oberen 30% sichtbar
+- **Berglandschaft-Hintergrund (v1.62):** Dynamischer Sonnenaufgang im Meditationsverlauf:
+  - Start: fast schwarz (overlay 0.90), Sterne im oberen 30% sichtbar – mit Helligkeitsgradient (oben hell, unten dunkel)
   - Im Verlauf: Overlay hebt sich sanft (CSS transition 1.2s), Sterne verblassen ab 35%
   - Ende: Berglandschaft vollständig sichtbar, goldene Morgendämmerung
   - Abdunkelung automatisch deaktiviert (ausgegraut) – Bergszene liefert eigene Dunkelheit
-  - Gong blendet sich beim Start sanft aus (opacity 0.15), kehrt bei Stop zurück
-
-### Offene Diskussion Bergmodus
-⚠️ **Noch nicht committet/gepusht – lokal testen zuerst!**
-
-Der Gong blendet sich beim Laufen auf 15% aus – gut. Aber das Label "STOPP" steht
-immer noch sichtbar im Himmel. Optionen:
-1. Label "STOPP" beim Bergmodus komplett ausblenden (nur der Gong-Kreis bleibt tastbar)
-2. Label mitausblenden (schon durch opacity 0.15 sehr blass, vielleicht reicht es)
-3. Noch weiter runter mit der opacity (z.B. 0.08)
-→ Mit Boris diskutieren bevor umgesetzt wird.
+  - Gong komplett unsichtbar beim Laufen (opacity 0)
+  - Tap auf Bildschirm → Gong erscheint bei 70% Opacity → nach 2,5 Sek. automatisch weg
+  - Zwischen-Gong im Bergmodus: nur Sound, keine visuelle Animation
+  - Technisch: `#berg-tap-layer` (z-index 2) fängt Taps ab, Gong-Container wechselt z-index 1↔3
 
 ### Wichtige Konstanten (app.js)
 ```
@@ -93,11 +86,11 @@ iOS: `git push` → GitHub Pages → Katharina tippt „Auf Update prüfen"
 - v1.59: iOS-Digit-Trennlinien entfernt
 - v1.60: Audio-Warm-up beim ersten Seitentouch
 - v1.61: Berglandschaft-Hintergrund mit dynamischem Sonnenaufgang
+- v1.62: Bergmodus verfeinert – Gong unsichtbar, Tap-Enthüllung (2,5s), Stern-Helligkeitsgradient, Zwischen-Gong nur Sound
 
 ## Offene Punkte / Nächste Schritte
 
 ### Bergmodus fertigstellen (nächster Schritt)
-- STOPP-Label Sichtbarkeit diskutieren und entscheiden
 - Lokal testen → commit → Boris fragen ob push → APK bauen
 
 ### Weitere Hintergründe geplant

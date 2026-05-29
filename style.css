@@ -26,6 +26,7 @@ html {
   pointer-events: none;
   z-index: 0;
   display: none;
+  transition: opacity 1.2s ease;
 }
 
 #berg-stars {
@@ -36,6 +37,14 @@ html {
   z-index: 0;
   opacity: 0;
   display: none;
+}
+
+#berg-tap-layer {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: auto;
 }
 
 .berg-star {
