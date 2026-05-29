@@ -47,6 +47,60 @@ html {
   pointer-events: auto;
 }
 
+#meer-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  display: none;
+  transition: opacity 1.2s ease;
+}
+
+/* Container schneidet die Sonne an der Horizontlinie ab (Unterkante = Horizont) */
+#meer-sun-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 1;
+  display: none;
+  overflow: hidden;
+}
+
+/* Aura: großer weicher Lichthof hinter der Sonne, wächst beim Untergang */
+#meer-aura {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  filter: blur(30px);
+}
+
+/* Sonne: ein rundes Element, der Radial-Gradient erzeugt Ball + Glühen selbst */
+#meer-sun {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  filter: blur(2px);
+}
+
+/* Lichtstreifen auf dem Wasser unterhalb des Horizonts */
+#meer-sun-reflection {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  display: none;
+  width: 90px;
+  filter: blur(8px);
+  transform: translateX(-50%);
+}
+
 .berg-star {
   position: absolute;
   background: #fff;

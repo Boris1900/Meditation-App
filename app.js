@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.62';
+const APP_VERSION = 'v1.67';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -206,6 +206,13 @@ function startTimer() {
     gongContainer.style.opacity = '0';
     gongContainer.style.zIndex = '1';
   }
+  if (currentBg === 'meer') {
+    updateMeerScene(0);
+    bergTapLayer.style.display = 'block';
+    gongContainer.style.transition = 'opacity 2s ease';
+    gongContainer.style.opacity = '0';
+    gongContainer.style.zIndex = '1';
+  }
 
   // Zwischen-Gong initialisieren
   zgongFired = false;
@@ -225,6 +232,10 @@ function startTimer() {
       const total = durationMinutes * 60;
       updateBergScene(total > 0 ? 1 - (remainingSeconds / total) : 1);
     }
+    if (currentBg === 'meer') {
+      const total = durationMinutes * 60;
+      updateMeerScene(total > 0 ? 1 - (remainingSeconds / total) : 1);
+    }
 
     if (zgongEnabled && !zgongFired && zgongRemaining > 0) {
       zgongRemaining--;
@@ -234,7 +245,7 @@ function startTimer() {
         zgongDisplay.classList.add('hidden');
         playGong();
         if (currentBg === 'buddha') swingGongZwischen();
-        else if (currentBg !== 'berg') fireWave();
+        else if (currentBg !== 'berg' && currentBg !== 'meer') fireWave();
       }
     }
 
@@ -258,7 +269,7 @@ function stopTimer() {
   stopBuddhaSmile();
   triggerBuddhaSmileOnce();
   updateDuration(durationMinutes);
-  if (currentBg === 'berg') {
+  if (currentBg === 'berg' || currentBg === 'meer') {
     clearTimeout(bergRevealTimeout);
     bergRevealTimeout = null;
     bergTapLayer.style.display = 'none';
@@ -266,6 +277,7 @@ function stopTimer() {
     gongContainer.style.opacity = '';
     gongContainer.style.zIndex = '';
   }
+  // Meer: Szene NICHT zurücksetzen – sie bleibt dunkel bis zum nächsten Start
 
   // Zwischen-Gong zurücksetzen
   zgongFired = false;
@@ -574,6 +586,7 @@ flickerCheckbox.addEventListener('change', () => setFlicker(flickerCheckbox.chec
 const BG_OPTIONS = {
   'buddha':      null,
   'berg':        'berg',
+  'meer':        'meer',
   'schwarz':     '#000000',
   'sehr-dunkel': '#111111',
   'dunkelgrau':  '#222222',
@@ -635,25 +648,118 @@ function showBergScene(show) {
   }
 }
 
+// Meer-Sonnenuntergang
+const meerOverlay    = document.getElementById('meer-overlay');
+const meerSunWrap    = document.getElementById('meer-sun-wrap');
+const meerAura       = document.getElementById('meer-aura');
+const meerSun        = document.getElementById('meer-sun');
+const meerReflection = document.getElementById('meer-sun-reflection');
+
+// Bildmaße + Horizontposition IM BILD (Anteil von oben). Daraus wird die
+// Bildschirm-Position exakt berechnet – egal wie "cover" das Bild beschneidet.
+const MEER_IMG_W        = 948;
+const MEER_IMG_H        = 1659;
+const MEER_HORIZON_FRAC = 0.58;  // Horizontlinie bei 58% der Bildhöhe
+const MEER_SUN_SIZE     = 300;   // gesamtes Sonnen-Element inkl. Glühen
+const MEER_DISC_PCT     = 0.24;  // Anteil des Gradients, der den hellen Ball ausmacht
+
+// Rechnet die Horizontlinie in Bildschirm-Pixel um (berücksichtigt background-size: cover)
+function meerHorizonPx() {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const scale = Math.max(vw / MEER_IMG_W, vh / MEER_IMG_H); // cover: größerer Faktor
+  const renderedH = MEER_IMG_H * scale;
+  const offsetTop = (renderedH - vh) / 2; // oben abgeschnittener Teil
+  return MEER_HORIZON_FRAC * renderedH - offsetTop;
+}
+
+function showMeerScene(show) {
+  if (show) {
+    meerOverlay.style.display    = 'block';
+    meerSunWrap.style.display    = 'block';
+    meerReflection.style.display = 'block';
+    updateMeerScene(0);
+  } else {
+    meerOverlay.style.display    = 'none';
+    meerSunWrap.style.display    = 'none';
+    meerReflection.style.display = 'none';
+  }
+}
+
+function updateMeerScene(progress) {
+  const H = meerHorizonPx();             // Horizont in px von oben (cover-korrekt)
+  meerSunWrap.style.height = H + 'px';   // Unterkante = Horizont, clippt Sonne+Aura
+
+  const discR = MEER_SUN_SIZE * MEER_DISC_PCT; // sichtbarer Ball-Radius
+
+  // Sonnen-Mittelpunkt relativ zur Horizontlinie: progress 0 → auf Horizont, sinkt mit progress
+  const centerFromHorizon = -progress * discR; // negativ = unter dem Horizont
+
+  // Farbe wird beim Sinken röter (Grün-/Blau-Anteil sinkt)
+  const core = `rgba(255,255,${Math.round(220 - 120 * progress)},1)`;
+  const mid1 = `rgba(255,${Math.round(215 - 90 * progress)},${Math.round(90 - 90 * progress)},1)`;
+  const mid2 = `rgba(255,${Math.round(120 - 60 * progress)},0,0.95)`;
+  const edge = `rgba(${Math.round(220 - 30 * progress)},40,0,0.45)`;
+
+  // Sonne
+  meerSun.style.bottom = (centerFromHorizon - MEER_SUN_SIZE / 2) + 'px';
+  meerSun.style.background =
+    `radial-gradient(circle, ${core} 0%, ${mid1} 8%, ${mid2} ${Math.round(MEER_DISC_PCT*100)}%, ${edge} 40%, rgba(180,30,0,0.15) 55%, transparent 72%)`;
+
+  // Aura: großer Lichthof um die Sonne, wächst und intensiviert sich beim Untergang
+  const auraSize  = 420 + 620 * progress;           // 420px → über 1000px
+  const auraAlpha = (0.30 + 0.45 * progress).toFixed(2);
+  meerAura.style.width      = auraSize + 'px';
+  meerAura.style.height     = auraSize + 'px';
+  meerAura.style.bottom     = (centerFromHorizon - auraSize / 2) + 'px';
+  meerAura.style.background =
+    `radial-gradient(circle, rgba(255,${Math.round(140 - 60*progress)},20,${auraAlpha}) 0%, ` +
+    `rgba(255,${Math.round(90 - 50*progress)},0,${(auraAlpha*0.5).toFixed(2)}) 35%, ` +
+    `rgba(200,40,0,${(auraAlpha*0.2).toFixed(2)}) 60%, transparent 80%)`;
+
+  // Lichtstreifen auf dem Wasser, direkt unter dem Horizont, verblasst beim Sinken
+  const reflAlpha = Math.max(0, 0.6 - progress * 0.6).toFixed(2);
+  meerReflection.style.left    = '50%';
+  meerReflection.style.top     = H + 'px';
+  meerReflection.style.height  = Math.round(60 + 40 * (1 - progress)) + 'px';
+  meerReflection.style.opacity = reflAlpha;
+  meerReflection.style.background =
+    'linear-gradient(to bottom, rgba(255,110,0,0.75), rgba(255,60,0,0.25), transparent)';
+
+  // Overlay dunkelt zum Ende ab
+  meerOverlay.style.opacity = (progress * 0.85).toFixed(3);
+}
+
 function setBg(key) {
   currentBg = key;
   const color = BG_OPTIONS[key];
-  const isBuddha = color === null;
-  const isBerg   = color === 'berg';
+  const isBuddha  = color === null;
+  const isBerg    = color === 'berg';
+  const isMeer    = color === 'meer';
+  const isImmersive = isBerg || isMeer;
 
   if (isBuddha) {
     appBgEl.style.background = '';
     gongEl.classList.remove('farbmodus');
     showBergScene(false);
+    showMeerScene(false);
   } else if (isBerg) {
     appBgEl.style.background = 'url("berglandschaft_0.1.jpg") center center / cover no-repeat #000d18';
     gongEl.classList.add('farbmodus');
     showBergScene(true);
+    showMeerScene(false);
+    if (flickerCheckbox.checked) setFlicker(false);
+  } else if (isMeer) {
+    appBgEl.style.background = 'url("meer_0.2.jpg") center center / cover no-repeat #1a0a00';
+    gongEl.classList.add('farbmodus');
+    showBergScene(false);
+    showMeerScene(true);
     if (flickerCheckbox.checked) setFlicker(false);
   } else {
     appBgEl.style.background = color;
     gongEl.classList.add('farbmodus');
     showBergScene(false);
+    showMeerScene(false);
     if (flickerCheckbox.checked) setFlicker(false);
   }
   const flickerSection = document.getElementById('flicker-section');
@@ -661,8 +767,8 @@ function setBg(key) {
   flickerSection.style.pointerEvents = isBuddha ? '' : 'none';
   const dimSection = document.getElementById('dim-section');
   if (dimSection) {
-    dimSection.style.opacity = isBerg ? '0.35' : '';
-    dimSection.style.pointerEvents = isBerg ? 'none' : '';
+    dimSection.style.opacity = isImmersive ? '0.35' : '';
+    dimSection.style.pointerEvents = isImmersive ? 'none' : '';
   }
   document.querySelectorAll('.bg-swatch').forEach(s => {
     s.classList.toggle('selected', s.dataset.bg === key);

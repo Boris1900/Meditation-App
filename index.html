@@ -13,6 +13,7 @@
   <link rel="apple-touch-icon" href="icon-1024.png">
   <link rel="preload" as="image" href="background.jpg">
   <link rel="preload" as="image" href="berglandschaft_0.1.jpg">
+  <link rel="preload" as="image" href="meer_0.2.jpg">
   <meta name="theme-color" content="#1a1a1a">
   <meta name="color-scheme" content="dark">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -99,6 +100,10 @@
           <span class="bg-swatch-color" style="background:url('berglandschaft_0.1.jpg') center/cover"></span>
           <span class="bg-swatch-label">Erwachen</span>
         </button>
+        <button class="bg-swatch" data-bg="meer">
+          <span class="bg-swatch-color" style="background:url('meer_0.1.jpg') center/cover"></span>
+          <span class="bg-swatch-label">Abendrot</span>
+        </button>
         <button class="bg-swatch" data-bg="schwarz">
           <span class="bg-swatch-color" style="background:#000"></span>
           <span class="bg-swatch-label">Schwarz</span>
@@ -145,8 +150,13 @@
   <!-- Flammen-Flackern (kleines Element direkt auf der Kerzenflamme) -->
   <div id="flame-flicker"></div>
 
-  <!-- Berg-Tap-Layer: fängt alle Taps im Bergmodus ab (Gong ein-/ausblenden) -->
+  <!-- Immersiv-Tap-Layer: fängt Taps in Berg- und Meeresmodus ab -->
   <div id="berg-tap-layer"></div>
+
+  <!-- Meer-Sonnenuntergang -->
+  <div id="meer-overlay" aria-hidden="true"></div>
+  <div id="meer-sun-wrap" aria-hidden="true"><div id="meer-aura"></div><div id="meer-sun"></div></div>
+  <div id="meer-sun-reflection" aria-hidden="true"></div>
 
   <!-- Gong: eigenes fixed-Element, damit z-index beim Zwischen-Gong über Overlay gehoben werden kann -->
   <div id="gong-container">

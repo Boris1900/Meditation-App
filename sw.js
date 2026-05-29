@@ -1,4 +1,4 @@
-const CACHE_NAME = 'augenblick-v1.62';
+const CACHE_NAME = 'augenblick-v1.67';
 
 const CACHE_FILES = [
   './',
@@ -12,6 +12,7 @@ const CACHE_FILES = [
   './gong_ohne_halter.png',
   './icon-1024.png',
   './berglandschaft_0.1.jpg',
+  './meer_0.2.jpg',
   './Sounds/Klangschale Morgenstern.mp3',
   './Sounds/Klangschale Mittagspause.mp3',
   './Sounds/Klangschale Abendrot.mp3',

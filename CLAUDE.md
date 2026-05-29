@@ -26,24 +26,30 @@ MeditationsApp/
 └── CLAUDE.md                    # Diese Datei
 ```
 
-## Aktueller Stand – v1.62 (lokal, noch nicht gepusht)
+## Aktueller Stand – v1.66 (lokal, noch nicht gepusht)
 
 - Timer 1–90 Min, Wake Lock ab App-Start, Abdunkelung 0–95%
 - **Lebendige Flamme** (Checkbox): ausgegraut wenn Farbhintergrund aktiv
 - Buddha-Lächeln + Aura: immer aktiv bei Buddha-Hintergrund
 - Gong-Animation, 3 Klangschalen (localStorage), Update-Funktion (APK-Download)
 - **Zwischen-Gong** (Checkbox + Slider): Countdown rechts neben Haupttimer
-- **Hintergrundfarbe** (9 Felder): Buddha, Berge, Schwarz, Sehr dunkel, Dunkelgrau, Dunkelblau, Dunkelgrün, Grasgrün, Warmes Gelb
-- **Gong-Welleneffekt** (Farbmodus + Bergmodus): weicher Schallwellen-Ring statt Swing
-- **Berglandschaft-Hintergrund (v1.62):** Dynamischer Sonnenaufgang im Meditationsverlauf:
-  - Start: fast schwarz (overlay 0.90), Sterne im oberen 30% sichtbar – mit Helligkeitsgradient (oben hell, unten dunkel)
-  - Im Verlauf: Overlay hebt sich sanft (CSS transition 1.2s), Sterne verblassen ab 35%
-  - Ende: Berglandschaft vollständig sichtbar, goldene Morgendämmerung
-  - Abdunkelung automatisch deaktiviert (ausgegraut) – Bergszene liefert eigene Dunkelheit
-  - Gong komplett unsichtbar beim Laufen (opacity 0)
-  - Tap auf Bildschirm → Gong erscheint bei 70% Opacity → nach 2,5 Sek. automatisch weg
-  - Zwischen-Gong im Bergmodus: nur Sound, keine visuelle Animation
-  - Technisch: `#berg-tap-layer` (z-index 2) fängt Taps ab, Gong-Container wechselt z-index 1↔3
+- **Hintergrundfarbe** (10 Felder): Buddha, Erwachen, Abendrot, Schwarz, Sehr dunkel, Dunkelgrau, Dunkelblau, Dunkelgrün, Grasgrün, Warmes Gelb
+- **Gong-Welleneffekt** (Farbmodus): weicher Schallwellen-Ring statt Swing
+- **Erwachen-Hintergrund (Berg):** Dynamischer Sonnenaufgang im Meditationsverlauf:
+  - Start: fast schwarz (overlay 0.90), Sterne im oberen 30% mit Helligkeitsgradient
+  - Im Verlauf: Overlay hebt sich, Sterne verblassen ab 35%, endet goldene Morgendämmerung
+  - Gong unsichtbar beim Laufen, Tap → Gong 2,5 Sek. sichtbar
+  - Zwischen-Gong: nur Sound
+  - Technisch: `#berg-tap-layer` (z-index 2), `MEER_HORIZON_FRAC` steuert Horizont
+- **Abendrot-Hintergrund (Meer, v1.66):** Animierter Sonnenuntergang:
+  - Bild: `meer_0.2.jpg` (948×1659px, spiegelglattes Wasser, kein Strand)
+  - Start: Sonne als große Halbkugel (300px) genau auf dem Horizont
+  - Im Verlauf: Sonne versinkt langsam, wird röter, Aura wächst von 420px auf >1000px
+  - Ende: Sonne weg, Szene fast schwarz (overlay 0.85)
+  - Gong wie Erwachen: unsichtbar, Tap enthüllt kurz
+  - Zwischen-Gong: nur Sound
+  - Technisch: `#meer-sun-wrap` (overflow:hidden, Höhe = Horizont-px), Horizont BERECHNET aus Bildmaßen + cover-Skalierung
+  - Wichtige Konstanten: `MEER_IMG_W=948`, `MEER_IMG_H=1659`, `MEER_HORIZON_FRAC=0.58`, `MEER_SUN_SIZE=300`, `MEER_DISC_PCT=0.24`
 
 ### Wichtige Konstanten (app.js)
 ```
@@ -87,10 +93,16 @@ iOS: `git push` → GitHub Pages → Katharina tippt „Auf Update prüfen"
 - v1.60: Audio-Warm-up beim ersten Seitentouch
 - v1.61: Berglandschaft-Hintergrund mit dynamischem Sonnenaufgang
 - v1.62: Bergmodus verfeinert – Gong unsichtbar, Tap-Enthüllung (2,5s), Stern-Helligkeitsgradient, Zwischen-Gong nur Sound
+- v1.63–v1.66: Abendrot-Modus (Meer) – animierter Sonnenuntergang mit versinkender Sonne, wachsender Aura, cover-korrekter Horizontberechnung
 
 ## Offene Punkte / Nächste Schritte
 
-### Bergmodus fertigstellen (nächster Schritt)
+### Abendrot-Modus fertigstellen (nächster Schritt)
+- ⚠️ **BUG:** Nach Timer-Ende springt die Szene zurück ins Helle (stopTimer ruft updateMeerScene(0))
+  - Gewünschtes Verhalten: Szene bleibt dunkel, nur Gong erscheint und ertönt
+  - Fix: in stopTimer() für Meer-Modus NICHT zurücksetzen, Szene auf progress=1 eingefroren lassen
+  - Erst wenn Nutzer neu startet oder Hintergrund wechselt → Reset auf 0
+- Horizont-Feintuning: `MEER_HORIZON_FRAC = 0.58` – Boris sagt "ziemlich gut", ggf. noch minimal anpassen
 - Lokal testen → commit → Boris fragen ob push → APK bauen
 
 ### Weitere Hintergründe geplant
