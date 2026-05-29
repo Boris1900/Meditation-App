@@ -28,7 +28,7 @@ MeditationsApp/
 └── CLAUDE.md                    # Diese Datei
 ```
 
-## Aktueller Stand – v1.59
+## Aktueller Stand – v1.60
 - Timer 1–90 Min, Wake Lock ab App-Start, Abdunkelung 0–95%
 - **Lebendige Flamme** (Checkbox): Flackern + Schein Stärke 30 in einem Schalter; ausgegraut wenn Farbhintergrund aktiv
 - Buddha-Lächeln + Aura: immer aktiv bei Buddha-Hintergrund, bei Start/Stop + alle 30–45 Sek.
@@ -54,7 +54,7 @@ Weiße Linie Android (Power-Button → Chrome-Reload) → Webtech-Grenze, in der
 ⚠️ Reihenfolge einhalten – sonst landet alte Version in der APK!
 
 1. Änderungen in Hauptdateien vornehmen
-2. Version hochzählen: `app.js` (APP_VERSION) + `sw.js` (CACHE_NAME) → aktuell `v1.59`
+2. Version hochzählen: `app.js` (APP_VERSION) + `sw.js` (CACHE_NAME) → aktuell `v1.60`
 3. `.\build-android.ps1` ausführen
 4. APK per Gradle bauen:
    `$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"`
@@ -74,7 +74,7 @@ gelöscht und über Safari neu hinzugefügt werden. Daten bleiben erhalten (hän
 
 **Neue Datei hinzugefügt?** → Auch in `build-android.ps1` + `sw.js` eintragen!
 
-**Ab v1.60:** Nur noch `Augenblick-vX.XX.apk` nötig – alle Altinstallationen (v1.57) haben jetzt v1.59 und kennen den neuen Namen.
+**Ab v1.60:** Nur noch `Augenblick-vX.XX.apk` nötig – ein Name reicht.
 
 ## Offene Punkte
 
@@ -84,6 +84,7 @@ gelöscht und über Safari neu hinzugefügt werden. Daten bleiben erhalten (hän
 **Feature D: Gong-Welleneffekt bei Farbhintergrund** ✅ fertig in v1.57
 **Fix: iOS-Timer-Zittern** ✅ fertig in v1.58 – Haupttimer + Zwischen-Gong-Timer zittern nicht mehr
 **Fix: iOS-Digit-Trennlinien** ✅ fertig in v1.59 – overflow:hidden entfernt, Rendering-Artefakte weg
+**Fix: Erster Gong verzögert** ✅ fertig in v1.60 – Audio-Warm-up beim ersten Seitentouch
 
 ### Mittelfristig
 - Play Store (25€), weitere Klangschalen
