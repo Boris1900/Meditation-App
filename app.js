@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.60';
+const APP_VERSION = 'v1.61';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -195,6 +195,7 @@ function startTimer() {
   scheduleAutoDim();
   scheduleBuddhaSmile();
   triggerBuddhaSmileOnce();
+  if (currentBg === 'berg') updateBergScene(0);
 
   // Zwischen-Gong initialisieren
   zgongFired = false;
@@ -210,6 +211,10 @@ function startTimer() {
   timerInterval = setInterval(() => {
     remainingSeconds--;
     renderTimer(formatTime(remainingSeconds));
+    if (currentBg === 'berg') {
+      const total = durationMinutes * 60;
+      updateBergScene(total > 0 ? 1 - (remainingSeconds / total) : 1);
+    }
 
     if (zgongEnabled && !zgongFired && zgongRemaining > 0) {
       zgongRemaining--;
@@ -533,6 +538,7 @@ flickerCheckbox.addEventListener('change', () => setFlicker(flickerCheckbox.chec
 // Hintergrundfarbe
 const BG_OPTIONS = {
   'buddha':      null,
+  'berg':        'berg',
   'schwarz':     '#000000',
   'sehr-dunkel': '#111111',
   'dunkelgrau':  '#222222',
@@ -544,16 +550,73 @@ const BG_OPTIONS = {
 
 let currentBg = 'buddha';
 
+// Berg-Sonnenaufgang
+let bergStarsCreated = false;
+
+function createBergStars() {
+  if (bergStarsCreated) return;
+  const container = document.getElementById('berg-stars');
+  if (!container) return;
+  for (let i = 0; i < 75; i++) {
+    const s = document.createElement('span');
+    s.className = 'berg-star';
+    const size = (Math.random() * 2 + 1).toFixed(1);
+    s.style.width  = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left   = (Math.random() * 100).toFixed(1) + '%';
+    s.style.top    = (Math.random() * 58).toFixed(1) + '%';
+    s.style.opacity = (Math.random() * 0.55 + 0.25).toFixed(2);
+  container.appendChild(s);
+  }
+  bergStarsCreated = true;
+}
+
+function updateBergScene(progress) {
+  const overlay = document.getElementById('berg-overlay');
+  const stars   = document.getElementById('berg-stars');
+  if (!overlay || !stars) return;
+  // Overlay: 0.90 (Nacht) → 0.08 (goldene Stunde)
+  overlay.style.opacity = (0.90 - progress * 0.82).toFixed(3);
+  // Sterne: sichtbar bis 35%, dann Ausblenden bis 65%
+  let so = 1;
+  if (progress > 0.35) so = Math.max(0, 1 - (progress - 0.35) / 0.30);
+  stars.style.opacity = so.toFixed(3);
+}
+
+function showBergScene(show) {
+  const overlay = document.getElementById('berg-overlay');
+  const stars   = document.getElementById('berg-stars');
+  if (!overlay || !stars) return;
+  if (show) {
+    createBergStars();
+    overlay.style.display = 'block';
+    stars.style.display   = 'block';
+    updateBergScene(0);
+  } else {
+    overlay.style.display = 'none';
+    stars.style.display   = 'none';
+  }
+}
+
 function setBg(key) {
   currentBg = key;
   const color = BG_OPTIONS[key];
   const isBuddha = color === null;
+  const isBerg   = color === 'berg';
+
   if (isBuddha) {
     appBgEl.style.background = '';
     gongEl.classList.remove('farbmodus');
+    showBergScene(false);
+  } else if (isBerg) {
+    appBgEl.style.background = 'url("berglandschaft_0.1.jpg") center center / cover no-repeat #000d18';
+    gongEl.classList.add('farbmodus');
+    showBergScene(true);
+    if (flickerCheckbox.checked) setFlicker(false);
   } else {
     appBgEl.style.background = color;
     gongEl.classList.add('farbmodus');
+    showBergScene(false);
     if (flickerCheckbox.checked) setFlicker(false);
   }
   const flickerSection = document.getElementById('flicker-section');

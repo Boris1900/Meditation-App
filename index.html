@@ -12,6 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="Augenblick">
   <link rel="apple-touch-icon" href="icon-1024.png">
   <link rel="preload" as="image" href="background.jpg">
+  <link rel="preload" as="image" href="berglandschaft_0.1.jpg">
   <meta name="theme-color" content="#1a1a1a">
   <meta name="color-scheme" content="dark">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,6 +24,11 @@
 
   <!-- Hintergrundbild: eigenes Element, Höhe per JS auf screen.height fixiert -->
   <div id="app-bg" aria-hidden="true"></div>
+
+  <!-- Berg-Nacht-Overlay: liegt über dem Hintergrundbild, wird per JS mit Timer aufgehellt -->
+  <div id="berg-overlay" aria-hidden="true"></div>
+  <!-- Berg-Sterne: eingeblendet zu Beginn, verblassen im Verlauf -->
+  <div id="berg-stars" aria-hidden="true"></div>
 
   <!-- Buddha-Lächeln: blendet über app-bg ein, liegt unter dem Dimm-Overlay -->
   <div id="bg-smile" aria-hidden="true"></div>
@@ -81,11 +87,15 @@
       </div>
       <hr class="menu-divider">
       <h2>Hintergrund</h2>
-      <p class="menu-hint">Farbe oder Buddha-Bild wählen</p>
+      <p class="menu-hint">Hintergrund wählen</p>
       <div id="bg-color-picker">
         <button class="bg-swatch" data-bg="buddha">
           <span class="bg-swatch-color" style="background:url('background.jpg') center/cover"></span>
           <span class="bg-swatch-label">Buddha</span>
+        </button>
+        <button class="bg-swatch" data-bg="berg">
+          <span class="bg-swatch-color" style="background:url('berglandschaft_0.1.jpg') center/cover"></span>
+          <span class="bg-swatch-label">Berge</span>
         </button>
         <button class="bg-swatch" data-bg="schwarz">
           <span class="bg-swatch-color" style="background:#000"></span>
