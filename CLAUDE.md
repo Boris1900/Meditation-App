@@ -89,6 +89,23 @@ gelöscht und über Safari neu hinzugefügt werden. Daten bleiben erhalten (hän
 ### Mittelfristig
 - Play Store (25€), weitere Klangschalen
 
+### Nächstes größeres Projekt: Tinnitus-Meditations-App
+Eigenständige App auf Basis von Augenblick – speziell für Tinnitus-Patienten.
+
+**Kernidee:** Hintergrundgeräusche (Field Recordings: Wasser, Wald, Vögel) laufen
+während der Meditation. Boris hat eigenes Archiv. Wenn die Meditationszeit länger ist
+als der Audio-File, läuft der Loop nahtlos weiter – kein hörbarer Übergang.
+
+**Technisch:** Web Audio API für nahtlosen Loop (MP3 hat encoding-bedingte Stille
+am Anfang/Ende – AudioBuffer-Lösung umgeht das sauber).
+
+**Design:** Modern, sachlich, schick – kein Buddha-Hintergrund, kein Gong.
+Start/Stop-Button mittig auf dem Bildschirm. Eigene visuelle Identität.
+
+**Strategisch:** Separate App (andere Zielgruppe: Tinnitus-Patienten). Könnte als
+Teil von Kursen oder Intensivtagen eingesetzt werden. Läuft parallel zu laufenden
+Projekten, kein Hauptfokus bis Herbst 2026.
+
 ### Aufgeschoben
 - Multi-MP3, Service Worker iOS optimieren
 
