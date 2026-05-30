@@ -27,7 +27,7 @@ MeditationsApp/
 └── CLAUDE.md                    # Diese Datei
 ```
 
-## Aktueller Stand – v1.72 (gepusht + APK released)
+## Aktueller Stand – v1.74 (gepusht + APK released)
 
 - Timer 1–90 Min, Wake Lock ab App-Start, Abdunkelung 0–95%
 - **Lebendige Flamme** (Checkbox): ausgegraut wenn Farbhintergrund aktiv
@@ -51,6 +51,11 @@ MeditationsApp/
   - Zwischen-Gong: nur Sound
   - Technisch: `#meer-sun-wrap` (overflow:hidden, Höhe = Horizont-px), Horizont BERECHNET aus Bildmaßen + cover-Skalierung
   - Wichtige Konstanten: `MEER_IMG_W=948`, `MEER_IMG_H=1659`, `MEER_HORIZON_FRAC=0.58`, `MEER_SUN_SIZE=300`, `MEER_DISC_PCT=0.24`
+  - **GERÄTEUNABHÄNGIGE HORIZONT-BERECHNUNG (ab v1.74):** `meerHorizonPx()` MISST die
+    gerenderte `#app-bg`-Box per `getBoundingClientRect()` statt `window.innerHeight`/
+    `screen.height` zu raten. Am echten iPhone verifiziert. Regel für alle künftigen
+    Bild-Hintergründe: Positionen IMMER aus der gemessenen Bildbox ableiten, nie aus
+    Fenster-Höhen – die weichen auf iOS (Safari-Leisten, Standalone) voneinander ab.
 
 ### Wichtige Konstanten (app.js)
 ```
@@ -101,6 +106,8 @@ iOS: `git push` → GitHub Pages → Katharina tippt „Auf Update prüfen"
 - v1.70: Abendrot – Gong-Tap-Verhalten wie Berg: unsichtbar beim Laufen, Tap → 0.7 opacity, nach 2,5 Sek. automatisch ausblenden
 - v1.71: Berg + Meer – Timer-Ziffern dimmen nach 3 Sek. auf 35% opacity, Tap hellt Gong + Timer gleichzeitig auf, nach 2,5 Sek. dimmen beide wieder
 - v1.72: Bugfixes – berglandschaft_0.1.jpg in Git eingecheckt (iOS-Fix), Swatch-Labels nowrap + Größen einheitlich, Timer-Dimming auf #timer-row Container umgestellt (zuverlässig)
+- v1.73: TEMP-Diagnose – vier Horizont-Linien zum Messen am echten iPhone (in v1.74 wieder entfernt)
+- v1.74: Sonne sitzt geräteunabhängig korrekt – Horizont aus gemessener #app-bg-Box statt geratener Fensterhöhe (am iPhone verifiziert: „gelbe Linie korrekt"). Swatch-Kästchen feste Reihenhöhe + kräftiger Rahmen, „Warmes Gelb" → „Gelb"
 
 ## Offene Punkte / Nächste Schritte
 

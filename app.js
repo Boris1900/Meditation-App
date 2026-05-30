@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.73';
+const APP_VERSION = 'v1.74';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -220,7 +220,6 @@ function startTimer() {
     brightenTimerText();
     scheduleTimerDim();
   }
-  clearHorizonDebug(); // Diagnose-Linien beim Start ausblenden
 
   // Zwischen-Gong initialisieren
   zgongFired = false;
@@ -539,8 +538,6 @@ navAudio.addEventListener('click', () => {
 });
 closeMenu.addEventListener('click', () => {
   audioMenu.classList.add('hidden');
-  // TEMPORÄRE DIAGNOSE: Linien nach Schließen frisch zeichnen (echte Viewport-Höhe)
-  if (currentBg === 'meer' && !isRunning) requestAnimationFrame(showHorizonDebug);
 });
 
 // Eigene MP3 laden
@@ -698,58 +695,19 @@ const MEER_HORIZON_FRAC = 0.58;  // Horizontlinie bei 58% der Bildhöhe
 const MEER_SUN_SIZE     = 300;   // gesamtes Sonnen-Element inkl. Glühen
 const MEER_DISC_PCT     = 0.24;  // Anteil des Gradients, der den hellen Ball ausmacht
 
-// Rechnet die Horizontlinie in Bildschirm-Pixel um (berücksichtigt background-size: cover)
+// Rechnet die Horizontlinie in Bildschirm-Pixel um (berücksichtigt background-size: cover).
+// WICHTIG: Höhe wird direkt aus der gerenderten #app-bg-Box GEMESSEN, nicht aus
+// window.innerHeight/screen.height geraten. So sitzt der Horizont auf jedem Gerät
+// (Android, iPhone, Safari, PWA) exakt richtig – am echten iPhone verifiziert.
 function meerHorizonPx() {
-  const vw = window.innerWidth;
-  const vh = bgViewH(); // iOS: screen.height (wie app-bg), Android: innerHeight
+  const rect = appBgEl.getBoundingClientRect();
+  const vw = rect.width;
+  const vh = rect.height;
   const scale = Math.max(vw / MEER_IMG_W, vh / MEER_IMG_H); // cover: größerer Faktor
   const renderedH = MEER_IMG_H * scale;
   const offsetTop = (renderedH - vh) / 2; // oben abgeschnittener Teil
-  return MEER_HORIZON_FRAC * renderedH - offsetTop;
+  return rect.top + (MEER_HORIZON_FRAC * renderedH - offsetTop);
 }
-
-// === TEMPORÄRE HORIZONT-DIAGNOSE (nach Lösung wieder entfernen) ===
-// Zeichnet drei farbige Linien an den Horizont-Positionen, die sich aus drei
-// verschiedenen Höhenquellen ergeben. So sieht man am echten Gerät sofort,
-// welche Quelle exakt auf dem Wasser-Horizont im Bild liegt.
-function horizonForVh(vh) {
-  const vw = window.innerWidth;
-  const scale = Math.max(vw / MEER_IMG_W, vh / MEER_IMG_H);
-  const renderedH = MEER_IMG_H * scale;
-  const offsetTop = (renderedH - vh) / 2;
-  return MEER_HORIZON_FRAC * renderedH - offsetTop;
-}
-
-function clearHorizonDebug() {
-  document.querySelectorAll('.horizon-debug').forEach(e => e.remove());
-}
-
-function showHorizonDebug() {
-  clearHorizonDebug();
-  if (currentBg !== 'meer') return;
-  const bgRect = appBgEl.getBoundingClientRect();
-  const sources = [
-    { key: 'innerHeight', vh: window.innerHeight,  color: '#ff3b30' },
-    { key: 'screen.height', vh: window.screen.height, color: '#34ff57' },
-    { key: 'visualVP',    vh: window.visualViewport ? Math.round(window.visualViewport.height) : window.innerHeight, color: '#3b9bff' },
-    { key: 'app-bg box',  vh: Math.round(bgRect.height), color: '#ffcc00' },
-  ];
-  let info = `vw=${window.innerWidth}  app-bg.top=${Math.round(bgRect.top)}<br>`;
-  sources.forEach(s => {
-    const y = horizonForVh(s.vh);
-    const line = document.createElement('div');
-    line.className = 'horizon-debug';
-    line.style.cssText = `position:fixed;left:0;width:100%;height:2px;background:${s.color};top:${y}px;z-index:50;pointer-events:none;`;
-    document.body.appendChild(line);
-    info += `<span style="color:${s.color}">━ ${s.key}=${s.vh} → ${Math.round(y)}px</span><br>`;
-  });
-  const box = document.createElement('div');
-  box.className = 'horizon-debug';
-  box.style.cssText = 'position:fixed;left:6px;top:50px;background:rgba(0,0,0,0.82);color:#fff;font:11px monospace;padding:8px 10px;z-index:50;border-radius:6px;pointer-events:none;line-height:1.6;';
-  box.innerHTML = info;
-  document.body.appendChild(box);
-}
-// === ENDE HORIZONT-DIAGNOSE ===
 
 function showMeerScene(show) {
   if (show) {
@@ -871,10 +829,6 @@ function setBg(key) {
     s.classList.toggle('selected', s.dataset.bg === key);
   });
   localStorage.setItem('medi_hintergrund', key);
-
-  // TEMPORÄRE DIAGNOSE: Horizont-Linien bei Abendrot zeigen (sonst entfernen)
-  if (isMeer) requestAnimationFrame(showHorizonDebug);
-  else clearHorizonDebug();
 }
 
 document.querySelectorAll('.bg-swatch').forEach(btn => {
