@@ -808,6 +808,9 @@ body.running #controls {
   padding: 6px 4px;
   cursor: pointer;
   transition: border-color 0.2s;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .bg-swatch-color {
@@ -820,12 +823,16 @@ body.running #controls {
 }
 
 .bg-swatch-label {
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   color: rgba(255,255,255,0.5);
   letter-spacing: 0.03em;
   text-align: center;
   line-height: 1.2;
   font-family: 'Georgia', serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .bg-swatch.selected {

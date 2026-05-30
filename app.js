@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.71';
+const APP_VERSION = 'v1.72';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -422,19 +422,15 @@ function stopBuddhaSmile() {
   buddhaAura.style.opacity = '0';
 }
 
-// Timer-Text dimmen/aufhellen (Berg + Meer)
+// Timer-Text dimmen/aufhellen (Berg + Meer) – über #timer-row Container
 function dimTimerText() {
-  timerText.style.transition = 'opacity 1.5s ease';
-  timerText.style.opacity = '0.35';
-  zgongDisplay.style.transition = 'opacity 1.5s ease';
-  zgongDisplay.style.opacity = '0.35';
+  timerRow.style.transition = 'opacity 1.5s ease';
+  timerRow.style.opacity = '0.3';
 }
 
 function brightenTimerText() {
-  timerText.style.transition = 'opacity 1s ease';
-  timerText.style.opacity = '';
-  zgongDisplay.style.transition = 'opacity 1s ease';
-  zgongDisplay.style.opacity = '';
+  timerRow.style.transition = 'opacity 1s ease';
+  timerRow.style.opacity = '1';
 }
 
 function scheduleTimerDim(delayMs = 3000) {
@@ -851,6 +847,7 @@ zgongSliderEl.addEventListener('input', () => {
 
 // Layout-Berechnung
 const timerArea = document.getElementById('timer-area');
+const timerRow  = document.getElementById('timer-row');
 
 const IMG_W = 852, IMG_H = 1846;
 const BUDDHA_PCT  = 0.54;   // Buddha-Kopfkrone bei 54% der Bildhöhe
