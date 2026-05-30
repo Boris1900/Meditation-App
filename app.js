@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.68';
+const APP_VERSION = 'v1.69';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -414,7 +414,7 @@ function stopBuddhaSmile() {
 
 // Dimm-Logik
 function dim() {
-  if (dimOpacity === 0 || currentBg === 'berg') return;
+  if (dimOpacity === 0 || currentBg === 'berg' || currentBg === 'meer') return;
   overlay.style.transitionDuration = '3s';
   overlay.style.opacity = dimOpacity;
   overlay.style.pointerEvents = 'auto';
@@ -653,7 +653,8 @@ const meerOverlay    = document.getElementById('meer-overlay');
 const meerSunWrap    = document.getElementById('meer-sun-wrap');
 const meerAura       = document.getElementById('meer-aura');
 const meerSun        = document.getElementById('meer-sun');
-const meerReflection = document.getElementById('meer-sun-reflection');
+const meerReflection  = document.getElementById('meer-sun-reflection');
+const meerWaterColor  = document.getElementById('meer-water-color');
 
 // Bildmaße + Horizontposition IM BILD (Anteil von oben). Daraus wird die
 // Bildschirm-Position exakt berechnet – egal wie "cover" das Bild beschneidet.
@@ -678,11 +679,13 @@ function showMeerScene(show) {
     meerOverlay.style.display    = 'block';
     meerSunWrap.style.display    = 'block';
     meerReflection.style.display = 'block';
+    meerWaterColor.style.display = 'block';
     updateMeerScene(0);
   } else {
     meerOverlay.style.display    = 'none';
     meerSunWrap.style.display    = 'none';
     meerReflection.style.display = 'none';
+    meerWaterColor.style.display = 'none';
   }
 }
 
@@ -692,8 +695,8 @@ function updateMeerScene(progress) {
 
   const discR = MEER_SUN_SIZE * MEER_DISC_PCT; // sichtbarer Ball-Radius
 
-  // Sonnen-Mittelpunkt relativ zur Horizontlinie: progress 0 → auf Horizont, sinkt mit progress
-  const centerFromHorizon = -progress * discR; // negativ = unter dem Horizont
+  // Sonnen-Mittelpunkt relativ zur Horizontlinie: progress 0 → knapp über Horizont, sinkt mit progress
+  const centerFromHorizon = 6 - progress * discR; // +6px über Horizont am Start
 
   // Farbe wird beim Sinken röter (Grün-/Blau-Anteil sinkt)
   const core = `rgba(255,255,${Math.round(220 - 120 * progress)},1)`;
@@ -728,6 +731,23 @@ function updateMeerScene(progress) {
 
   // Overlay dunkelt zum Ende ab
   meerOverlay.style.opacity = (progress * 0.85).toFixed(3);
+
+  // Wasserfarbe: warm orange → dunkelrot (3-Punkte-Verlauf, oberes Drittel bleibt am Ende sichtbar rot)
+  const waterHeight = Math.max(0, window.innerHeight - H);
+  meerWaterColor.style.top    = H + 'px';
+  meerWaterColor.style.height = waterHeight + 'px';
+  // Oben (Horizont): bleibt auch am Ende warm-dunkelrot sichtbar
+  const r1 = Math.round(200 -  40 * progress);  // 200 → 160
+  const g1 = Math.round(70  -  70 * progress);  // 70  →   0
+  const a1 = Math.min(0.78, progress * 0.85).toFixed(2);
+  // Mitte (~33%): Übergang
+  const rM = Math.round(130 -  80 * progress);  // 130 →  50
+  const aM = Math.min(0.55, progress * 0.65).toFixed(2);
+  // Unten: dunkel
+  const r2 = Math.round(80  -  50 * progress);  //  80 →  30
+  const a2 = Math.min(0.35, progress * 0.42).toFixed(2);
+  meerWaterColor.style.background =
+    `linear-gradient(to bottom, rgba(${r1},${g1},0,${a1}) 0%, rgba(${rM},0,0,${aM}) 33%, rgba(${r2},0,0,${a2}) 100%)`;
 }
 
 function setBg(key) {

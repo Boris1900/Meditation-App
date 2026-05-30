@@ -15,6 +15,7 @@ MeditationsApp/
 ├── background.jpg               # Hintergrundbild (Buddha, Bambus, Kerze)
 ├── background_laecheln_v0.4.jpg # Buddha-Lächeln-Bild
 ├── berglandschaft_0.1.jpg       # Berglandschaft (948x1659px, DALL-E generiert)
+├── meer_0.2.jpg                 # Spiegelglattes Meer ohne Strand (948x1659px, ChatGPT)
 ├── gong.png                     # Gong mit Halterung (Buddha-Modus)
 ├── gong_ohne_halter.png         # Gong ohne Halterung (Farbmodus + Bergmodus)
 ├── icon-1024.png                # App-Icon-Quelle 1024x1024
@@ -26,7 +27,7 @@ MeditationsApp/
 └── CLAUDE.md                    # Diese Datei
 ```
 
-## Aktueller Stand – v1.66 (lokal, noch nicht gepusht)
+## Aktueller Stand – v1.69 (gepusht + APK released)
 
 - Timer 1–90 Min, Wake Lock ab App-Start, Abdunkelung 0–95%
 - **Lebendige Flamme** (Checkbox): ausgegraut wenn Farbhintergrund aktiv
@@ -67,7 +68,7 @@ Weiße Linie Android (Power-Button → Chrome-Reload) → Webtech-Grenze, in der
 ⚠️ Reihenfolge einhalten – sonst landet alte Version in der APK!
 
 1. Änderungen in Hauptdateien vornehmen
-2. Version hochzählen: `app.js` (APP_VERSION) + `sw.js` (CACHE_NAME) → aktuell `v1.61`
+2. Version hochzählen: `app.js` (APP_VERSION) + `sw.js` (CACHE_NAME) → aktuell `v1.68`
 3. `.\build-android.ps1` ausführen
 4. APK per Gradle bauen:
    `$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"`
@@ -94,16 +95,16 @@ iOS: `git push` → GitHub Pages → Katharina tippt „Auf Update prüfen"
 - v1.61: Berglandschaft-Hintergrund mit dynamischem Sonnenaufgang
 - v1.62: Bergmodus verfeinert – Gong unsichtbar, Tap-Enthüllung (2,5s), Stern-Helligkeitsgradient, Zwischen-Gong nur Sound
 - v1.63–v1.66: Abendrot-Modus (Meer) – animierter Sonnenuntergang mit versinkender Sonne, wachsender Aura, cover-korrekter Horizontberechnung
+- v1.67: Abendrot fertiggestellt – meer_0.2.jpg (kein Strand), Szene bleibt dunkel nach Timer-Ende
+- v1.68: Bugfixes – Swatch-Vorschaubild korrigiert, sanfte Sonnen-Animation (CSS transition 1s linear)
+- v1.69: Abendrot-Fixes – Abdunkelung im Meer-Modus deaktiviert, Wasserfarbe mit 3-Punkte-Verlauf (orange → weinrot → dunkel), Sonne minimal höher
 
 ## Offene Punkte / Nächste Schritte
 
-### Abendrot-Modus fertigstellen (nächster Schritt)
-- ⚠️ **BUG:** Nach Timer-Ende springt die Szene zurück ins Helle (stopTimer ruft updateMeerScene(0))
-  - Gewünschtes Verhalten: Szene bleibt dunkel, nur Gong erscheint und ertönt
-  - Fix: in stopTimer() für Meer-Modus NICHT zurücksetzen, Szene auf progress=1 eingefroren lassen
-  - Erst wenn Nutzer neu startet oder Hintergrund wechselt → Reset auf 0
+### Abendrot-Modus: offene Feinarbeit
 - Horizont-Feintuning: `MEER_HORIZON_FRAC = 0.58` – Boris sagt "ziemlich gut", ggf. noch minimal anpassen
-- Lokal testen → commit → Boris fragen ob push → APK bauen
+- Sonne am Handy prüfen (OnePlus 5): sitzt die Halbkugel genau auf der Linie?
+- Ggf. Sonnenuntergang-Geschwindigkeit und Aura-Intensität nachjustieren
 
 ### Weitere Hintergründe geplant
 - **Strandbild:** Sonnenuntergang über dem Meer (hell → dunkel im Meditationsverlauf)

@@ -92,6 +92,16 @@ html {
   transition: bottom 1s linear;
 }
 
+/* Wasserfarb-Layer: warm orange → dunkles Weinrot unterhalb des Horizonts */
+#meer-water-color {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 2;
+  display: none;
+}
+
 /* Lichtstreifen auf dem Wasser unterhalb des Horizonts */
 #meer-sun-reflection {
   position: fixed;
