@@ -77,6 +77,7 @@ html {
   transform: translateX(-50%);
   border-radius: 50%;
   filter: blur(30px);
+  transition: bottom 1s linear, width 1s linear, height 1s linear;
 }
 
 /* Sonne: ein rundes Element, der Radial-Gradient erzeugt Ball + Glühen selbst */
@@ -88,6 +89,7 @@ html {
   height: 300px;
   border-radius: 50%;
   filter: blur(2px);
+  transition: bottom 1s linear;
 }
 
 /* Lichtstreifen auf dem Wasser unterhalb des Horizonts */
