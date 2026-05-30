@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.77';
+const APP_VERSION = 'v1.78';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -210,6 +210,7 @@ function startTimer() {
     gongContainer.style.transition = 'opacity 2s ease';
     gongContainer.style.opacity = '0';
     gongContainer.style.zIndex = '1';
+    startBergStars();
   }
   if (currentBg === 'meer') {
     updateMeerScene(0);
@@ -278,6 +279,7 @@ function stopTimer() {
   plusBtn.disabled = false;
   releaseWakeLock();
   brighten();
+  stopBergStars();
   stopBuddhaSmile();
   triggerBuddhaSmileOnce();
   updateDuration(durationMinutes);
@@ -690,6 +692,73 @@ function showBergScene(show) {
   }
 }
 
+// ── Berg: Sternschnuppen ──────────────────────────────────────────────────────
+let bergStarTimer  = null;
+let bergStarActive = false;
+
+function fireBergStar() {
+  if (bergStarActive) return;
+  const starsEl = document.getElementById('berg-stars');
+  if (!starsEl) return;
+  const starsOpacity = parseFloat(starsEl.style.opacity) || 0;
+  if (starsOpacity < 0.2) return;
+  // In der Dämmerungsphase (0.2–0.5) zufällig auslassen
+  if (starsOpacity < 0.5 && Math.random() > starsOpacity * 1.5) return;
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const angleDeg = 25 + Math.random() * 20;
+  const angleRad = angleDeg * Math.PI / 180;
+  const ux = -Math.cos(angleRad);
+  const uy =  Math.sin(angleRad);
+  const peakX  = vw * (0.2 + Math.random() * 0.6);
+  const peakY  = vh * (0.04 + Math.random() * 0.22);
+  const preLen  = vw * (0.18 + Math.random() * 0.10);
+  const postLen = vw * (0.15 + Math.random() * 0.10);
+  const startTx = -ux * preLen;
+  const startTy = -uy * preLen;
+  const endTx   =  ux * postLen;
+  const endTy   =  uy * postLen;
+  const tailLen  = 50 + Math.random() * 35;
+  const duration = 1200 + Math.random() * 600;
+  const maxOp    = Math.min(0.85, starsOpacity * 0.85);
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText = `position:fixed;left:${peakX}px;top:${peakY}px;width:0;height:0;pointer-events:none;z-index:1;`;
+  const streak = document.createElement('div');
+  streak.style.cssText = `position:absolute;left:-${tailLen/2}px;top:-1px;width:${tailLen}px;height:1.5px;background:linear-gradient(to right,rgba(210,225,255,0.75),rgba(200,218,255,0.35),rgba(190,210,255,0));border-radius:2px;transform:rotate(-${angleDeg}deg);transform-origin:center center;filter:drop-shadow(0 0 2px rgba(200,220,255,0.4));`;
+  wrap.appendChild(streak);
+  document.body.appendChild(wrap);
+  bergStarActive = true;
+
+  wrap.animate([
+    { transform: `translate(${startTx}px,${startTy}px)`, opacity: 0 },
+    { transform: `translate(${startTx*0.3}px,${startTy*0.3}px)`, opacity: maxOp * 0.9, offset: 0.35 },
+    { transform: `translate(0px,0px)`, opacity: maxOp, offset: 0.5 },
+    { transform: `translate(${endTx*0.6}px,${endTy*0.6}px)`, opacity: maxOp * 0.25, offset: 0.75 },
+    { transform: `translate(${endTx}px,${endTy}px)`, opacity: 0 }
+  ], { duration, easing: 'linear', fill: 'forwards' })
+  .onfinish = () => { wrap.remove(); bergStarActive = false; };
+}
+
+function startBergStars() {
+  stopBergStars();
+  bergStarTimer = setTimeout(function fire() {
+    if (!isRunning || currentBg !== 'berg') return;
+    fireBergStar();
+    const starsOpacity = parseFloat((document.getElementById('berg-stars') || {}).style?.opacity) || 0;
+    if (starsOpacity > 0.05) {
+      bergStarTimer = setTimeout(fire, 60000 + Math.random() * 240000);
+    }
+  }, 8000 + Math.random() * 4000);
+}
+
+function stopBergStars() {
+  clearTimeout(bergStarTimer);
+  bergStarTimer  = null;
+  bergStarActive = false;
+}
+
 // Meer-Sonnenuntergang
 const meerOverlay    = document.getElementById('meer-overlay');
 const meerSunWrap    = document.getElementById('meer-sun-wrap');
@@ -808,6 +877,7 @@ function setBg(key) {
     gongEl.classList.remove('farbmodus');
     showBergScene(false);
     showMeerScene(false);
+    stopBergStars();
   } else if (isBerg) {
     appBgEl.style.background = 'url("berglandschaft_0.1.jpg") center center / cover no-repeat #000d18';
     gongEl.classList.add('farbmodus');
@@ -819,6 +889,7 @@ function setBg(key) {
     gongEl.classList.add('farbmodus');
     showBergScene(false);
     showMeerScene(true);
+    stopBergStars();
     if (flickerCheckbox.checked) setFlicker(false);
   } else {
     appBgEl.style.background = color;
