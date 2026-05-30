@@ -794,6 +794,8 @@ body.running #controls {
 #bg-color-picker {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 74px;        /* feste Reihenhöhe – alle Kästchen exakt gleich groß */
+  align-items: start;          /* Inhalt oben verankert, auch bei 2-zeiligem Label */
   gap: 8px;
 }
 
@@ -817,7 +819,10 @@ body.running #controls {
   width: 44px;
   height: 44px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.15);
+  /* Kräftiger Rahmen: sonst verschmelzen dunkle Kästchen mit dem Hintergrund
+     und wirken kleiner als helle (Grasgrün, Gelb) */
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4);
   display: block;
   flex-shrink: 0;
 }
@@ -827,11 +832,8 @@ body.running #controls {
   color: rgba(255,255,255,0.5);
   letter-spacing: 0.03em;
   text-align: center;
-  line-height: 1.2;
+  line-height: 1.15;
   font-family: 'Georgia', serif;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   max-width: 100%;
 }
 
