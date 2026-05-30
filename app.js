@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.69';
+const APP_VERSION = 'v1.70';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -473,7 +473,7 @@ bergTapLayer.addEventListener('click', (e) => {
   gongContainer.style.opacity = '0.7';
   gongContainer.style.zIndex = '3';
   bergRevealTimeout = setTimeout(() => {
-    if (isRunning && currentBg === 'berg') {
+    if (isRunning && (currentBg === 'berg' || currentBg === 'meer')) {
       gongContainer.style.transition = 'opacity 1.5s ease';
       gongContainer.style.opacity = '0';
       gongContainer.style.zIndex = '1';
