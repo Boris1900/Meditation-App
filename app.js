@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.70';
+const APP_VERSION = 'v1.71';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -73,6 +73,9 @@ let zgongFired     = false;
 let dimOpacity = 0;
 let isDimmed = false;
 let autoDimTimeout = null;
+
+// Timer-Text-Dimm-State (Berg + Meer)
+let timerDimTimeout = null;
 
 // Berg-Modus: Gong kurz einblenden bei Tap
 let bergRevealTimeout = null;
@@ -213,6 +216,10 @@ function startTimer() {
     gongContainer.style.opacity = '0';
     gongContainer.style.zIndex = '1';
   }
+  if (currentBg === 'berg' || currentBg === 'meer') {
+    brightenTimerText();
+    scheduleTimerDim();
+  }
 
   // Zwischen-Gong initialisieren
   zgongFired = false;
@@ -256,8 +263,11 @@ function startTimer() {
 function stopTimer() {
   clearInterval(timerInterval);
   clearTimeout(autoDimTimeout);
+  clearTimeout(timerDimTimeout);
   timerInterval = null;
   autoDimTimeout = null;
+  timerDimTimeout = null;
+  brightenTimerText();
   isRunning = false;
   gongLabel.textContent = 'START';
   document.body.classList.remove('running');
@@ -412,6 +422,28 @@ function stopBuddhaSmile() {
   buddhaAura.style.opacity = '0';
 }
 
+// Timer-Text dimmen/aufhellen (Berg + Meer)
+function dimTimerText() {
+  timerText.style.transition = 'opacity 1.5s ease';
+  timerText.style.opacity = '0.35';
+  zgongDisplay.style.transition = 'opacity 1.5s ease';
+  zgongDisplay.style.opacity = '0.35';
+}
+
+function brightenTimerText() {
+  timerText.style.transition = 'opacity 1s ease';
+  timerText.style.opacity = '';
+  zgongDisplay.style.transition = 'opacity 1s ease';
+  zgongDisplay.style.opacity = '';
+}
+
+function scheduleTimerDim(delayMs = 3000) {
+  clearTimeout(timerDimTimeout);
+  timerDimTimeout = setTimeout(() => {
+    if (isRunning && (currentBg === 'berg' || currentBg === 'meer')) dimTimerText();
+  }, delayMs);
+}
+
 // Dimm-Logik
 function dim() {
   if (dimOpacity === 0 || currentBg === 'berg' || currentBg === 'meer') return;
@@ -469,14 +501,17 @@ gongEl.addEventListener('click', (e) => {
 bergTapLayer.addEventListener('click', (e) => {
   e.stopPropagation();
   clearTimeout(bergRevealTimeout);
+  clearTimeout(timerDimTimeout);
   gongContainer.style.transition = 'opacity 1s ease';
   gongContainer.style.opacity = '0.7';
   gongContainer.style.zIndex = '3';
+  brightenTimerText();
   bergRevealTimeout = setTimeout(() => {
     if (isRunning && (currentBg === 'berg' || currentBg === 'meer')) {
       gongContainer.style.transition = 'opacity 1.5s ease';
       gongContainer.style.opacity = '0';
       gongContainer.style.zIndex = '1';
+      dimTimerText();
     }
   }, 2500);
 });

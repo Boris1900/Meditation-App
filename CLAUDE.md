@@ -27,7 +27,7 @@ MeditationsApp/
 └── CLAUDE.md                    # Diese Datei
 ```
 
-## Aktueller Stand – v1.70 (gepusht + APK released)
+## Aktueller Stand – v1.71 (gepusht + APK released)
 
 - Timer 1–90 Min, Wake Lock ab App-Start, Abdunkelung 0–95%
 - **Lebendige Flamme** (Checkbox): ausgegraut wenn Farbhintergrund aktiv
@@ -99,6 +99,7 @@ iOS: `git push` → GitHub Pages → Katharina tippt „Auf Update prüfen"
 - v1.68: Bugfixes – Swatch-Vorschaubild korrigiert, sanfte Sonnen-Animation (CSS transition 1s linear)
 - v1.69: Abendrot-Fixes – Abdunkelung im Meer-Modus deaktiviert, Wasserfarbe mit 3-Punkte-Verlauf (orange → weinrot → dunkel), Sonne minimal höher
 - v1.70: Abendrot – Gong-Tap-Verhalten wie Berg: unsichtbar beim Laufen, Tap → 0.7 opacity, nach 2,5 Sek. automatisch ausblenden
+- v1.71: Berg + Meer – Timer-Ziffern dimmen nach 3 Sek. auf 35% opacity, Tap hellt Gong + Timer gleichzeitig auf, nach 2,5 Sek. dimmen beide wieder
 
 ## Offene Punkte / Nächste Schritte
 
