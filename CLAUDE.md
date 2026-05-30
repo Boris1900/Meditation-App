@@ -29,33 +29,49 @@ MeditationsApp/
 
 ## Aktueller Stand – v1.75 (gepusht + APK released)
 
-- Timer 1–90 Min, Wake Lock ab App-Start, Abdunkelung 0–95%
-- **Lebendige Flamme** (Checkbox): ausgegraut wenn Farbhintergrund aktiv
+- Timer 1–90 Min, Wake Lock ab App-Start
 - Buddha-Lächeln + Aura: immer aktiv bei Buddha-Hintergrund
 - Gong-Animation, 3 Klangschalen (localStorage), Update-Funktion (APK-Download)
 - **Zwischen-Gong** (Checkbox + Slider): Countdown rechts neben Haupttimer
-- **Hintergrundfarbe** (10 Felder): Buddha, Erwachen, Abendrot, Schwarz, Sehr dunkel, Dunkelgrau, Dunkelblau, Dunkelgrün, Grasgrün, Warmes Gelb
-- **Gong-Welleneffekt** (Farbmodus): weicher Schallwellen-Ring statt Swing
-- **Erwachen-Hintergrund (Berg):** Dynamischer Sonnenaufgang im Meditationsverlauf:
+- **10 Hintergründe:** Buddha, Erwachen (Berg), Abendrot (Meer), Schwarz, Sehr dunkel,
+  Dunkelgrau, Dunkelblau, Dunkelgrün, Grasgrün, Gelb
+
+### Menü-Struktur (ab v1.75)
+1. **Gong-Sound wählen** – MP3 laden oder 3 Klangschalen
+2. **Zwischen-Gong** – Checkbox + Slider
+3. **Timeranzeige abdunkeln** – Checkbox, übergeordnet für alle Hintergründe.
+   Timer dimmt nach 3s auf 30%, Antippen hellt kurz auf (2,5s), dann wieder dim.
+4. **Display abdunkeln** – Slider 0–95%, gilt für alle Hintergründe außer Berg
+   (Berg startet bewusst dunkel, Abdunkelung wäre kontraproduktiv)
+5. **Hintergrund** – 10 Kästchen
+6. **Lebendige Flamme** 🕯️ – erscheint nur wenn Buddha gewählt ist
+7. **Auf Update prüfen**
+
+### Immersive Hintergründe
+- **Erwachen (Berg):** Dynamischer Sonnenaufgang:
   - Start: fast schwarz (overlay 0.90), Sterne im oberen 30% mit Helligkeitsgradient
   - Im Verlauf: Overlay hebt sich, Sterne verblassen ab 35%, endet goldene Morgendämmerung
-  - Gong unsichtbar beim Laufen, Tap → Gong 2,5 Sek. sichtbar
+  - Gong unsichtbar beim Laufen, Tap → Gong 2,5 Sek. sichtbar + Timer aufhellen
   - Zwischen-Gong: nur Sound
-  - Technisch: `#berg-tap-layer` (z-index 2), `MEER_HORIZON_FRAC` steuert Horizont
-- **Abendrot-Hintergrund (Meer, v1.66):** Animierter Sonnenuntergang:
+  - Abdunkelung: deaktiviert (Berg ist Ausnahme)
+  - Technisch: `#berg-tap-layer` (z-index 2)
+
+- **Abendrot (Meer):** Animierter Sonnenuntergang:
   - Bild: `meer_0.2.jpg` (948×1659px, spiegelglattes Wasser, kein Strand)
   - Start: Sonne als große Halbkugel (300px) genau auf dem Horizont
-  - Im Verlauf: Sonne versinkt langsam, wird röter, Aura wächst von 420px auf >1000px
+  - Im Verlauf: Sonne versinkt, wird röter, Aura wächst 420px → >1000px
+  - Wasser: 3-Punkte-Farbverlauf (orange → weinrot → dunkel), oberes Drittel bleibt sichtbar
   - Ende: Sonne weg, Szene fast schwarz (overlay 0.85)
-  - Gong wie Erwachen: unsichtbar, Tap enthüllt kurz
+  - Gong wie Berg: unsichtbar, Tap enthüllt kurz
   - Zwischen-Gong: nur Sound
-  - Technisch: `#meer-sun-wrap` (overflow:hidden, Höhe = Horizont-px), Horizont BERECHNET aus Bildmaßen + cover-Skalierung
-  - Wichtige Konstanten: `MEER_IMG_W=948`, `MEER_IMG_H=1659`, `MEER_HORIZON_FRAC=0.58`, `MEER_SUN_SIZE=300`, `MEER_DISC_PCT=0.24`
-  - **GERÄTEUNABHÄNGIGE HORIZONT-BERECHNUNG (ab v1.74):** `meerHorizonPx()` MISST die
-    gerenderte `#app-bg`-Box per `getBoundingClientRect()` statt `window.innerHeight`/
-    `screen.height` zu raten. Am echten iPhone verifiziert. Regel für alle künftigen
-    Bild-Hintergründe: Positionen IMMER aus der gemessenen Bildbox ableiten, nie aus
-    Fenster-Höhen – die weichen auf iOS (Safari-Leisten, Standalone) voneinander ab.
+  - Abdunkelung: aktiv (Meer ist KEINE Ausnahme)
+  - Technisch: `#meer-sun-wrap` (overflow:hidden, Höhe = Horizont-px)
+  - **HORIZONT-BERECHNUNG (ab v1.74):** `meerHorizonPx()` MISST die gerenderte
+    `#app-bg`-Box per `getBoundingClientRect()` – am iPhone verifiziert, geräteunabhängig.
+    **Regel für künftige Bild-Hintergründe:** Positionen IMMER aus gemessener Bildbox,
+    NIE aus `window.innerHeight`/`screen.height` – weichen auf iOS stark ab!
+  - Wichtige Konstanten: `MEER_IMG_W=948`, `MEER_IMG_H=1659`, `MEER_HORIZON_FRAC=0.58`,
+    `MEER_SUN_SIZE=300`, `MEER_DISC_PCT=0.24`
 
 ### Wichtige Konstanten (app.js)
 ```
@@ -73,7 +89,7 @@ Weiße Linie Android (Power-Button → Chrome-Reload) → Webtech-Grenze, in der
 ⚠️ Reihenfolge einhalten – sonst landet alte Version in der APK!
 
 1. Änderungen in Hauptdateien vornehmen
-2. Version hochzählen: `app.js` (APP_VERSION) + `sw.js` (CACHE_NAME) → aktuell `v1.68`
+2. Version hochzählen: `app.js` (APP_VERSION) + `sw.js` (CACHE_NAME) → aktuell `v1.75`
 3. `.\build-android.ps1` ausführen
 4. APK per Gradle bauen:
    `$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"`
@@ -98,31 +114,33 @@ iOS: `git push` → GitHub Pages → Katharina tippt „Auf Update prüfen"
 - v1.59: iOS-Digit-Trennlinien entfernt
 - v1.60: Audio-Warm-up beim ersten Seitentouch
 - v1.61: Berglandschaft-Hintergrund mit dynamischem Sonnenaufgang
-- v1.62: Bergmodus verfeinert – Gong unsichtbar, Tap-Enthüllung (2,5s), Stern-Helligkeitsgradient, Zwischen-Gong nur Sound
-- v1.63–v1.66: Abendrot-Modus (Meer) – animierter Sonnenuntergang mit versinkender Sonne, wachsender Aura, cover-korrekter Horizontberechnung
-- v1.67: Abendrot fertiggestellt – meer_0.2.jpg (kein Strand), Szene bleibt dunkel nach Timer-Ende
-- v1.68: Bugfixes – Swatch-Vorschaubild korrigiert, sanfte Sonnen-Animation (CSS transition 1s linear)
-- v1.69: Abendrot-Fixes – Abdunkelung im Meer-Modus deaktiviert, Wasserfarbe mit 3-Punkte-Verlauf (orange → weinrot → dunkel), Sonne minimal höher
-- v1.70: Abendrot – Gong-Tap-Verhalten wie Berg: unsichtbar beim Laufen, Tap → 0.7 opacity, nach 2,5 Sek. automatisch ausblenden
-- v1.71: Berg + Meer – Timer-Ziffern dimmen nach 3 Sek. auf 35% opacity, Tap hellt Gong + Timer gleichzeitig auf, nach 2,5 Sek. dimmen beide wieder
-- v1.72: Bugfixes – berglandschaft_0.1.jpg in Git eingecheckt (iOS-Fix), Swatch-Labels nowrap + Größen einheitlich, Timer-Dimming auf #timer-row Container umgestellt (zuverlässig)
-- v1.73: TEMP-Diagnose – vier Horizont-Linien zum Messen am echten iPhone (in v1.74 wieder entfernt)
-- v1.74: Sonne sitzt geräteunabhängig korrekt – Horizont aus gemessener #app-bg-Box statt geratener Fensterhöhe (am iPhone verifiziert: „gelbe Linie korrekt"). Swatch-Kästchen feste Reihenhöhe + kräftiger Rahmen, „Warmes Gelb" → „Gelb"
-- v1.75: Menü-Umbau – Zwischen-Gong oben, neue Checkbox „Timeranzeige abdunkeln" (übergeordnet alle Hintergründe), Display-Abdunkelung für alle außer Berg, Lebendige Flamme nur bei Buddha sichtbar
+- v1.62: Bergmodus verfeinert – Gong unsichtbar, Tap-Enthüllung (2,5s), Stern-Helligkeitsgradient
+- v1.63–v1.66: Abendrot-Modus – animierter Sonnenuntergang, cover-korrekte Horizontberechnung
+- v1.67: Abendrot fertiggestellt – meer_0.2.jpg, Szene bleibt dunkel nach Timer-Ende
+- v1.68: Bugfixes – Swatch-Vorschaubild, sanfte Sonnen-Animation
+- v1.69: Abendrot – Wasserfarbe 3-Punkte-Verlauf, Sonne höher
+- v1.70: Abendrot – Gong-Tap-Verhalten wie Berg
+- v1.71: Berg + Meer – Timer-Ziffern dimmen (35%), koordiniert mit Gong-Tap
+- v1.72: berglandschaft_0.1.jpg in Git (iOS-Fix), Swatch-Größen einheitlich, Timer-Dim robuster
+- v1.73: TEMP-Diagnose Horizont-Linien iPhone (in v1.74 entfernt)
+- v1.74: Sonne geräteunabhängig korrekt – Horizont aus gemessener #app-bg-Box (iPhone verifiziert)
+- v1.75: Menü-Umbau – neue Struktur, Timeranzeige abdunkeln (übergeordnet alle),
+  Display abdunkeln für alle außer Berg, Lebendige Flamme nur bei Buddha, Gelb umbenannt
 
 ## Offene Punkte / Nächste Schritte
 
-### Abendrot-Modus: offene Feinarbeit
-- Horizont-Feintuning: `MEER_HORIZON_FRAC = 0.58` – Boris sagt "ziemlich gut", ggf. noch minimal anpassen
-- Sonne am Handy prüfen (OnePlus 5): sitzt die Halbkugel genau auf der Linie?
-- Ggf. Sonnenuntergang-Geschwindigkeit und Aura-Intensität nachjustieren
+### Menü-Erweiterung geplant (besprochen, noch nicht gebaut)
+- Wenn Buddha-Kästchen angetippt wird → Untermenü mit Lebendige Flamme + Abdunkeln klappt auf
+  (aktuell: Lebendige Flamme erscheint/verschwindet unter den Kästchen – funktioniert, aber
+  Untermenü-Konzept noch offen)
 
 ### Weitere Hintergründe geplant
 - **Strandbild:** Sonnenuntergang über dem Meer (hell → dunkel im Meditationsverlauf)
-  - Gleiches Konzept wie Bergbild, umgekehrte Richtung
+  - Gleiches Konzept wie Abendrot
   - Prompt für DALL-E: "Photorealistic ocean sunset, portrait 1024x1792, sun still visible
     just above horizon, warm orange-red sky, calm water reflection, dark sandy beach in lower
     third, no people, no text, meditative atmosphere"
+  - Bei neuem Hintergrund Checkliste beachten (siehe Memory: feedback_neue_hintergruende_checkliste)
 
 ### Tinnitus-Meditations-App (übernächstes Projekt)
 Eigenständige neue App für Tinnitus-Patienten. Hintergrundgeräusche (Boris' Field Recordings:
@@ -145,11 +163,13 @@ Start/Stop-Button mittig. Web Audio API für gapless loop. Separates Repo + Doma
 Ablauf: Code fertig → `npx serve -p 3456 .` → Boris schaut im Browser → Feedback → anpassen
 → erst dann push/APK.
 
+⛔ **Push und APK immer zusammen.** Nie nur pushen ohne APK, nie nur APK ohne Push.
+
 ## Lokaler Server
 `npx serve -p 3456 .`
 
 ## Kontext für neue Session
 - Boris: Heilpraktiker, kein Entwickler, beurteilt visuell
-- Testgeräte: OnePlus 5 (Android 10) + iPhone Katharina (iOS/Safari)
+- Testgeräte: OnePlus 5 Android (Boris) + iPhone Katharina (iOS/Safari)
 - Android Studio Panda 4, debug APK, StatusBar transparent via `@capacitor/status-bar`
 - Neue Session starten mit: "Lies die CLAUDE.md und sag wo wir stehen"
