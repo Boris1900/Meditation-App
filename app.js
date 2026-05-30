@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.75';
+const APP_VERSION = 'v1.76';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -712,8 +712,8 @@ const MEER_DISC_PCT     = 0.24;  // Anteil des Gradients, der den hellen Ball au
 // (Android, iPhone, Safari, PWA) exakt richtig – am echten iPhone verifiziert.
 function meerHorizonPx() {
   const rect = appBgEl.getBoundingClientRect();
-  const vw = rect.width;
-  const vh = rect.height;
+  const vw = rect.width  || window.innerWidth;
+  const vh = rect.height || window.innerHeight;
   const scale = Math.max(vw / MEER_IMG_W, vh / MEER_IMG_H); // cover: größerer Faktor
   const renderedH = MEER_IMG_H * scale;
   const offsetTop = (renderedH - vh) / 2; // oben abgeschnittener Teil

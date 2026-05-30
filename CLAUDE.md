@@ -6,7 +6,7 @@ PWA + Android APK via Capacitor. v1.75 live.
 GitHub Pages: https://boris1900.github.io/Meditation-App/ | Repo: Boris1900/Meditation-App
 Android-Paketname `de.tinnituspraxis.meditation` bleibt vorerst (Legacy).
 
-## Aktueller Stand – v1.75
+## Aktueller Stand – v1.76
 
 **Timer:** 1–90 Min, Wake Lock, 3 Klangschalen, Zwischen-Gong (Checkbox + Slider)
 
@@ -49,15 +49,9 @@ IMG_W_GONG=1024, IMG_H_GONG=1536, DISC_Y_PCT=0.537, DISC_R_PCT=0.292
 - v1.72: iOS-Fix berglandschaft (nie in Git), Swatch-Größen einheitlich
 - v1.74: Horizont geräteunabhängig korrekt (getBoundingClientRect, iPhone verifiziert)
 - v1.75: Menü umgebaut, Timeranzeige abdunkeln (alle), Display abdunkeln (alle außer Berg), Lebendige Flamme nur Buddha
+- v1.76: Android-Fix Sonne beim ersten Start (Fallback window.innerHeight wenn rect.height=0)
 
 ## Offene Punkte
-
-### 🐛 Bug: Sonne falsch beim ersten App-Start (Android, v1.75)
-Nach Neuinstallation sitzt die Sonne ganz oben statt am Horizont. Nach Hintergrundwechsel
-(z.B. Buddha → Meer) stimmt sie. Ursache: `getBoundingClientRect()` auf `#app-bg` liefert
-beim ersten Render noch Höhe 0, bevor Layout + Bild fertig sind. Fix: `meerHorizonPx()`
-erst aufrufen wenn Bild geladen + Layout berechnet ist (z.B. auf `load`-Event oder mit
-Fallback auf `screen.height` wenn `rect.height === 0`). iPhone nicht betroffen.
 
 - **Strandbild** geplant (Sonnenuntergang, DALL-E-Prompt in alter CLAUDE.md)
 - **Checkliste neue Hintergründe** beachten → Memory: `feedback_neue_hintergruende_checkliste`
