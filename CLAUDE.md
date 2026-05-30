@@ -27,7 +27,7 @@ MeditationsApp/
 └── CLAUDE.md                    # Diese Datei
 ```
 
-## Aktueller Stand – v1.74 (gepusht + APK released)
+## Aktueller Stand – v1.75 (gepusht + APK released)
 
 - Timer 1–90 Min, Wake Lock ab App-Start, Abdunkelung 0–95%
 - **Lebendige Flamme** (Checkbox): ausgegraut wenn Farbhintergrund aktiv
@@ -108,6 +108,7 @@ iOS: `git push` → GitHub Pages → Katharina tippt „Auf Update prüfen"
 - v1.72: Bugfixes – berglandschaft_0.1.jpg in Git eingecheckt (iOS-Fix), Swatch-Labels nowrap + Größen einheitlich, Timer-Dimming auf #timer-row Container umgestellt (zuverlässig)
 - v1.73: TEMP-Diagnose – vier Horizont-Linien zum Messen am echten iPhone (in v1.74 wieder entfernt)
 - v1.74: Sonne sitzt geräteunabhängig korrekt – Horizont aus gemessener #app-bg-Box statt geratener Fensterhöhe (am iPhone verifiziert: „gelbe Linie korrekt"). Swatch-Kästchen feste Reihenhöhe + kräftiger Rahmen, „Warmes Gelb" → „Gelb"
+- v1.75: Menü-Umbau – Zwischen-Gong oben, neue Checkbox „Timeranzeige abdunkeln" (übergeordnet alle Hintergründe), Display-Abdunkelung für alle außer Berg, Lebendige Flamme nur bei Buddha sichtbar
 
 ## Offene Punkte / Nächste Schritte
 

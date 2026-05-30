@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.74';
+const APP_VERSION = 'v1.75';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -74,8 +74,9 @@ let dimOpacity = 0;
 let isDimmed = false;
 let autoDimTimeout = null;
 
-// Timer-Text-Dimm-State (Berg + Meer)
+// Timer-Text-Dimm-State (alle Hintergründe, steuerbar per Checkbox)
 let timerDimTimeout = null;
+let timerDimEnabled = false;
 
 // Berg-Modus: Gong kurz einblenden bei Tap
 let bergRevealTimeout = null;
@@ -101,7 +102,8 @@ const currentName = document.getElementById('current-audio-name');
 const klangBtns   = document.querySelectorAll('.klang-btn');
 const dimSlider   = document.getElementById('dim-slider');
 const dimLevelLabel = document.getElementById('dim-level-label');
-const flickerCheckbox = document.getElementById('flicker-checkbox');
+const flickerCheckbox   = document.getElementById('flicker-checkbox');
+const timerDimCheckbox  = document.getElementById('timer-dim-checkbox');
 const flameFlicker    = document.getElementById('flame-flicker');
 const bgSmile     = document.getElementById('bg-smile');
 const buddhaAura  = document.getElementById('buddha-aura');
@@ -216,7 +218,7 @@ function startTimer() {
     gongContainer.style.opacity = '0';
     gongContainer.style.zIndex = '1';
   }
-  if (currentBg === 'berg' || currentBg === 'meer') {
+  if (timerDimEnabled) {
     brightenTimerText();
     scheduleTimerDim();
   }
@@ -435,14 +437,16 @@ function brightenTimerText() {
 
 function scheduleTimerDim(delayMs = 3000) {
   clearTimeout(timerDimTimeout);
+  if (!timerDimEnabled) return;
   timerDimTimeout = setTimeout(() => {
-    if (isRunning && (currentBg === 'berg' || currentBg === 'meer')) dimTimerText();
+    if (isRunning && timerDimEnabled) dimTimerText();
   }, delayMs);
 }
 
 // Dimm-Logik
 function dim() {
-  if (dimOpacity === 0 || currentBg === 'berg' || currentBg === 'meer') return;
+  // Abdunkelung gilt für alle Hintergründe – Ausnahme nur Berg (startet bewusst dunkel)
+  if (dimOpacity === 0 || currentBg === 'berg') return;
   overlay.style.transitionDuration = '3s';
   overlay.style.opacity = dimOpacity;
   overlay.style.pointerEvents = 'auto';
@@ -470,6 +474,7 @@ overlay.addEventListener('click', (e) => {
   e.stopPropagation();
   if (isRunning && isDimmed) {
     brighten();
+    if (timerDimEnabled) { clearTimeout(timerDimTimeout); brightenTimerText(); scheduleTimerDim(2500); }
   }
 });
 
@@ -507,12 +512,12 @@ bergTapLayer.addEventListener('click', (e) => {
       gongContainer.style.transition = 'opacity 1.5s ease';
       gongContainer.style.opacity = '0';
       gongContainer.style.zIndex = '1';
-      dimTimerText();
+      if (timerDimEnabled) dimTimerText();
     }
   }, 2500);
 });
 
-// Tap auf Display (nicht Gong, nicht Nav) während Timer hell läuft → sofort abdunkeln
+// Tap auf Display (nicht Gong, nicht Nav) während Timer hell läuft → abdunkeln + Timer aufhellen
 document.addEventListener('click', (e) => {
   if (!isRunning || isDimmed) return;
   if (e.target.closest('#gong')) return;
@@ -520,6 +525,12 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('#audio-menu')) return;
   clearTimeout(autoDimTimeout);
   dim();
+  // Timer kurz aufhellen (gilt für alle Hintergründe außer berg/meer die eigenen Tap-Layer haben)
+  if (timerDimEnabled && currentBg !== 'berg' && currentBg !== 'meer') {
+    clearTimeout(timerDimTimeout);
+    brightenTimerText();
+    scheduleTimerDim(2500);
+  }
 });
 
 // Wake Lock
@@ -791,7 +802,6 @@ function setBg(key) {
   const isBuddha  = color === null;
   const isBerg    = color === 'berg';
   const isMeer    = color === 'meer';
-  const isImmersive = isBerg || isMeer;
 
   if (isBuddha) {
     appBgEl.style.background = '';
@@ -817,14 +827,10 @@ function setBg(key) {
     showMeerScene(false);
     if (flickerCheckbox.checked) setFlicker(false);
   }
+  // Lebendige Flamme nur bei Buddha sichtbar (Block erscheint/verschwindet)
   const flickerSection = document.getElementById('flicker-section');
-  flickerSection.style.opacity = isBuddha ? '' : '0.35';
-  flickerSection.style.pointerEvents = isBuddha ? '' : 'none';
-  const dimSection = document.getElementById('dim-section');
-  if (dimSection) {
-    dimSection.style.opacity = isImmersive ? '0.35' : '';
-    dimSection.style.pointerEvents = isImmersive ? 'none' : '';
-  }
+  flickerSection.style.display = isBuddha ? '' : 'none';
+  // Display-Abdunkelung gilt jetzt übergeordnet für alle – kein Ausgrauen mehr
   document.querySelectorAll('.bg-swatch').forEach(s => {
     s.classList.toggle('selected', s.dataset.bg === key);
   });
@@ -1005,6 +1011,18 @@ updateDimSliderProgress();
 
 const savedFlackern = localStorage.getItem('medi_flackern');
 setFlicker(savedFlackern === '1'); // Default: aus
+
+// Timeranzeige abdunkeln laden
+const savedTimerDim = localStorage.getItem('medi_timer_dim');
+timerDimEnabled = savedTimerDim === '1';
+timerDimCheckbox.checked = timerDimEnabled;
+
+timerDimCheckbox.addEventListener('change', () => {
+  timerDimEnabled = timerDimCheckbox.checked;
+  localStorage.setItem('medi_timer_dim', timerDimEnabled ? '1' : '0');
+  // Wenn gerade am laufen und nun deaktiviert: Timer sofort auf volle Helligkeit
+  if (!timerDimEnabled && isRunning) { clearTimeout(timerDimTimeout); brightenTimerText(); }
+});
 
 const savedBg = localStorage.getItem('medi_hintergrund') || 'buddha';
 setBg(savedBg);

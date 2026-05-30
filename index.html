@@ -58,24 +58,6 @@
         📱 <strong>iPhone-Nutzer:</strong> Der seitliche Stummschalter muss <strong>ausgeschaltet</strong> sein (kein orangefarbener Streifen) – sonst ist kein Ton zu hören.
       </div>
       <hr class="menu-divider">
-      <h2>Abdunkelung</h2>
-      <p class="menu-hint">Dunkelt das Display nach dem Start automatisch ab. Antippen hellt es wieder auf.</p>
-      <div id="dim-section">
-        <div class="dim-slider-row">
-          <span class="dim-end-label">Keine</span>
-          <input type="range" id="dim-slider" min="0" max="95" value="85" step="5">
-          <span class="dim-end-label">Sehr dunkel</span>
-        </div>
-        <p id="dim-level-label">Stark</p>
-      </div>
-      <div id="flicker-section">
-        <hr class="menu-divider">
-        <label class="flicker-toggle">
-          <input type="checkbox" id="flicker-checkbox">
-          <span>Lebendige Flamme <span style="font-style:normal">🕯️</span></span>
-        </label>
-      </div>
-      <hr class="menu-divider">
       <label class="flicker-toggle">
         <input type="checkbox" id="zgong-checkbox">
         <span>Zwischen-Gong <span style="font-style:normal">🔔</span></span>
@@ -87,6 +69,23 @@
           <span class="dim-end-label" id="zgong-max-label">39 Min</span>
         </div>
         <p id="zgong-value-label">nach 20 Minuten</p>
+      </div>
+      <hr class="menu-divider">
+      <label class="flicker-toggle">
+        <input type="checkbox" id="timer-dim-checkbox">
+        <span>Timeranzeige abdunkeln <span style="font-style:normal">🕐</span></span>
+      </label>
+      <p class="menu-hint" style="margin-top:4px">Timer tritt nach ein paar Sekunden zurück. Antippen hellt ihn kurz auf.</p>
+      <hr class="menu-divider">
+      <h2>Display abdunkeln</h2>
+      <p class="menu-hint">Dunkelt das Display während der Meditation ab. Antippen hellt es wieder auf.</p>
+      <div id="dim-section">
+        <div class="dim-slider-row">
+          <span class="dim-end-label">Aus</span>
+          <input type="range" id="dim-slider" min="0" max="95" value="85" step="5">
+          <span class="dim-end-label">Sehr dunkel</span>
+        </div>
+        <p id="dim-level-label">Stark</p>
       </div>
       <hr class="menu-divider">
       <h2>Hintergrund</h2>
@@ -132,6 +131,13 @@
           <span class="bg-swatch-color" style="background:#c8a400"></span>
           <span class="bg-swatch-label">Gelb</span>
         </button>
+      </div>
+      <div id="flicker-section">
+        <hr class="menu-divider">
+        <label class="flicker-toggle">
+          <input type="checkbox" id="flicker-checkbox">
+          <span>Lebendige Flamme <span style="font-style:normal">🕯️</span></span>
+        </label>
       </div>
       <hr class="menu-divider">
       <button id="update-btn" onclick="checkForUpdate()" class="update-btn">🔄 Auf Update prüfen</button>
