@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.78';
+const APP_VERSION = 'v1.79';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -702,6 +702,7 @@ function fireBergStar() {
   if (!starsEl) return;
   const starsOpacity = parseFloat(starsEl.style.opacity) || 0;
   if (starsOpacity < 0.2) return;
+  // In der Dämmerungsphase (0.2–0.5) zufällig auslassen
   if (starsOpacity < 0.5 && Math.random() > starsOpacity * 1.5) return;
 
   const vw = window.innerWidth;
