@@ -4,6 +4,18 @@
 $src = $PSScriptRoot
 $www = "$src\www"
 
+# Aktuelle Version aus app.js lesen (z.B. v1.80)
+$verMatch = (Get-Content "$src\app.js" | Select-String "APP_VERSION\s*=\s*'([^']+)'")
+$version  = $verMatch.Matches.Groups[1].Value
+
+# Alte APKs aufräumen: nur die der aktuellen Version behalten (GitHub hat alle Releases)
+Get-ChildItem "$src\Augenblick-v*.apk" -ErrorAction SilentlyContinue |
+  Where-Object { $_.Name -ne "Augenblick-$version.apk" } |
+  ForEach-Object {
+    Write-Host "Lösche alte APK: $($_.Name)" -ForegroundColor DarkGray
+    Remove-Item $_.FullName -Force
+  }
+
 Write-Host "Kopiere Web-Dateien nach www/..." -ForegroundColor Cyan
 
 Copy-Item "$src\index.html"                    $www -Force
@@ -23,5 +35,7 @@ Write-Host "Starte Capacitor Sync..." -ForegroundColor Cyan
 npx cap sync android
 
 Write-Host ""
-Write-Host "Fertig! Jetzt in Android Studio:" -ForegroundColor Green
-Write-Host "  Shift+Shift -> 'Generate APKs' -> warten -> APK umbenennen" -ForegroundColor Green
+Write-Host "Fertig! Aktuelle Version: $version" -ForegroundColor Green
+Write-Host "Jetzt bauen und APK kopieren:" -ForegroundColor Green
+Write-Host "  cd android; .\gradlew assembleDebug" -ForegroundColor Green
+Write-Host "  Copy-Item android\app\build\outputs\apk\debug\app-debug.apk Augenblick-$version.apk -Force" -ForegroundColor Green
