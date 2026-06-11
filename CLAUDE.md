@@ -6,7 +6,7 @@ PWA + Android APK via Capacitor. v1.75 live.
 GitHub Pages: https://boris1900.github.io/Meditation-App/ | Repo: Boris1900/Meditation-App
 Android-Paketname `de.tinnituspraxis.meditation` bleibt vorerst (Legacy).
 
-## Aktueller Stand – v1.78
+## Aktueller Stand – v1.80
 
 **Timer:** 1–90 Min, Wake Lock, 3 Klangschalen, Zwischen-Gong (Checkbox + Slider)
 
@@ -52,6 +52,8 @@ IMG_W_GONG=1024, IMG_H_GONG=1536, DISC_Y_PCT=0.537, DISC_R_PCT=0.292
 - v1.76: Android-Fix Sonne beim ersten Start (Fallback window.innerHeight wenn rect.height=0)
 - v1.77: Slider-Label-Abstand vereinheitlicht (gap entfernt, margin-top 10px bei Zgong + Dim)
 - v1.78: Sternschnuppen im Berg-Hintergrund (erste nach ~10s, dann alle 1–5 min, Helligkeit-abhängig)
+- v1.79: Menü-Icon auf Hamburger (drei Striche) geändert
+- v1.80: Statusleiste während Meditation ausgeblendet (StatusBar.hide bei Start, show bei Stop/Finish). Nur Android-APK – iOS-PWA kann Statusleiste nicht per JS ausblenden
 
 ## Offene Punkte
 

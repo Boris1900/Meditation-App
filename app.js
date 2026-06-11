@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.79';
+const APP_VERSION = 'v1.80';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -9,6 +9,20 @@ window.addEventListener('load', () => {
     StatusBar.setStyle({ style: 'DARK' });
   }
 });
+
+// Statusleiste während der Meditation ausblenden (nur native App).
+// Hängt an der Session, nicht am Display-Zustand: Antippen zum Restzeit-Ablesen
+// holt die Leiste NICHT zurück.
+function hideStatusBar() {
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    window.Capacitor.Plugins.StatusBar.hide();
+  }
+}
+function showStatusBar() {
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    window.Capacitor.Plugins.StatusBar.show();
+  }
+}
 
 // Geräteerkennung
 function isIOS() {
@@ -201,6 +215,7 @@ function startTimer() {
   minusBtn.disabled = true;
   plusBtn.disabled = true;
   requestWakeLock();
+  hideStatusBar();
   scheduleAutoDim();
   scheduleBuddhaSmile();
   triggerBuddhaSmileOnce();
@@ -278,6 +293,7 @@ function stopTimer() {
   minusBtn.disabled = false;
   plusBtn.disabled = false;
   releaseWakeLock();
+  showStatusBar();
   brighten();
   stopBergStars();
   stopBuddhaSmile();
