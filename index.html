@@ -26,6 +26,9 @@
   <!-- Hintergrundbild: eigenes Element, Höhe per JS auf screen.height fixiert -->
   <div id="app-bg" aria-hidden="true"></div>
 
+  <!-- Slide-Ebene: hält den hereingleitenden Hintergrund beim Wischen -->
+  <div id="bg-slide" aria-hidden="true"></div>
+
   <!-- Berg-Nacht-Overlay: liegt über dem Hintergrundbild, wird per JS mit Timer aufgehellt -->
   <div id="berg-overlay" aria-hidden="true"></div>
   <!-- Berg-Sterne: eingeblendet zu Beginn, verblassen im Verlauf -->
@@ -164,6 +167,9 @@
   <div id="meer-sun-wrap" aria-hidden="true"><div id="meer-aura"></div><div id="meer-sun"></div></div>
   <div id="meer-sun-reflection" aria-hidden="true"></div>
   <div id="meer-water-color" aria-hidden="true"></div>
+
+  <!-- Seiten-Pünktchen: zeigen Position im Hintergrund-Karussell, blenden beim Start aus -->
+  <div id="bg-dots" aria-hidden="true"></div>
 
   <!-- Gong: eigenes fixed-Element, damit z-index beim Zwischen-Gong über Overlay gehoben werden kann -->
   <div id="gong-container">

@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.81';
+const APP_VERSION = 'v1.82';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -504,6 +504,7 @@ overlay.addEventListener('click', (e) => {
 let gongLocked = false;
 gongEl.addEventListener('click', (e) => {
   e.stopPropagation();
+  if (didSwipe) { didSwipe = false; return; }   // Wisch-Geste startet keinen Timer
   if (gongLocked) return;
   gongLocked = true;
   setTimeout(() => { gongLocked = false; }, 1000);
@@ -937,11 +938,133 @@ function setBg(key) {
   document.querySelectorAll('.bg-swatch').forEach(s => {
     s.classList.toggle('selected', s.dataset.bg === key);
   });
+  const idx = BG_ORDER.indexOf(key);
+  if (idx !== -1) carouselIdx = idx;
+  updateBgDots(key);
   localStorage.setItem('medi_hintergrund', key);
 }
 
 document.querySelectorAll('.bg-swatch').forEach(btn => {
   btn.addEventListener('click', () => setBg(btn.dataset.bg));
+});
+
+// ── Hintergrund-Karussell: Wischen in der Hauptansicht ────────────────────────
+// Reihenfolge wie im Menü, Endlos-Schleife. Nur im Ruhezustand (nicht während Meditation).
+const BG_ORDER = ['buddha', 'berg', 'meer', 'schwarz', 'sehr-dunkel',
+  'dunkelgrau', 'dunkelblau', 'dunkelgruen', 'grasgruen', 'warmes-gelb'];
+let carouselIdx = 0;
+
+// Basis-Aussehen eines Hintergrunds als CSS-background-String (für die Slide-Ebene).
+// Bei Berg/Meer nur das statische Bild – die lebenden Overlays rasten nach dem Slide ein.
+function bgBaseStyle(key) {
+  const color = BG_OPTIONS[key];
+  if (color === null)   return "url('background.jpg') center center / cover no-repeat #1a1a1a";
+  if (color === 'berg') return 'url("berglandschaft_0.1.jpg") center center / cover no-repeat #000d18';
+  if (color === 'meer') return 'url("meer_0.2.jpg") center center / cover no-repeat #1a0a00';
+  return color;
+}
+
+// Bilder einmal beim Start vorladen, damit das Wischen flüssig läuft
+['background.jpg', 'berglandschaft_0.1.jpg', 'meer_0.2.jpg'].forEach(src => {
+  const img = new Image();
+  img.src = src;
+});
+
+// ── Seiten-Pünktchen ──────────────────────────────────────────────────────────
+const bgDotsEl = document.getElementById('bg-dots');
+BG_ORDER.forEach((key, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'bg-dot';
+  dot.dataset.bg = key;
+  bgDotsEl.appendChild(dot);
+});
+function updateBgDots(key) {
+  bgDotsEl.querySelectorAll('.bg-dot').forEach(d => {
+    d.classList.toggle('active', d.dataset.bg === key);
+  });
+}
+
+// ── Slide-Animation ───────────────────────────────────────────────────────────
+const bgSlideEl = document.getElementById('bg-slide');
+let bgSliding       = false;
+let bgSlidingTarget = null;
+
+// Elemente der aktuell sichtbaren Szene, die beim Slide mitwandern müssen
+function outgoingSceneEls() {
+  const els = [appBgEl];
+  if (currentBg === 'berg') {
+    els.push(document.getElementById('berg-overlay'), document.getElementById('berg-stars'));
+  } else if (currentBg === 'meer') {
+    els.push(meerOverlay, meerSunWrap, meerReflection, meerWaterColor);
+  }
+  return els.filter(Boolean);
+}
+
+function slideBgTo(key, direction) {
+  // Schnelles Weiterwischen während der Animation: Ziel merken, am Ende einrasten
+  if (bgSliding) { bgSlidingTarget = key; return; }
+  bgSliding = true;
+  bgSlidingTarget = key;
+
+  const enterFrom = direction < 0 ? '100%' : '-100%';
+  const exitTo    = direction < 0 ? '-100%' : '100%';
+  const outEls = outgoingSceneEls();
+
+  bgSlideEl.style.background = bgBaseStyle(key);
+  bgSlideEl.style.transition = 'none';
+  bgSlideEl.style.transform  = `translateX(${enterFrom})`;
+  outEls.forEach(el => { el.style.transition = 'none'; el.style.transform = 'translateX(0)'; });
+
+  bgSlideEl.offsetHeight; // reflow erzwingen
+
+  const ease = 'transform 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+  bgSlideEl.style.transition = ease;
+  bgSlideEl.style.transform  = 'translateX(0)';
+  outEls.forEach(el => { el.style.transition = ease; el.style.transform = `translateX(${exitTo})`; });
+
+  setTimeout(() => {
+    // Transforms zurücksetzen, echte Szene anwenden (inkl. Overlays)
+    outEls.forEach(el => { el.style.transition = 'none'; el.style.transform = ''; });
+    setBg(bgSlidingTarget);
+    bgSlideEl.style.transition = 'none';
+    bgSlideEl.style.transform  = 'translateX(100%)';
+    bgSliding = false;
+    bgSlidingTarget = null;
+  }, 430);
+}
+
+// ── Wisch-Erkennung ───────────────────────────────────────────────────────────
+let swipeStartX = null;
+let swipeStartY = null;
+let didSwipe    = false;
+
+document.addEventListener('pointerdown', (e) => {
+  if (!e.isPrimary) return;
+  if (isRunning) return;                                  // nur im Ruhezustand
+  const t = e.target;
+  if (t instanceof Element && (t.closest('#audio-menu') || t.closest('#bottom-nav'))) return;
+  swipeStartX = e.clientX;
+  swipeStartY = e.clientY;
+  didSwipe = false;
+});
+
+document.addEventListener('pointerup', (e) => {
+  if (!e.isPrimary || swipeStartX === null) return;
+  const dx = e.clientX - swipeStartX;
+  const dy = e.clientY - swipeStartY;
+  swipeStartX = null;
+  if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;   // kein klarer Horizontalwisch
+  if (isRunning) return;
+  didSwipe = true;
+  const direction = dx < 0 ? -1 : 1;
+  const next = dx < 0
+    ? (carouselIdx + 1) % BG_ORDER.length
+    : (carouselIdx - 1 + BG_ORDER.length) % BG_ORDER.length;
+  slideBgTo(BG_ORDER[next], direction);
+});
+
+document.addEventListener('pointercancel', (e) => {
+  if (e.isPrimary) swipeStartX = null;
 });
 
 // Zwischen-Gong Menü
@@ -1002,6 +1125,8 @@ function fixBgHeight() {
   const h = window.screen.height + 'px';
   const bg = document.getElementById('app-bg');
   if (bg) bg.style.height = h;
+  const slide = document.getElementById('bg-slide');
+  if (slide) slide.style.height = h;
   if (bgSmile) bgSmile.style.height = h;
 }
 
