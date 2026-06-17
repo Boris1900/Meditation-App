@@ -6,7 +6,7 @@ PWA + Android APK via Capacitor. v1.75 live.
 GitHub Pages: https://boris1900.github.io/Meditation-App/ | Repo: Boris1900/Meditation-App
 Android-Paketname `de.tinnituspraxis.meditation` bleibt vorerst (Legacy).
 
-## Aktueller Stand – v1.82
+## Aktueller Stand – v1.83
 
 **Timer:** 1–90 Min, Wake Lock, 3 Klangschalen, Zwischen-Gong (Checkbox + Slider)
 
@@ -56,6 +56,7 @@ IMG_W_GONG=1024, IMG_H_GONG=1536, DISC_Y_PCT=0.537, DISC_R_PCT=0.292
 - v1.80: Statusleiste während Meditation ausgeblendet (StatusBar.hide bei Start, show bei Stop/Finish). Nur Android-APK – iOS-PWA kann Statusleiste nicht per JS ausblenden
 - v1.81: Einheitliches Tap-Verhalten beim Restzeit-Blick. Zweiter Tap blendet sofort aus (Gong bei Berg/Meer via hideBergGong; Display-Overlay bei Buddha/Farben). Kein Tap → Auto-Fade nach 4s (vorher Berg/Meer 2,5s, Farben blieben hell)
 - v1.82: Hintergrund-Karussell. Wischen in der Hauptansicht (nur im Ruhezustand) blättert durch alle 10 Hintergründe in Menü-Reihenfolge, Endlos-Schleife, mit Slide-Animation (#bg-slide). Seiten-Pünktchen (#bg-dots) zeigen Position, blenden beim Start aus wie der Gong. Bilder werden beim Start vorgeladen. BG_ORDER + slideBgTo + bgBaseStyle. Berg/Meer-Overlays rasten nach dem Slide ein (statisches Bild gleitet, Szene danach)
+- v1.83: Seiten-Pünktchen neu positioniert (über der Hamburger-Nav am unteren Bildrand statt darunter) und dezenter (kleiner, geringere Opacity). Reiner Indikator, nicht antippbar (zu fummelig)
 
 ## Offene Punkte
 
