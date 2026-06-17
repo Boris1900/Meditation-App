@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.83';
+const APP_VERSION = 'v1.85';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -986,8 +986,7 @@ function updateBgDots(key) {
 
 // ── Slide-Animation ───────────────────────────────────────────────────────────
 const bgSlideEl = document.getElementById('bg-slide');
-let bgSliding       = false;
-let bgSlidingTarget = null;
+let bgSliding = false;
 
 // Elemente der aktuell sichtbaren Szene, die beim Slide mitwandern müssen
 function outgoingSceneEls() {
@@ -1000,71 +999,112 @@ function outgoingSceneEls() {
   return els.filter(Boolean);
 }
 
-function slideBgTo(key, direction) {
-  // Schnelles Weiterwischen während der Animation: Ziel merken, am Ende einrasten
-  if (bgSliding) { bgSlidingTarget = key; return; }
-  bgSliding = true;
-  bgSlidingTarget = key;
+// ── Wisch-Erkennung: echte Touch-Events mit Live-Folge des Hintergrunds ───────
+// Pointer-Events sind auf Android unzuverlässig (Browser bricht die Geste mit
+// pointercancel ab → nichts passiert). Touch-Events + preventDefault sichern die
+// Geste; der Hintergrund folgt dem Finger und rastet beim Loslassen ein oder
+// schnappt zurück.
+let didSwipe = false;
+let dragStartX = 0, dragStartY = 0;
+let dragActive = false;     // Finger liegt auf wischbarer Fläche
+let dragHoriz  = false;     // horizontale Geste bestätigt
+let dragNeighborIdx = -1;   // aktuell auf der Slide-Ebene vorbereiteter Nachbar
+let dragViewW = 1;
 
-  const enterFrom = direction < 0 ? '100%' : '-100%';
-  const exitTo    = direction < 0 ? '-100%' : '100%';
-  const outEls = outgoingSceneEls();
-
-  bgSlideEl.style.background = bgBaseStyle(key);
-  bgSlideEl.style.transition = 'none';
-  bgSlideEl.style.transform  = `translateX(${enterFrom})`;
-  outEls.forEach(el => { el.style.transition = 'none'; el.style.transform = 'translateX(0)'; });
-
-  bgSlideEl.offsetHeight; // reflow erzwingen
-
-  const ease = 'transform 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-  bgSlideEl.style.transition = ease;
-  bgSlideEl.style.transform  = 'translateX(0)';
-  outEls.forEach(el => { el.style.transition = ease; el.style.transform = `translateX(${exitTo})`; });
-
-  setTimeout(() => {
-    // Transforms zurücksetzen, echte Szene anwenden (inkl. Overlays)
-    outEls.forEach(el => { el.style.transition = 'none'; el.style.transform = ''; });
-    setBg(bgSlidingTarget);
-    bgSlideEl.style.transition = 'none';
-    bgSlideEl.style.transform  = 'translateX(100%)';
-    bgSliding = false;
-    bgSlidingTarget = null;
-  }, 430);
+function swipeBlocked(t) {
+  if (isRunning) return true;                            // nur im Ruhezustand
+  if (!(t instanceof Element)) return false;
+  return !!(t.closest('input') || t.closest('#bottom-nav') || t.closest('#audio-menu'));
 }
 
-// ── Wisch-Erkennung ───────────────────────────────────────────────────────────
-let swipeStartX = null;
-let swipeStartY = null;
-let didSwipe    = false;
+document.addEventListener('touchstart', (e) => {
+  if (bgSliding || e.touches.length !== 1) return;
+  if (swipeBlocked(e.target)) return;
+  dragStartX = e.touches[0].clientX;
+  dragStartY = e.touches[0].clientY;
+  dragViewW  = window.innerWidth || 1;
+  dragActive = true;
+  dragHoriz  = false;
+  didSwipe   = false;
+  dragNeighborIdx = -1;
+}, { passive: true });
 
-document.addEventListener('pointerdown', (e) => {
-  if (!e.isPrimary) return;
-  if (isRunning) return;                                  // nur im Ruhezustand
-  const t = e.target;
-  if (t instanceof Element && (t.closest('#audio-menu') || t.closest('#bottom-nav'))) return;
-  swipeStartX = e.clientX;
-  swipeStartY = e.clientY;
-  didSwipe = false;
-});
+document.addEventListener('touchmove', (e) => {
+  if (!dragActive) return;
+  const dx = e.touches[0].clientX - dragStartX;
+  const dy = e.touches[0].clientY - dragStartY;
 
-document.addEventListener('pointerup', (e) => {
-  if (!e.isPrimary || swipeStartX === null) return;
-  const dx = e.clientX - swipeStartX;
-  const dy = e.clientY - swipeStartY;
-  swipeStartX = null;
-  if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;   // kein klarer Horizontalwisch
-  if (isRunning) return;
-  didSwipe = true;
-  const direction = dx < 0 ? -1 : 1;
-  const next = dx < 0
+  if (!dragHoriz) {
+    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;            // Richtung noch unklar
+    if (Math.abs(dy) >= Math.abs(dx)) { dragActive = false; return; }  // vertikal → abbrechen
+    dragHoriz = true;
+    didSwipe  = true;
+    outgoingSceneEls().forEach(el => { el.style.transition = 'none'; });
+    bgSlideEl.style.transition = 'none';
+  }
+
+  e.preventDefault();   // Geste übernehmen, Browser-Scroll/Zurück verhindern
+
+  const dir = dx < 0 ? -1 : 1;
+  const neighborIdx = dir < 0
     ? (carouselIdx + 1) % BG_ORDER.length
     : (carouselIdx - 1 + BG_ORDER.length) % BG_ORDER.length;
-  slideBgTo(BG_ORDER[next], direction);
+  if (neighborIdx !== dragNeighborIdx) {
+    dragNeighborIdx = neighborIdx;
+    bgSlideEl.style.background = bgBaseStyle(BG_ORDER[neighborIdx]);
+  }
+  const base = dir < 0 ? '100%' : '-100%';
+  bgSlideEl.style.transform = `translateX(calc(${base} + ${dx}px))`;
+  outgoingSceneEls().forEach(el => { el.style.transform = `translateX(${dx}px)`; });
+}, { passive: false });
+
+function endDrag(dx) {
+  const ease = 'transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94)';
+  const outEls = outgoingSceneEls();
+  const passed = Math.abs(dx) > dragViewW * 0.18 && dragNeighborIdx !== -1;
+
+  if (passed) {
+    const dir = dx < 0 ? -1 : 1;
+    const exitTo = dir < 0 ? '-100%' : '100%';
+    const targetKey = BG_ORDER[dragNeighborIdx];
+    bgSliding = true;
+    bgSlideEl.style.transition = ease;
+    bgSlideEl.style.transform  = 'translateX(0)';
+    outEls.forEach(el => { el.style.transition = ease; el.style.transform = `translateX(${exitTo})`; });
+    setTimeout(() => {
+      outEls.forEach(el => { el.style.transition = 'none'; el.style.transform = ''; });
+      setBg(targetKey);
+      bgSlideEl.style.transition = 'none';
+      bgSlideEl.style.transform  = 'translateX(100%)';
+      bgSliding = false;
+    }, 300);
+  } else {
+    // Zurückschnappen ohne Wechsel
+    bgSlideEl.style.transition = ease;
+    bgSlideEl.style.transform  = 'translateX(' + (dx < 0 ? '100%' : '-100%') + ')';
+    outEls.forEach(el => { el.style.transition = ease; el.style.transform = 'translateX(0)'; });
+    setTimeout(() => {
+      outEls.forEach(el => { el.style.transition = 'none'; el.style.transform = ''; });
+      bgSlideEl.style.transition = 'none';
+      bgSlideEl.style.transform  = 'translateX(100%)';
+    }, 300);
+  }
+}
+
+document.addEventListener('touchend', (e) => {
+  if (!dragActive) return;
+  const wasHoriz = dragHoriz;
+  dragActive = false;
+  dragHoriz  = false;
+  if (!wasHoriz) return;
+  const dx = (e.changedTouches[0] ? e.changedTouches[0].clientX : dragStartX) - dragStartX;
+  endDrag(dx);
 });
 
-document.addEventListener('pointercancel', (e) => {
-  if (e.isPrimary) swipeStartX = null;
+document.addEventListener('touchcancel', () => {
+  if (dragActive && dragHoriz) endDrag(0);   // zurückschnappen
+  dragActive = false;
+  dragHoriz  = false;
 });
 
 // Zwischen-Gong Menü

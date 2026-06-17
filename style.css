@@ -721,9 +721,12 @@ input[type="range"]::-webkit-slider-thumb {
   right: 0;
   height: calc(64px + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(255,255,255,0.08);
+  /* Milchglas-Balken: einheitlich auf allen Hintergründen. Leichte Tönung +
+     Sättigung statt deckendem Schwarz, damit die Hintergrundfarbe durchscheint */
+  background: rgba(28,28,30,0.30);
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  border-top: 1px solid rgba(255,255,255,0.12);
   display: flex;
   align-items: center;
   justify-content: space-around;
