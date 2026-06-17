@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.80';
+const APP_VERSION = 'v1.81';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -94,6 +94,7 @@ let timerDimEnabled = false;
 
 // Berg-Modus: Gong kurz einblenden bei Tap
 let bergRevealTimeout = null;
+let bergGongVisible = false;
 const bergTapLayer = document.getElementById('berg-tap-layer');
 
 // Wake Lock
@@ -302,6 +303,7 @@ function stopTimer() {
   if (currentBg === 'berg' || currentBg === 'meer') {
     clearTimeout(bergRevealTimeout);
     bergRevealTimeout = null;
+    bergGongVisible = false;
     bergTapLayer.style.display = 'none';
     gongContainer.style.transition = 'opacity 1.5s ease';
     gongContainer.style.opacity = '';
@@ -487,12 +489,14 @@ function scheduleAutoDim(delayMs = 3000) {
   }
 }
 
-// Overlay: Tap während abgedunkelt → nur aufhellen, bleibt hell bis zum nächsten Tipp
+// Overlay: Tap während abgedunkelt → aufhellen. Dunkelt nach 2,5 Sek. von allein
+// wieder ab (wie der Gong bei Berg/Meer). Zweiter Tap dunkelt sofort ab (document-Handler).
 overlay.addEventListener('click', (e) => {
   e.stopPropagation();
   if (isRunning && isDimmed) {
     brighten();
-    if (timerDimEnabled) { clearTimeout(timerDimTimeout); brightenTimerText(); scheduleTimerDim(2500); }
+    scheduleAutoDim(4000);
+    if (timerDimEnabled) { clearTimeout(timerDimTimeout); brightenTimerText(); scheduleTimerDim(4000); }
   }
 });
 
@@ -516,23 +520,35 @@ gongEl.addEventListener('click', (e) => {
   }
 });
 
-// Berg-Tap-Layer: Tap → Gong erscheint kurz, verschwindet nach 2,5 Sek. automatisch
+// Gong (Berg/Meer) wieder ausblenden – genutzt vom Auto-Timeout UND vom zweiten Tap
+function hideBergGong() {
+  clearTimeout(bergRevealTimeout);
+  bergRevealTimeout = null;
+  gongContainer.style.transition = 'opacity 1.5s ease';
+  gongContainer.style.opacity = '0';
+  gongContainer.style.zIndex = '1';
+  if (timerDimEnabled) dimTimerText();
+  bergGongVisible = false;
+}
+
+// Berg-Tap-Layer:
+//  - Tap → Gong erscheint, verschwindet nach 2,5 Sek. automatisch
+//  - Zweiter Tap (solange Gong sichtbar) → Gong sofort wieder ausblenden
 bergTapLayer.addEventListener('click', (e) => {
   e.stopPropagation();
-  clearTimeout(bergRevealTimeout);
+  if (bergGongVisible) {            // schon sichtbar → sofort ausblenden
+    hideBergGong();
+    return;
+  }
   clearTimeout(timerDimTimeout);
   gongContainer.style.transition = 'opacity 1s ease';
   gongContainer.style.opacity = '0.7';
   gongContainer.style.zIndex = '3';
   brightenTimerText();
+  bergGongVisible = true;
   bergRevealTimeout = setTimeout(() => {
-    if (isRunning && (currentBg === 'berg' || currentBg === 'meer')) {
-      gongContainer.style.transition = 'opacity 1.5s ease';
-      gongContainer.style.opacity = '0';
-      gongContainer.style.zIndex = '1';
-      if (timerDimEnabled) dimTimerText();
-    }
-  }, 2500);
+    if (isRunning && (currentBg === 'berg' || currentBg === 'meer')) hideBergGong();
+  }, 4000);
 });
 
 // Tap auf Display (nicht Gong, nicht Nav) während Timer hell läuft → abdunkeln + Timer aufhellen
@@ -547,7 +563,7 @@ document.addEventListener('click', (e) => {
   if (timerDimEnabled && currentBg !== 'berg' && currentBg !== 'meer') {
     clearTimeout(timerDimTimeout);
     brightenTimerText();
-    scheduleTimerDim(2500);
+    scheduleTimerDim(4000);
   }
 });
 
