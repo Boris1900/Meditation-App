@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.85';
+const APP_VERSION = 'v1.86';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -1065,15 +1065,20 @@ function endDrag(dx) {
 
   if (passed) {
     const dir = dx < 0 ? -1 : 1;
-    const exitTo = dir < 0 ? '-100%' : '100%';
+    // In Pixeln (volle Viewport-Breite), NICHT in Prozent: die Szenen-Overlays
+    // (z.B. Meer-Sonne 300px) müssen wie das Bild ganz rausrutschen, sonst
+    // blitzen sie mittig über dem neuen Hintergrund auf.
+    const exitPx = dir < 0 ? -dragViewW : dragViewW;
     const targetKey = BG_ORDER[dragNeighborIdx];
     bgSliding = true;
     bgSlideEl.style.transition = ease;
     bgSlideEl.style.transform  = 'translateX(0)';
-    outEls.forEach(el => { el.style.transition = ease; el.style.transform = `translateX(${exitTo})`; });
+    outEls.forEach(el => { el.style.transition = ease; el.style.transform = `translateX(${exitPx}px)`; });
     setTimeout(() => {
-      outEls.forEach(el => { el.style.transition = 'none'; el.style.transform = ''; });
+      // Erst neuen Hintergrund setzen (versteckt alte Szenen-Overlays via display:none),
+      // DANN Transforms zurücksetzen – sonst blitzen Meer-Sonne/Reflexion 1 Frame in der Mitte auf
       setBg(targetKey);
+      outEls.forEach(el => { el.style.transition = 'none'; el.style.transform = ''; });
       bgSlideEl.style.transition = 'none';
       bgSlideEl.style.transform  = 'translateX(100%)';
       bgSliding = false;
