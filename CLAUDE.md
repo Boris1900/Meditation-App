@@ -2,7 +2,7 @@
 
 ## Übersicht
 Meditations-Timer mit Klangschale für Boris + Katharina, auch weitergebbar.
-PWA + Android APK via Capacitor. v1.75 live.
+PWA + Android APK via Capacitor. v1.88 live.
 GitHub Pages: https://boris1900.github.io/Meditation-App/ | Repo: Boris1900/Meditation-App
 Android-Paketname `de.tinnituspraxis.meditation` bleibt vorerst (Legacy).
 
@@ -10,18 +10,28 @@ Android-Paketname `de.tinnituspraxis.meditation` bleibt vorerst (Legacy).
 
 **Timer:** 1–90 Min, Wake Lock, 3 Klangschalen, Zwischen-Gong (Checkbox + Slider)
 
+**Statusleiste:** Während der Meditation komplett ausgeblendet (StatusBar.hide bei Start, show bei Stop). Nur in der Android-APK – iOS-PWA kann das nicht per JS.
+
 **Menü-Reihenfolge:**
 1. Gong-Sound wählen
 2. Zwischen-Gong
-3. Timeranzeige abdunkeln ☐ – übergeordnet alle Hintergründe; dimmt nach 3s, Tap hellt 2,5s auf
+3. Timeranzeige abdunkeln ☐ – übergeordnet alle Hintergründe
 4. Display abdunkeln – Slider 0–95%, gilt für ALLE außer Berg
 5. Hintergrund (10 Kästchen: Buddha, Erwachen, Abendrot, Schwarz, Sehr dunkel, Dunkelgrau, Dunkelblau, Dunkelgrün, Grasgrün, Gelb)
 6. Lebendige Flamme 🕯️ – erscheint nur bei Buddha
 7. Auf Update prüfen
 
+**Restzeit-Blick (einheitlich auf ALLEN Hintergründen, ab v1.81):**
+Während der Meditation ist abgedunkelt (Farben/Buddha = Display-Overlay; Berg/Meer = Gong unsichtbar). Tap zeigt Restzeit/Gong. Zweiter Tap blendet SOFORT wieder aus. Ohne Tap blendet es nach 4s von allein zurück.
+
+**Hintergrund-Karussell (ab v1.82, Wischen ab v1.85):**
+In der Hauptansicht (nur im Ruhezustand, nicht während Meditation) lässt sich mit dem Finger seitlich durch alle 10 Hintergründe wischen (Reihenfolge wie im Menü, Endlos-Schleife). Hintergrund folgt LIVE dem Finger (Touch-Events + preventDefault, NICHT Pointer – die brechen auf Android ab), rastet ab 18% Viewport-Breite ein, sonst Zurückschnappen. Dezente Seiten-Pünktchen (#bg-dots) über dem Hamburger zeigen die Position, blenden beim Start aus wie der Gong (reiner Indikator, nicht antippbar). Menü bleibt als Direktwähler. Slide-Ebene = #bg-slide; Kernfunktionen: BG_ORDER, bgBaseStyle, outgoingSceneEls, endDrag.
+
 **Immersive Hintergründe:**
-- **Erwachen (Berg):** Sonnenaufgang-Animation (schwarz → goldene Morgendämmerung). Gong unsichtbar, Tap → Gong + Timer 2,5s sichtbar. Abdunkelung deaktiviert.
-- **Abendrot (Meer):** Sonnenuntergang-Animation. Sonne sinkt, Aura wächst, Wasser 3-Punkte-Farbverlauf (orange → weinrot → dunkel). Gong wie Berg. Abdunkelung aktiv.
+- **Erwachen (Berg):** Sonnenaufgang-Animation (schwarz → goldene Morgendämmerung), Sternschnuppen. Abdunkelung deaktiviert. Beim Reinwischen sofort dunkel (Nacht-Schleier in bgBaseStyle eingebacken + showBergScene setzt overlay ohne 1,2s-Fade).
+- **Abendrot (Meer):** Sonnenuntergang-Animation. Sonne sinkt, Aura wächst, Wasser 3-Punkte-Farbverlauf (orange → weinrot → dunkel). Abdunkelung aktiv. Beim Reinwischen blendet die Szene sanft ein (fadeInMeerScene, ~550ms) statt schlagartig.
+
+**Milchglas-Balken:** #bottom-nav (Hamburger) ist auf allen Hintergründen einheitliches Milchglas (rgba(28,28,30,0.30) + blur(18px) saturate(1.6) + -webkit-backdrop-filter für iOS).
 
 **⚠️ Horizont-Regel (ab v1.74, am iPhone verifiziert):**
 Positionen IMMER per `getBoundingClientRect()` auf `#app-bg` messen – NIE aus `window.innerHeight` / `screen.height`. Auf iOS weichen diese Werte ab!
@@ -71,10 +81,10 @@ IMG_W_GONG=1024, IMG_H_GONG=1536, DISC_Y_PCT=0.537, DISC_R_PCT=0.292
 - Play Store (25€), weitere Klangschalen
 
 ## Arbeitsregeln
-⛔ **Nie pushen ohne Boris-OK.** Commit ok, aber vor `git push` immer fragen.
-⛔ **Push und APK immer zusammen** – nie nur eines von beiden.
-⛔ **Neue visuelle Features erst lokal testen** (`npx serve -p 3456 .`) → Feedback → dann push/APK.
-✅ **Immer erst fragen bevor umgesetzt wird.**
+✅ **Iterativer Fluss (ab 20.06.2026):** umsetzen → lokal/headless testen → committen + pushen + Release in EINEM Zug. Boris will bei diesem Projekt NICHT pro Schritt gefragt werden ("push doch gleich"). Direkt durchziehen, er beurteilt das Ergebnis am Gerät.
+⛔ **Push und APK immer zusammen** – nie nur eines von beiden. Version in `app.js` (APP_VERSION) + `sw.js` (CACHE_NAME) hochzählen.
+✅ **Visuelle Änderungen vorher prüfen:** lokal `npx serve -p 3456 .` + Playwright/headless. ACHTUNG: Service Worker cached hartnäckig die alte app.js – beim Testen per `navigator.serviceWorker.getRegistrations()` unregister + `caches.delete` leeren, dann reload.
+⚠️ Bei wirklich großen/riskanten Eingriffen (z.B. Horizont-Mechanik, Hosting/DNS) weiter vorher abstimmen. Siehe Memory [[feedback_schritte_nachfragen]].
 
 ## Kontext
 - Boris: Heilpraktiker, kein Entwickler, beurteilt visuell
