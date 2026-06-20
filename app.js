@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.86';
+const APP_VERSION = 'v1.87';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -718,7 +718,11 @@ function showBergScene(show) {
     createBergStars();
     overlay.style.display = 'block';
     stars.style.display   = 'block';
+    // Nacht sofort setzen, ohne 1,2s-Einblendung (sonst kurz hell beim Reinwischen)
+    overlay.style.transition = 'none';
     updateBergScene(0);
+    void overlay.offsetHeight;        // Reflow erzwingen
+    overlay.style.transition = '';    // CSS-Transition (1,2s) für den Sonnenaufgang zurück
   } else {
     overlay.style.display = 'none';
     stars.style.display   = 'none';
@@ -959,7 +963,9 @@ let carouselIdx = 0;
 function bgBaseStyle(key) {
   const color = BG_OPTIONS[key];
   if (color === null)   return "url('background.jpg') center center / cover no-repeat #1a1a1a";
-  if (color === 'berg') return 'url("berglandschaft_0.1.jpg") center center / cover no-repeat #000d18';
+  // Berg mit dunklem Nacht-Schleier eingebacken, damit es beim Reinwischen
+  // sofort dunkel ist (statt erst hell und dann nachzudunkeln)
+  if (color === 'berg') return 'linear-gradient(rgba(0,13,24,0.9), rgba(0,13,24,0.9)), url("berglandschaft_0.1.jpg") center center / cover no-repeat #000d18';
   if (color === 'meer') return 'url("meer_0.2.jpg") center center / cover no-repeat #1a0a00';
   return color;
 }

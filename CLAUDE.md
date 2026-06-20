@@ -6,7 +6,7 @@ PWA + Android APK via Capacitor. v1.75 live.
 GitHub Pages: https://boris1900.github.io/Meditation-App/ | Repo: Boris1900/Meditation-App
 Android-Paketname `de.tinnituspraxis.meditation` bleibt vorerst (Legacy).
 
-## Aktueller Stand – v1.86
+## Aktueller Stand – v1.87
 
 **Timer:** 1–90 Min, Wake Lock, 3 Klangschalen, Zwischen-Gong (Checkbox + Slider)
 
@@ -60,6 +60,7 @@ IMG_W_GONG=1024, IMG_H_GONG=1536, DISC_Y_PCT=0.537, DISC_R_PCT=0.292
 - v1.84 (nicht released, in v1.85 enthalten): Hamburger-Balken Milchglas einheitlich
 - v1.85: Zwei Dinge. (1) Hamburger-Balken (#bottom-nav) einheitliches Milchglas auf allen Hintergründen: statt deckendem rgba(0,0,0,0.5) jetzt rgba(28,28,30,0.30) + blur(18px) saturate(1.6) + -webkit-backdrop-filter (iOS) + hellere Oberkante (vorher bei Farbflächen schwarzer Klotz). (2) Wischen funktioniert jetzt auf echtem Android: Umstellung von Pointer- auf echte Touch-Events mit preventDefault (passive:false). Pointer-Events brachen mit pointercancel ab → nichts passierte. Hintergrund folgt jetzt LIVE dem Finger (touchmove translatiert #app-bg + Szenen-Overlays + #bg-slide), rastet ab 18% Viewport-Breite ein, sonst Zurückschnappen. slideBgTo entfernt (toter Code)
 - v1.86: Slide-Bugfix. Beim Wegwischen von Meer/Berg blitzten die Szenen-Overlays (Meer-Sonne, Reflexion) kurz mittig über dem neuen Hintergrund auf. Ursache: Abschluss-Animation nutzte translateX(-100%), aber die Overlays sind unterschiedlich groß (Sonne nur 300px), rutschten so nicht ganz raus. Fix: Exit jetzt in Pixeln (volle Viewport-Breite, dragViewW) statt Prozent; zusätzlich setBg vor dem Transform-Reset (versteckt Overlays früher)
+- v1.87: Berg beim Reinwischen sofort dunkel statt erst hell-dann-dunkel. (1) bgBaseStyle('berg') hat jetzt dunklen Nacht-Schleier eingebacken (linear-gradient rgba(0,13,24,0.9) über dem Bild), damit die Slide-Vorschau dunkel ist. (2) showBergScene setzt den berg-overlay beim Einblenden sofort (transition:none + reflow + restore), sonst blendete er von 0 auf 0.9 über 1,2s ein → kurz hell. Sonnenaufgang-Animation beim Timer bleibt erhalten
 
 ## Offene Punkte
 
