@@ -1,5 +1,5 @@
 // Version
-const APP_VERSION = 'v1.87';
+const APP_VERSION = 'v1.88';
 
 // Statusleiste in nativer App transparent machen (Inhalt geht darunter durch)
 window.addEventListener('load', () => {
@@ -826,6 +826,15 @@ function meerHorizonPx() {
   return rect.top + (MEER_HORIZON_FRAC * renderedH - offsetTop);
 }
 
+// Meer-Szene (Sonne, Aura, Reflexion, Wasser) sanft einblenden statt schlagartig –
+// fürs Reinwischen. Animiert nur die Opacity, fasst die Horizont-Positionierung nicht an.
+function fadeInMeerScene(ms = 550) {
+  [meerSunWrap, meerReflection, meerWaterColor].forEach(el => {
+    const target = getComputedStyle(el).opacity;   // Zielwert (z.B. Reflexion ~0.6)
+    el.animate([{ opacity: 0 }, { opacity: target }], { duration: ms, easing: 'ease' });
+  });
+}
+
 function showMeerScene(show) {
   if (show) {
     meerOverlay.style.display    = 'block';
@@ -1088,6 +1097,7 @@ function endDrag(dx) {
       bgSlideEl.style.transition = 'none';
       bgSlideEl.style.transform  = 'translateX(100%)';
       bgSliding = false;
+      if (targetKey === 'meer') fadeInMeerScene();   // Sonne & Co. sanft einblenden statt schlagartig
     }, 300);
   } else {
     // Zurückschnappen ohne Wechsel
